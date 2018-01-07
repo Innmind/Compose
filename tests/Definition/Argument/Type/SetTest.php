@@ -23,5 +23,6 @@ class SetTest extends TestCase
 
         $this->assertTrue($type->accepts(new S('stdClass')));
         $this->assertFalse($type->accepts(new S('foo')));
+        $this->assertFalse($type->accepts(new \stdClass));
     }
 }

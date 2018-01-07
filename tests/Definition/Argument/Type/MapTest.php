@@ -25,5 +25,7 @@ class MapTest extends TestCase
         $this->assertFalse($type->accepts(new M('foo', 'stdClass')));
         $this->assertFalse($type->accepts(new M('string', 'bar')));
         $this->assertFalse($type->accepts(new M('foo', 'bar')));
+        $this->assertFalse($type->accepts('foo'));
+        $this->assertFalse($type->accepts(new \stdClass));
     }
 }

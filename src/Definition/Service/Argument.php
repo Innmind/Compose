@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Innmind\Compose\Definition\Service;
 
+use Innmind\Compose\Definition\Name;
+
 final class Argument
 {
     private $name;

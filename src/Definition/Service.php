@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Compose\Definition;
 
 use Innmind\Compose\{
-    Definition\Service\Name,
     Definition\Service\Constructor,
     Definition\Service\Argument,
     Exception\ServiceCannotDecorateMultipleServices

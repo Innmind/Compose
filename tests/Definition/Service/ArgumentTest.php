@@ -3,8 +3,8 @@ declare(strict_types = 1);
 
 namespace Tests\Innmind\Compose\Definition\Service;
 
-use Innmind\Compose\Definition\Service\{
-    Argument,
+use Innmind\Compose\Definition\{
+    Service\Argument,
     Name
 };
 use PHPUnit\Framework\TestCase;

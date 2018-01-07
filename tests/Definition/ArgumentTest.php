@@ -5,9 +5,8 @@ namespace Tests\Innmind\Compose\Definition;
 
 use Innmind\Compose\{
     Definition\Argument,
-    Definition\Argument\Name,
+    Definition\Name,
     Definition\Argument\Type,
-    Definition\Service\Name as ServiceName,
     Exception\InvalidArgument
 };
 use PHPUnit\Framework\TestCase;
@@ -46,7 +45,7 @@ class ArgumentTest extends TestCase
             $this->createMock(Type::class)
         );
 
-        $argument2 = $argument->defaultsTo($name = new ServiceName('bar'));
+        $argument2 = $argument->defaultsTo($name = new Name('bar'));
 
         $this->assertInstanceOf(Argument::class, $argument2);
         $this->assertNotSame($argument, $argument2);

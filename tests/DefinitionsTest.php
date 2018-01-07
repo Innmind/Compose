@@ -7,10 +7,9 @@ use Innmind\Compose\{
     Definitions,
     Arguments,
     Definition\Argument,
-    Definition\Argument\Name as ArgName,
+    Definition\Name,
     Definition\Argument\Type\Primitive,
     Definition\Service,
-    Definition\Service\Name,
     Definition\Service\Constructor
 };
 use Innmind\Immutable\Map;
@@ -39,7 +38,7 @@ class DefinitionsTest extends TestCase
         $definitions = new Definitions(
             $arguments = new Arguments(
                 new Argument(
-                    new ArgName('baz'),
+                    new Name('baz'),
                     new Primitive('string')
                 )
             ),
@@ -61,6 +60,6 @@ class DefinitionsTest extends TestCase
         $this->assertNotSame($definitions->arguments(), $definitions2->arguments());
         $this->assertSame($arguments, $definitions->arguments());
         $this->assertNotSame($arguments, $definitions2->arguments());
-        $this->assertSame('42', $definitions2->arguments()->get(new ArgName('baz')));
+        $this->assertSame('42', $definitions2->arguments()->get(new Name('baz')));
     }
 }

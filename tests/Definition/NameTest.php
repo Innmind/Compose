@@ -1,10 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\Compose\Definition\Service;
+namespace Tests\Innmind\Compose\Definition;
 
 use Innmind\Compose\{
-    Definition\Service\Name,
+    Definition\Name,
     Exception\NameMustContainAtLeastACharacter
 };
 use PHPUnit\Framework\TestCase;

@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Compose\Definition;
 
 use Innmind\Compose\{
-    Definition\Argument\Name,
     Definition\Argument\Type,
     Exception\InvalidArgument
 };
@@ -35,7 +34,7 @@ final class Argument
         return $self;
     }
 
-    public function defaultsTo(Service\Name $name): self
+    public function defaultsTo(Name $name): self
     {
         $self = clone $this;
         $self->default = $name;
@@ -50,10 +49,10 @@ final class Argument
 
     public function hasDefault(): bool
     {
-        return $this->default instanceOf Service\Name;
+        return $this->default instanceOf Name;
     }
 
-    public function default(): Service\Name
+    public function default(): Name
     {
         return $this->default;
     }

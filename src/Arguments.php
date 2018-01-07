@@ -5,7 +5,7 @@ namespace Innmind\Compose;
 
 use Innmind\Compose\{
     Definition\Argument,
-    Definition\Argument\Name,
+    Definition\Name,
     Exception\MissingArgument,
     Exception\ArgumentNotProvided
 };

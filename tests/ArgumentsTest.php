@@ -6,9 +6,8 @@ namespace Tests\Innmind\Compose;
 use Innmind\Compose\{
     Arguments,
     Definition\Argument,
-    Definition\Argument\Name,
+    Definition\Name,
     Definition\Argument\Type\Primitive,
-    Definition\Service\Name as ServiceName,
     Exception\MissingArgument,
     Exception\InvalidArgument,
     Exception\ArgumentNotProvided
@@ -32,7 +31,7 @@ class ArgumentsTest extends TestCase
             (new Argument(
                 new Name('baz'),
                 new Primitive('string')
-            ))->defaultsTo(new ServiceName('foobar'))
+            ))->defaultsTo(new Name('foobar'))
         );
 
         $arguments2 = $arguments->bind(Map::of(
@@ -159,7 +158,7 @@ class ArgumentsTest extends TestCase
                 (new Argument(
                     new Name('foo'),
                     new Primitive('int')
-                ))->defaultsTo(new ServiceName('foobar'))
+                ))->defaultsTo(new Name('foobar'))
             ],
         ];
     }

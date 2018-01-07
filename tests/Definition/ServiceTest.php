@@ -5,7 +5,7 @@ namespace Tests\Innmind\Compose\Definition;
 
 use Innmind\Compose\{
     Definition\Service,
-    Definition\Service\Name,
+    Definition\Name,
     Definition\Service\Constructor,
     Definition\Service\Argument,
     Exception\ServiceCannotDecorateMultipleServices

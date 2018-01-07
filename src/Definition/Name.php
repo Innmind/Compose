@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Compose\Definition\Argument;
+namespace Innmind\Compose\Definition;
 
-use Innmind\Compose\Exception\NameMustBeAlphaNumeric;
+use Innmind\Compose\Exception\NameMustContainAtLeastACharacter;
 use Innmind\Immutable\Str;
 
 final class Name
@@ -12,8 +12,8 @@ final class Name
 
     public function __construct(string $value)
     {
-        if (!Str::of($value)->matches('~^[a-zA-Z0-9]+$~')) {
-            throw new NameMustBeAlphaNumeric($value);
+        if (Str::of($value)->empty()) {
+            throw new NameMustContainAtLeastACharacter;
         }
 
         $this->value = $value;

@@ -5,7 +5,7 @@ namespace Innmind\Compose;
 
 use Innmind\Compose\Definition\{
     Service,
-    Service\Name
+    Name
 };
 use Innmind\Immutable\{
     Sequence,

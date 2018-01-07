@@ -17,6 +17,7 @@ class ArgumentTest extends TestCase
 
         $this->assertInstanceOf(Argument::class, $argument);
         $this->assertTrue($argument->decorates());
+        $this->assertFalse($argument->toUnwind());
 
         $this->expectException(\TypeError::class);
         $argument->reference();
@@ -29,6 +30,18 @@ class ArgumentTest extends TestCase
 
         $this->assertInstanceOf(Argument::class, $argument);
         $this->assertFalse($argument->decorates());
+        $this->assertFalse($argument->toUnwind());
+        $this->assertSame($name, $argument->reference());
+    }
+
+    public function testUnwind()
+    {
+        $name = new Name('foo');
+        $argument = Argument::unwind($name);
+
+        $this->assertInstanceOf(Argument::class, $argument);
+        $this->assertFalse($argument->decorates());
+        $this->assertTrue($argument->toUnwind());
         $this->assertSame($name, $argument->reference());
     }
 }

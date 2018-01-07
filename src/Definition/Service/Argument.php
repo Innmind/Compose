@@ -6,10 +6,12 @@ namespace Innmind\Compose\Definition\Service;
 final class Argument
 {
     private $name;
+    private $unwind;
 
-    private function __construct(Name $name = null)
+    private function __construct(Name $name = null, bool $unwind = false)
     {
         $this->name = $name;
+        $this->unwind = $unwind;
     }
 
     public static function decorate(): self
@@ -22,6 +24,11 @@ final class Argument
         return new self($name);
     }
 
+    public static function unwind(Name $name): self
+    {
+        return new self($name, true);
+    }
+
     public function decorates(): bool
     {
         return is_null($this->name);
@@ -30,5 +37,10 @@ final class Argument
     public function reference(): Name
     {
         return $this->name;
+    }
+
+    public function toUnwind(): bool
+    {
+        return $this->unwind;
     }
 }

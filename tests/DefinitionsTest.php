@@ -9,6 +9,7 @@ use Innmind\Compose\{
     Definition\Argument,
     Definition\Name,
     Definition\Argument\Type\Primitive,
+    Definition\Argument\Type\Instance,
     Definition\Service,
     Definition\Service\Constructor
 };
@@ -61,5 +62,85 @@ class DefinitionsTest extends TestCase
         $this->assertSame($arguments, $definitions->arguments());
         $this->assertNotSame($arguments, $definitions2->arguments());
         $this->assertSame('42', $definitions2->arguments()->get(new Name('baz')));
+    }
+
+    public function testBuild()
+    {
+        $definitions = new Definitions(
+            new Arguments(
+                new Argument(
+                    new Name('firstArg'),
+                    new Primitive('int')
+                ),
+                (new Argument(
+                    new Name('secondArg'),
+                    new Instance('stdClass')
+                ))->defaultsTo(new Name('defaultStd')),
+                (new Argument(
+                    new Name('thirdArg'),
+                    new Primitive('array')
+                ))->makeOptional()
+            ),
+            new Service(
+                new Name('wished'),
+                new Constructor(ServiceFixture::class),
+                Service\Argument::variable(new Name('firstArg')),
+                Service\Argument::variable(new Name('secondArg')),
+                Service\Argument::unwind(new Name('thirdArg'))
+            ),
+            new Service(
+                new Name('defaultStd'),
+                new Constructor('stdClass')
+            )
+        );
+
+        $service = $definitions
+            ->inject(Map::of('string', 'mixed', ['firstArg'], [42]))
+            ->build(new Name('wished'));
+
+        $this->assertInstanceOf(ServiceFixture::class, $service);
+        $this->assertSame(42, $service->first);
+        $this->assertInstanceOf('stdClass', $service->second);
+        $this->assertSame([], $service->third);
+
+        $service = $definitions
+            ->inject(Map::of(
+                'string',
+                'mixed',
+                ['firstArg', 'secondArg'],
+                [
+                    42,
+                    $expected = new \stdClass,
+                ]
+            ))
+            ->build(new Name('wished'));
+
+        $this->assertInstanceOf(ServiceFixture::class, $service);
+        $this->assertSame(42, $service->first);
+        $this->assertSame($expected, $service->second);
+        $this->assertSame([], $service->third);
+
+        $service = $definitions
+            ->inject(Map::of('string', 'mixed', ['firstArg', 'thirdArg'], [42, [1, 2, 3]]))
+            ->build(new Name('wished'));
+
+        $this->assertInstanceOf(ServiceFixture::class, $service);
+        $this->assertSame(42, $service->first);
+        $this->assertInstanceOf('stdClass', $service->second);
+        $this->assertSame([1, 2, 3], $service->third);
+    }
+}
+
+class ServiceFixture
+{
+    public $first;
+    public $second;
+    public $third;
+
+    public function __construct(int $first, \stdClass $second, ...$third)
+    {
+        $this->first = $first;
+        $this->second = $second;
+        $this->third = $third;
     }
 }

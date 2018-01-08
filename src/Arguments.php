@@ -7,7 +7,8 @@ use Innmind\Compose\{
     Definition\Argument,
     Definition\Name,
     Exception\MissingArgument,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Exception\ArgumentNotDefined
 };
 use Innmind\Immutable\{
     Sequence,
@@ -80,6 +81,10 @@ final class Arguments
      */
     public function get(Name $name)
     {
+        if (!$this->arguments->contains((string) $name)) {
+            throw new ArgumentNotDefined((string) $name);
+        }
+
         if (!$this->values->contains((string) $name)) {
             throw new ArgumentNotProvided($this->arguments->get((string) $name));
         }

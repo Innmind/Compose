@@ -146,4 +146,29 @@ class DefinitionsTest extends TestCase
         $this->assertInstanceOf('stdClass', $definitions->build(new Name('foo')));
         $this->assertInstanceOf('stdClass', $definitions->build(new Name('bar')));
     }
+
+    public function testBuildWithADirectDependencyToAnotherService()
+    {
+        $definitions = new Definitions(
+            new Arguments(
+                new Argument(
+                    new Name('firstArg'),
+                    new Primitive('int')
+                )
+            ),
+            (new Service(
+                new Name('wished'),
+                new Constructor(ServiceFixture::class),
+                Service\Argument::variable(new Name('firstArg')),
+                Service\Argument::variable(new Name('defaultStd'))
+            ))->exposeAs(new Name('foo')),
+            new Service(
+                new Name('defaultStd'),
+                new Constructor('stdClass')
+            )
+        );
+        $definitions = $definitions->inject(Map::of('string', 'mixed', ['firstArg'], [42]));
+
+        $this->assertInstanceOf(ServiceFixture::class, $definitions->build(new Name('wished')));
+    }
 }

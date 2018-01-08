@@ -7,7 +7,8 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service,
     Definition\Service\Argument,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Exception\ArgumentNotDefined
 };
 use Innmind\Immutable\{
     Sequence,
@@ -114,11 +115,11 @@ final class Definitions
         try {
             return $this->arguments->get($argument->reference());
         } catch (ArgumentNotProvided $e) {
-            //pass
-        }
-
-        if ($e->argument()->hasDefault()) {
-            return $this->build($e->argument()->default());
+            if ($e->argument()->hasDefault()) {
+                return $this->build($e->argument()->default());
+            }
+        } catch (ArgumentNotDefined $e) {
+            return $this->build($argument->reference());
         }
 
         //null as the argument must be optional here, requirement as been

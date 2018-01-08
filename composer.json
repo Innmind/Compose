@@ -26,7 +26,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Innmind\\Compose\\": "tests/"
+            "Tests\\Innmind\\Compose\\": "tests/",
+            "Fixture\\Innmind\\Compose\\": "fixtures/"
         }
     },
     "require-dev": {

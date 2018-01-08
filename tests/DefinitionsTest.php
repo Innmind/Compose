@@ -15,6 +15,7 @@ use Innmind\Compose\{
 };
 use Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
+use Fixture\Innmind\Compose\ServiceFixture;
 
 class DefinitionsTest extends TestCase
 {
@@ -128,19 +129,5 @@ class DefinitionsTest extends TestCase
         $this->assertSame(42, $service->first);
         $this->assertInstanceOf('stdClass', $service->second);
         $this->assertSame([1, 2, 3], $service->third);
-    }
-}
-
-class ServiceFixture
-{
-    public $first;
-    public $second;
-    public $third;
-
-    public function __construct(int $first, \stdClass $second, ...$third)
-    {
-        $this->first = $first;
-        $this->second = $second;
-        $this->third = $third;
     }
 }

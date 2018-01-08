@@ -58,6 +58,9 @@ class ServiceTest extends TestCase
         $this->assertTrue($service2->exposed());
         $this->assertSame($name, $service2->name());
         $this->assertSame($expose, $service2->exposedAs());
+        $this->assertFalse($service->isExposedAs($expose));
+        $this->assertTrue($service2->isExposedAs($expose));
+        $this->assertFalse($service2->isExposedAs(new Name('unknown')));
     }
 
     public function testThrowWhenTryingToDecorateMultipleService()

@@ -56,6 +56,11 @@ final class Service
         return $this->exposeName;
     }
 
+    public function isExposedAs(Name $name): bool
+    {
+        return (string) $this->exposeName === (string) $name;
+    }
+
     public function name(): Name
     {
         return $this->name;

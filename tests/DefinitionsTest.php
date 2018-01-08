@@ -23,16 +23,18 @@ class DefinitionsTest extends TestCase
     {
         $definitions = new Definitions(
             $arguments = new Arguments,
-            $service = new Service(
+            $service = (new Service(
                 new Name('foo'),
                 new Constructor('stdClass')
-            )
+            ))->exposeAs(new Name('baz'))
         );
 
         $this->assertSame($arguments, $definitions->arguments());
         $this->assertTrue($definitions->has(new Name('foo')));
+        $this->assertTrue($definitions->has(new Name('baz')));
         $this->assertFalse($definitions->has(new Name('bar')));
         $this->assertSame($service, $definitions->get(new Name('foo')));
+        $this->assertSame($service, $definitions->get(new Name('baz')));
     }
 
     public function testInject()
@@ -129,5 +131,19 @@ class DefinitionsTest extends TestCase
         $this->assertSame(42, $service->first);
         $this->assertInstanceOf('stdClass', $service->second);
         $this->assertSame([1, 2, 3], $service->third);
+    }
+
+    public function testBuildViaExposedName()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            (new Service(
+                new Name('foo'),
+                new Constructor('stdClass')
+            ))->exposeAs(new Name('bar'))
+        );
+
+        $this->assertInstanceOf('stdClass', $definitions->build(new Name('foo')));
+        $this->assertInstanceOf('stdClass', $definitions->build(new Name('bar')));
     }
 }

@@ -12,12 +12,14 @@ use Innmind\Compose\{
 use Innmind\Immutable\{
     Sequence,
     MapInterface,
-    Map
+    Map,
+    Pair
 };
 
 final class Definitions
 {
     private $definitions;
+    private $exposed;
     private $arguments;
 
     public function __construct(Arguments $arguments, Service ...$definitions)
@@ -32,6 +34,17 @@ final class Definitions
                 );
             }
         );
+        $this->exposed = $this
+            ->definitions
+            ->filter(static function(string $name, Service $definition): bool {
+                return $definition->exposed();
+            })
+            ->map(static function(string $name, Service $definition): Pair {
+                return new Pair(
+                    (string) $definition->exposedAs(),
+                    $definition
+                );
+            });
     }
 
     /**
@@ -61,12 +74,20 @@ final class Definitions
 
     public function has(Name $name): bool
     {
-        return $this->definitions->contains((string) $name);
+        if ($this->definitions->contains((string) $name)) {
+            return true;
+        }
+
+        return $this->exposed->contains((string) $name);
     }
 
     public function get(Name $name): Service
     {
-        return $this->definitions->get((string) $name);
+        try {
+            return $this->definitions->get((string) $name);
+        } catch (\Exception $e) {
+            return $this->exposed->get((string) $name);
+        }
     }
 
     public function buildArguments(Service $service): Sequence

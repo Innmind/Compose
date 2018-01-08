@@ -11,7 +11,8 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Definition\Argument\Type\Instance,
     Definition\Service,
-    Definition\Service\Constructor
+    Definition\Service\Constructor,
+    Exception\AtLeastOneServiceMustBeExposed
 };
 use Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
@@ -46,10 +47,10 @@ class DefinitionsTest extends TestCase
                     new Primitive('string')
                 )
             ),
-            $service = new Service(
+            $service = (new Service(
                 new Name('foo'),
                 new Constructor('stdClass')
-            )
+            ))->exposeAs(new Name('watev'))
         );
 
         $definitions2 = $definitions->inject(Map::of(
@@ -84,13 +85,13 @@ class DefinitionsTest extends TestCase
                     new Primitive('array')
                 ))->makeOptional()
             ),
-            new Service(
+            (new Service(
                 new Name('wished'),
                 new Constructor(ServiceFixture::class),
                 Service\Argument::variable(new Name('firstArg')),
                 Service\Argument::variable(new Name('secondArg')),
                 Service\Argument::unwind(new Name('thirdArg'))
-            ),
+            ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('defaultStd'),
                 new Constructor('stdClass')
@@ -170,5 +171,12 @@ class DefinitionsTest extends TestCase
         $definitions = $definitions->inject(Map::of('string', 'mixed', ['firstArg'], [42]));
 
         $this->assertInstanceOf(ServiceFixture::class, $definitions->build(new Name('wished')));
+    }
+
+    public function testThrowWhenNoServiceExposed()
+    {
+        $this->expectException(AtLeastOneServiceMustBeExposed::class);
+
+        new Definitions(new Arguments);
     }
 }

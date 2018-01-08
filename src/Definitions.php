@@ -8,7 +8,8 @@ use Innmind\Compose\{
     Definition\Service,
     Definition\Service\Argument,
     Exception\ArgumentNotProvided,
-    Exception\ArgumentNotDefined
+    Exception\ArgumentNotDefined,
+    Exception\AtLeastOneServiceMustBeExposed
 };
 use Innmind\Immutable\{
     Sequence,
@@ -46,6 +47,10 @@ final class Definitions
                     $definition
                 );
             });
+
+        if ($this->exposed->size() === 0) {
+            throw new AtLeastOneServiceMustBeExposed;
+        }
     }
 
     /**

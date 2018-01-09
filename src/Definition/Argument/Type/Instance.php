@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Compose\Definition\Argument\Type;
 
 use Innmind\Compose\Definition\Argument\Type;
+use Innmind\Immutable\Str;
 
 final class Instance implements Type
 {
@@ -20,5 +21,13 @@ final class Instance implements Type
     public function accepts($value): bool
     {
         return $value instanceof $this->class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function fromString(Str $value): Type
+    {
+        return new self((string) $value);
     }
 }

@@ -7,6 +7,7 @@ use Innmind\Compose\Definition\Argument\{
     Type\Instance,
     Type
 };
+use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
 
 class InstanceTest extends TestCase
@@ -22,5 +23,12 @@ class InstanceTest extends TestCase
 
         $this->assertTrue($type->accepts(new \stdClass));
         $this->assertFalse($type->accepts(new class{}));
+    }
+
+    public function testFromString()
+    {
+        $this->assertTrue(
+            Instance::fromString(Str::of('stdClass'))->accepts(new \stdClass)
+        );
     }
 }

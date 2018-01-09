@@ -5,8 +5,10 @@ namespace Innmind\Compose\Definition\Argument\Type;
 
 use Innmind\Compose\{
     Definition\Argument\Type,
-    Exception\NotAPrimitiveType
+    Exception\NotAPrimitiveType,
+    Exception\ValueNotSupported
 };
+use Innmind\Immutable\Str;
 
 final class Primitive implements Type
 {
@@ -27,5 +29,17 @@ final class Primitive implements Type
     public function accepts($value): bool
     {
         return ($this->function)($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function fromString(Str $value): Type
+    {
+        try {
+            return new self((string) $value);
+        } catch (NotAPrimitiveType $e) {
+            throw new ValueNotSupported((string) $value, 0, $e);
+        }
     }
 }

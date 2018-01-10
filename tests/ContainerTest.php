@@ -35,8 +35,8 @@ class ContainerTest extends TestCase
             (new Service(
                 new Name('wished'),
                 new Constructor(ServiceFixture::class),
-                Service\Argument::variable(new Name('firstArg')),
-                Service\Argument::variable(new Name('defaultStd'))
+                Service\Argument\Reference::fromValue('$firstArg'),
+                Service\Argument\Reference::fromValue('$defaultStd')
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('defaultStd'),

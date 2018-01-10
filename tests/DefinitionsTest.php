@@ -88,9 +88,9 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('wished'),
                 new Constructor(ServiceFixture::class),
-                Service\Argument::variable(new Name('firstArg')),
-                Service\Argument::variable(new Name('secondArg')),
-                Service\Argument::unwind(new Name('thirdArg'))
+                Service\Argument\Reference::fromValue('$firstArg'),
+                Service\Argument\Reference::fromValue('$secondArg'),
+                Service\Argument\Unwind::fromValue('...$thirdArg')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('defaultStd'),
@@ -160,8 +160,8 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('wished'),
                 new Constructor(ServiceFixture::class),
-                Service\Argument::variable(new Name('firstArg')),
-                Service\Argument::variable(new Name('defaultStd'))
+                Service\Argument\Reference::fromValue('$firstArg'),
+                Service\Argument\Reference::fromValue('$defaultStd')
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('defaultStd'),
@@ -187,8 +187,8 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('wished'),
                 new Constructor(ServiceFixture::class),
-                Service\Argument::primitive(42),
-                Service\Argument::variable(new Name('defaultStd'))
+                Service\Argument\Primitive::fromValue(42),
+                Service\Argument\Reference::fromValue('$defaultStd')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('defaultStd'),

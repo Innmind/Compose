@@ -6,6 +6,7 @@ namespace Innmind\Compose\Definition;
 use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service\Argument,
+    Definitions,
     Exception\ServiceCannotDecorateMultipleServices
 };
 use Innmind\Immutable\{
@@ -16,7 +17,7 @@ use Innmind\Immutable\{
 final class Service
 {
     private $name;
-    private $constructor;
+    private $construct;
     private $arguments;
     private $exposeName;
 
@@ -26,11 +27,11 @@ final class Service
         Argument ...$arguments
     ) {
         $this->name = $name;
-        $this->constructor = $constructor;
+        $this->construct = $constructor;
         $this->arguments = Stream::of(Argument::class, ...$arguments);
 
         $decorates = $this->arguments->filter(static function(Argument $argument): bool {
-            return $argument->decorates();
+            return $argument instanceof Argument\Decorate;
         });
 
         if ($decorates->size() > 1) {
@@ -68,7 +69,7 @@ final class Service
 
     public function constructor(): Constructor
     {
-        return $this->constructor;
+        return $this->construct;
     }
 
     /**
@@ -77,5 +78,15 @@ final class Service
     public function arguments(): StreamInterface
     {
         return $this->arguments;
+    }
+
+    public function build(Definitions $definitions): object
+    {
+        return ($this->construct)(...$this->arguments->reduce(
+            Stream::of('mixed'),
+            static function(Stream $arguments, Argument $argument) use ($definitions): Stream {
+                return $argument->resolve($arguments, $definitions);
+            }
+        ));
     }
 }

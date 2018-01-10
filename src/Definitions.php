@@ -66,11 +66,7 @@ final class Definitions
 
     public function build(Name $name): object
     {
-        $definition = $this->get($name);
-        $arguments = $this->buildArguments($definition);
-        $construct = $definition->constructor();
-
-        return $construct(...$arguments);
+        return $this->get($name)->build($this);
     }
 
     public function arguments(): Arguments
@@ -94,46 +90,5 @@ final class Definitions
         } catch (\Exception $e) {
             return $this->exposed->get((string) $name);
         }
-    }
-
-    public function buildArguments(Service $service): Sequence
-    {
-        return $service
-            ->arguments()
-            ->reduce(
-                new Sequence,
-                function(Sequence $arguments, Argument $argument): Sequence {
-                    // @todo: handle the decoration
-                    $value = $this->fetchArgumentValue($argument);
-
-                    if ($argument->toUnwind()) {
-                        return $arguments->append(new Sequence(...$value ?? []));
-                    }
-
-                    return $arguments->add($value);
-                }
-            );
-    }
-
-    public function fetchArgumentValue(Argument $argument)
-    {
-        if ($argument->isPrimitive()) {
-            return $argument->value();
-        }
-
-        try {
-            return $this->arguments->get($argument->reference());
-        } catch (ArgumentNotProvided $e) {
-            if ($e->argument()->hasDefault()) {
-                return $this->build($e->argument()->default());
-            }
-        } catch (ArgumentNotDefined $e) {
-            return $this->build($argument->reference());
-        }
-
-        //null as the argument must be optional here, requirement as been
-        //checked earlier
-
-        return null;
     }
 }

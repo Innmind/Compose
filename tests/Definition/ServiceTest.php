@@ -29,8 +29,8 @@ class ServiceTest extends TestCase
         $service = new Service(
             $name = new Name('foo'),
             $constructor = new Constructor($class),
-            $arg1 = Argument::decorate(),
-            $arg2 = Argument::variable(new Name('bar'))
+            $arg1 = Argument\Decorate::fromValue('@decorated'),
+            $arg2 = Argument\Reference::fromValue('$bar')
         );
 
         $this->assertSame($name, $service->name());
@@ -80,8 +80,8 @@ class ServiceTest extends TestCase
                 new Service(
                     new Name('foo'),
                     new Constructor($class),
-                    Argument::decorate(),
-                    Argument::decorate()
+                    Argument\Decorate::fromValue('@decorated'),
+                    Argument\Decorate::fromValue('@decorated')
                 );
             });
     }

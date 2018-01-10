@@ -117,6 +117,10 @@ final class Definitions
 
     public function fetchArgumentValue(Argument $argument)
     {
+        if ($argument->isPrimitive()) {
+            return $argument->value();
+        }
+
         try {
             return $this->arguments->get($argument->reference());
         } catch (ArgumentNotProvided $e) {

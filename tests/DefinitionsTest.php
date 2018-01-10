@@ -179,4 +179,26 @@ class DefinitionsTest extends TestCase
 
         new Definitions(new Arguments);
     }
+
+    public function testBuildWithAPrimitiveArgument()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            (new Service(
+                new Name('wished'),
+                new Constructor(ServiceFixture::class),
+                Service\Argument::primitive(42),
+                Service\Argument::variable(new Name('defaultStd'))
+            ))->exposeAs(new Name('watev')),
+            new Service(
+                new Name('defaultStd'),
+                new Constructor('stdClass')
+            )
+        );
+
+        $service = $definitions->build(new Name('watev'));
+
+        $this->assertInstanceOf(ServiceFixture::class, $service);
+        $this->assertSame(42, $service->first);
+    }
 }

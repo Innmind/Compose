@@ -18,6 +18,7 @@ class ArgumentTest extends TestCase
         $this->assertInstanceOf(Argument::class, $argument);
         $this->assertTrue($argument->decorates());
         $this->assertFalse($argument->toUnwind());
+        $this->assertFalse($argument->isPrimitive());
 
         $this->expectException(\TypeError::class);
         $argument->reference();
@@ -31,6 +32,7 @@ class ArgumentTest extends TestCase
         $this->assertInstanceOf(Argument::class, $argument);
         $this->assertFalse($argument->decorates());
         $this->assertFalse($argument->toUnwind());
+        $this->assertFalse($argument->isPrimitive());
         $this->assertSame($name, $argument->reference());
     }
 
@@ -41,7 +43,22 @@ class ArgumentTest extends TestCase
 
         $this->assertInstanceOf(Argument::class, $argument);
         $this->assertFalse($argument->decorates());
+        $this->assertFalse($argument->isPrimitive());
         $this->assertTrue($argument->toUnwind());
         $this->assertSame($name, $argument->reference());
+    }
+
+    public function testPrimitive()
+    {
+        $argument = Argument::primitive('foo');
+
+        $this->assertInstanceOf(Argument::class, $argument);
+        $this->assertTrue($argument->isPrimitive());
+        $this->assertFalse($argument->decorates());
+        $this->assertFalse($argument->toUnwind());
+        $this->assertSame('foo', $argument->value());
+
+        $this->expectException(\TypeError::class);
+        $argument->reference();
     }
 }

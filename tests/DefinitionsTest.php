@@ -12,7 +12,8 @@ use Innmind\Compose\{
     Definition\Argument\Type\Instance,
     Definition\Service,
     Definition\Service\Constructor,
-    Exception\AtLeastOneServiceMustBeExposed
+    Exception\AtLeastOneServiceMustBeExposed,
+    Exception\CircularDependency
 };
 use Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
@@ -200,5 +201,59 @@ class DefinitionsTest extends TestCase
 
         $this->assertInstanceOf(ServiceFixture::class, $service);
         $this->assertSame(42, $service->first);
+    }
+
+    public function testThrowExceptionWhenCircularDependencyFound()
+    {
+        $this->expectException(CircularDependency::class);
+        $this->expectExceptionMessage('foo -> bar -> foo');
+
+        $definitions = new Definitions(
+            new Arguments,
+            (new Service(
+                new Name('foo'),
+                new Constructor('stdClass'),
+                Service\Argument\Reference::fromValue('$bar')
+            ))->exposeAs(new Name('watev')),
+            new Service(
+                new Name('bar'),
+                new Constructor('stdClass'),
+                Service\Argument\Reference::fromValue('$foo')
+            )
+        );
+
+        $definitions->build(new Name('foo'));
+    }
+
+    public function testDoesntRethrowWhenBuildingAValidServiceAfterACircularDependencyFound()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            (new Service(
+                new Name('foo'),
+                new Constructor('stdClass'),
+                Service\Argument\Reference::fromValue('$baz'),
+                Service\Argument\Reference::fromValue('$bar')
+            ))->exposeAs(new Name('watev')),
+            new Service(
+                new Name('bar'),
+                new Constructor('stdClass'),
+                Service\Argument\Reference::fromValue('$foo')
+            ),
+            new Service(
+                new Name('baz'),
+                new Constructor('stdClass')
+            )
+        );
+
+        try {
+            $definitions->build(new Name('foo'));
+
+            $this->fail('it should throw');
+        } catch (CircularDependency $e) {
+            //pass
+        }
+
+        $this->assertInstanceOf('stdClass', $definitions->build(new Name('baz')));
     }
 }

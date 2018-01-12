@@ -9,13 +9,15 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
-    Exception\AtLeastOneServiceMustBeExposed
+    Exception\AtLeastOneServiceMustBeExposed,
+    Exception\CircularDependency
 };
 use Innmind\Immutable\{
     Sequence,
     MapInterface,
     Map,
-    Pair
+    Pair,
+    Stream
 };
 
 final class Definitions
@@ -23,6 +25,7 @@ final class Definitions
     private $definitions;
     private $exposed;
     private $arguments;
+    private $building;
 
     public function __construct(Arguments $arguments, Service ...$definitions)
     {
@@ -51,6 +54,8 @@ final class Definitions
         if ($this->exposed->size() === 0) {
             throw new AtLeastOneServiceMustBeExposed;
         }
+
+        $this->building = Stream::of('string');
     }
 
     /**
@@ -60,13 +65,35 @@ final class Definitions
     {
         $self = clone $this;
         $self->arguments = $self->arguments->bind($arguments);
+        $self->building = $self->building->clear();
 
         return $self;
     }
 
     public function build(Name $name): object
     {
-        return $this->get($name)->build($this);
+        try {
+            if ($this->building->contains((string) $name)) {
+                throw new CircularDependency(
+                    (string) $this
+                        ->building
+                        ->add((string) $name)
+                        ->join(' -> ')
+                );
+            }
+
+            $this->building = $this->building->add((string) $name);
+
+            $service = $this->get($name)->build($this);
+
+            $this->building = $this->building->dropEnd(1);
+        } catch (\Throwable $e) {
+            $this->building = $this->building->clear();
+
+            throw $e;
+        }
+
+        return $service;
     }
 
     public function arguments(): Arguments

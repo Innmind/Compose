@@ -8,7 +8,8 @@ use Innmind\Compose\{
     Loader,
     Definition\Name,
     Definition\Argument\Types,
-    Definition\Service\Arguments
+    Definition\Service\Arguments,
+    Definition\Service\Constructors
 };
 use Innmind\Url\Path;
 use Innmind\Immutable\Map;
@@ -21,13 +22,13 @@ class YamlTest extends TestCase
     {
         $this->assertInstanceOf(
             Loader::class,
-            new Yaml(new Types, new Arguments)
+            new Yaml(new Types, new Arguments, new Constructors)
         );
     }
 
     public function testLoadFullContainer()
     {
-        $load = new Yaml(new Types, new Arguments);
+        $load = new Yaml(new Types, new Arguments, new Constructors);
 
         $definitions = $load(new Path('fixtures/container/full.yml'));
 

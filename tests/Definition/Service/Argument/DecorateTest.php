@@ -14,7 +14,10 @@ use Innmind\Compose\{
     Exception\ValueNotSupported,
     Exception\DecoratedArgumentCannotBeResolved
 };
-use Innmind\Immutable\Stream;
+use Innmind\Immutable\{
+    Stream,
+    Str
+};
 use PHPUnit\Framework\TestCase;
 
 class DecorateTest extends TestCase
@@ -44,7 +47,7 @@ class DecorateTest extends TestCase
                 new Arguments,
                 (new Service(
                     new Name('foo'),
-                    new Constructor('stdClass')
+                    Constructor\Construct::fromString(Str::of('stdClass'))
                 ))->exposeAs(new Name('foo'))
             )
         );

@@ -18,7 +18,8 @@ use Innmind\Compose\{
 use Innmind\Immutable\{
     StreamInterface,
     Stream,
-    Map
+    Map,
+    Str
 };
 use PHPUnit\Framework\TestCase;
 
@@ -58,7 +59,7 @@ class UnwindTest extends TestCase
             ),
             (new Service(
                 new Name('foo'),
-                new Constructor('stdClass')
+                Constructor\Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
         $definitions = $definitions->inject(Map::of(
@@ -90,7 +91,7 @@ class UnwindTest extends TestCase
             ),
             (new Service(
                 new Name('foo'),
-                new Constructor('stdClass')
+                Constructor\Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
         $definitions = $definitions->inject(Map::of(
@@ -118,11 +119,11 @@ class UnwindTest extends TestCase
                 new Arguments,
                 (new Service(
                     new Name('foo'),
-                    new Constructor('stdClass')
+                    Constructor\Construct::fromString(Str::of('stdClass'))
                 ))->exposeAs(new Name('foo')),
                 new Service(
                     new Name('baz'),
-                    new Constructor(\SplObjectStorage::class)
+                    Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
                 )
             )
         );
@@ -143,11 +144,11 @@ class UnwindTest extends TestCase
             ),
             (new Service(
                 new Name('foo'),
-                new Constructor('stdClass')
+                Constructor\Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('bar'),
-                new Constructor(\SplObjectStorage::class)
+                Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
             )
         );
         $definitions = $definitions->inject(Map::of(

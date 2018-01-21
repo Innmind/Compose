@@ -14,7 +14,8 @@ use Innmind\Compose\{
 };
 use Innmind\Immutable\{
     StreamInterface,
-    Stream
+    Stream,
+    Str
 };
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +37,7 @@ class PrimitiveTest extends TestCase
                 new Arguments,
                 (new Service(
                     new Name('foo'),
-                    new Constructor('stdClass')
+                    Constructor\Construct::fromString(Str::of('stdClass'))
                 ))->exposeAs(new Name('foo'))
             )
         );

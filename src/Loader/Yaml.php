@@ -12,7 +12,7 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service,
     Definition\Service\Arguments as ServiceArguments,
-    Definition\Service\Constructor,
+    Definition\Service\Constructors,
     Exception\DomainException
 };
 use Innmind\Url\PathInterface;
@@ -36,9 +36,13 @@ final class Yaml implements Loader
     private $resolver;
     private $types;
     private $arguments;
+    private $constructors;
 
-    public function __construct(Types $types, ServiceArguments $arguments)
-    {
+    public function __construct(
+        Types $types,
+        ServiceArguments $arguments,
+        Constructors $constructors
+    ) {
         $this->resolver = new OptionsResolver;
         $this->resolver->setRequired(['expose', 'services']);
         $this->resolver->setDefined('arguments');
@@ -48,6 +52,7 @@ final class Yaml implements Loader
         $this->resolver->setDefault('arguments', []);
         $this->types = $types;
         $this->arguments = $arguments;
+        $this->constructors = $constructors;
     }
 
     public function __invoke(PathInterface $definition): Definitions
@@ -174,9 +179,7 @@ final class Yaml implements Loader
                     ->add((string) $components->get('name'))
                     ->join('.')
             ),
-            new Constructor(
-                (string) $components->get('constructor')->trim('  ') //space and non breaking space
-            ),
+            $this->constructors->load($components->get('constructor')->trim('  ')), //space and non breaking space
             ...$arguments
         );
     }

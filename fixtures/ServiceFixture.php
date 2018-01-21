@@ -15,4 +15,9 @@ final class ServiceFixture
         $this->second = $second;
         $this->third = $third;
     }
+
+    public static function make(...$arguments): self
+    {
+        return new self(...$arguments);
+    }
 }

@@ -14,7 +14,10 @@ use Innmind\Compose\{
     Definition\Service\Constructor,
     Exception\NotFound
 };
-use Innmind\Immutable\Map;
+use Innmind\Immutable\{
+    Map,
+    Str
+};
 use Psr\Container\ContainerInterface;
 use PHPUnit\Framework\TestCase;
 use Fixture\Innmind\Compose\ServiceFixture;
@@ -34,13 +37,13 @@ class ContainerTest extends TestCase
             ),
             (new Service(
                 new Name('wished'),
-                new Constructor(ServiceFixture::class),
+                Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
                 Service\Argument\Reference::fromValue('$firstArg'),
                 Service\Argument\Reference::fromValue('$defaultStd')
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('defaultStd'),
-                new Constructor('stdClass')
+                Constructor\Construct::fromString(Str::of('stdClass'))
             )
         );
 

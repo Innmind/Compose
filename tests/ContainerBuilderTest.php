@@ -8,7 +8,8 @@ use Innmind\Compose\{
     Container,
     Loader\Yaml,
     Definition\Argument\Types,
-    Definition\Service\Arguments
+    Definition\Service\Arguments,
+    Definition\Service\Constructors
 };
 use Innmind\Url\Path;
 use Innmind\Immutable\Map;
@@ -22,7 +23,8 @@ class ContainerBuilderTest extends TestCase
         $build = new ContainerBuilder(
             new Yaml(
                 new Types,
-                new Arguments
+                new Arguments,
+                new Constructors
             )
         );
 

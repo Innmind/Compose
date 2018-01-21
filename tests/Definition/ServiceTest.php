@@ -10,7 +10,10 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Exception\ServiceCannotDecorateMultipleServices
 };
-use Innmind\Immutable\StreamInterface;
+use Innmind\Immutable\{
+    StreamInterface,
+    Str
+};
 use PHPUnit\Framework\TestCase;
 use Eris\{
     TestTrait,
@@ -28,7 +31,7 @@ class ServiceTest extends TestCase
 
         $service = new Service(
             $name = new Name('foo'),
-            $constructor = new Constructor($class),
+            $constructor = Constructor\Construct::fromString(Str::of($class)),
             $arg1 = Argument\Decorate::fromValue('@decorated'),
             $arg2 = Argument\Reference::fromValue('$bar')
         );
@@ -47,7 +50,7 @@ class ServiceTest extends TestCase
 
         $service = new Service(
             $name = new Name('foo'),
-            new Constructor($class)
+            Constructor\Construct::fromString(Str::of($class))
         );
 
         $service2 = $service->exposeAs($expose = new Name('baz'));
@@ -79,7 +82,7 @@ class ServiceTest extends TestCase
 
                 new Service(
                     new Name('foo'),
-                    new Constructor($class),
+                    Constructor\Construct::fromString(Str::of($class)),
                     Argument\Decorate::fromValue('@decorated'),
                     Argument\Decorate::fromValue('@decorated')
                 );

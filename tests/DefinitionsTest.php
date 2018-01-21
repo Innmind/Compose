@@ -284,6 +284,22 @@ class DefinitionsTest extends TestCase
         $this->assertSame($service, $definitions->build(new Name('watev')));
     }
 
+    public function testReturnSameInstanceWhenCalledEitherByNameOrExposedName()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            (new Service(
+                new Name('foo'),
+                Constructor\Construct::fromString(Str::of('stdClass'))
+            ))->exposeAs(new Name('watev'))
+        );
+
+        $this->assertSame(
+            $definitions->build(new Name('watev')),
+            $definitions->build(new Name('foo'))
+        );
+    }
+
     public function testInstancesAreResettedWhenInjectingNewArguments()
     {
         $definitions = new Definitions(

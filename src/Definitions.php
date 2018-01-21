@@ -75,6 +75,9 @@ final class Definitions
 
     public function build(Name $name): object
     {
+        $definition = $this->get($name);
+        $name = $definition->name();
+
         if ($this->instances->contains((string) $name)) {
             return $this->instances->get((string) $name);
         }
@@ -91,7 +94,7 @@ final class Definitions
 
             $this->building = $this->building->add((string) $name);
 
-            $service = $this->get($name)->build($this);
+            $service = $definition->build($this);
 
             $this->instances = $this->instances->put((string) $name, $service);
             $this->building = $this->building->dropEnd(1);

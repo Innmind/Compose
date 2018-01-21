@@ -26,6 +26,7 @@ class SetTest extends TestCase
 
         $this->assertInstanceOf(ImmutableSet::class, $instance);
         $this->assertSame('int', (string) $instance->type());
+        $this->assertCount(2, $instance);
         $this->assertSame([1, 2], $instance->toPrimitive());
     }
 

@@ -26,6 +26,7 @@ class StreamTest extends TestCase
 
         $this->assertInstanceOf(ImmutableStream::class, $instance);
         $this->assertSame('int', (string) $instance->type());
+        $this->assertCount(2, $instance);
         $this->assertSame([1, 2], $instance->toPrimitive());
     }
 

@@ -53,6 +53,7 @@ final class Arguments
             Argument\Decorate::class,
             Argument\Reference::class,
             Argument\Unwind::class,
+            Argument\Pair::class,
             Argument\Primitive::class
         );
     }

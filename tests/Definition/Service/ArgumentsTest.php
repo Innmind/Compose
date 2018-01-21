@@ -22,7 +22,7 @@ class ArgumentsTest extends TestCase
     {
         $this->assertInstanceOf(StreamInterface::class, Arguments::defaults());
         $this->assertSame('string', (string) Arguments::defaults()->type());
-        $this->assertCount(4, Arguments::defaults());
+        $this->assertCount(5, Arguments::defaults());
         $this->assertSame(Arguments::defaults(), Arguments::defaults());
     }
 

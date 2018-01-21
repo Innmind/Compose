@@ -25,7 +25,7 @@ class ConstructorsTest extends TestCase
     {
         $this->assertInstanceOf(StreamInterface::class, Constructors::defaults());
         $this->assertSame('string', (string) Constructors::defaults()->type());
-        $this->assertCount(4, Constructors::defaults());
+        $this->assertCount(5, Constructors::defaults());
         $this->assertSame(Constructors::defaults(), Constructors::defaults());
     }
 

@@ -51,6 +51,7 @@ final class Constructors
             Constructor\Factory::class,
             Constructor\Set::class,
             Constructor\Stream::class,
+            Constructor\Map::class,
             Constructor\Construct::class
         );
     }

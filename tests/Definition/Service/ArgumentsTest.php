@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\Compose\Definition\Argument;
+namespace Tests\Innmind\Compose\Definition\Service;
 
 use Innmind\Compose\{
     Definition\Service\Arguments,

@@ -26,6 +26,7 @@ final class Definitions
     private $exposed;
     private $arguments;
     private $building;
+    private $instances;
 
     public function __construct(Arguments $arguments, Service ...$definitions)
     {
@@ -56,6 +57,7 @@ final class Definitions
         }
 
         $this->building = Stream::of('string');
+        $this->instances = new Map('string', 'object');
     }
 
     /**
@@ -66,12 +68,17 @@ final class Definitions
         $self = clone $this;
         $self->arguments = $self->arguments->bind($arguments);
         $self->building = $self->building->clear();
+        $self->instances = $self->instances->clear();
 
         return $self;
     }
 
     public function build(Name $name): object
     {
+        if ($this->instances->contains((string) $name)) {
+            return $this->instances->get((string) $name);
+        }
+
         try {
             if ($this->building->contains((string) $name)) {
                 throw new CircularDependency(
@@ -86,6 +93,7 @@ final class Definitions
 
             $service = $this->get($name)->build($this);
 
+            $this->instances = $this->instances->put((string) $name, $service);
             $this->building = $this->building->dropEnd(1);
         } catch (\Throwable $e) {
             $this->building = $this->building->clear();

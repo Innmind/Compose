@@ -13,12 +13,10 @@ use Psr\Container\ContainerInterface;
 final class Container implements ContainerInterface
 {
     private $definitions;
-    private $instances;
 
     public function __construct(Definitions $definitions)
     {
         $this->definitions = $definitions;
-        $this->instances = new Map('string', 'object');
     }
 
     /**
@@ -30,7 +28,7 @@ final class Container implements ContainerInterface
             throw new NotFound($id);
         }
 
-        return $this->build(new Name($id));
+        return $this->definitions->build(new Name($id));
     }
 
     /**
@@ -53,17 +51,5 @@ final class Container implements ContainerInterface
         }
 
         return $definition->isExposedAs($name);
-    }
-
-    private function build(Name $name): object
-    {
-        if ($this->instances->contains((string) $name)) {
-            return $this->instances->get((string) $name);
-        }
-
-        $instance = $this->definitions->build($name);
-        $this->instances = $this->instances->put((string) $name, $instance);
-
-        return $instance;
     }
 }

@@ -256,4 +256,38 @@ class DefinitionsTest extends TestCase
 
         $this->assertInstanceOf('stdClass', $definitions->build(new Name('baz')));
     }
+
+    public function testBuildAServiceOnlyOnce()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            (new Service(
+                new Name('foo'),
+                new Constructor('stdClass')
+            ))->exposeAs(new Name('watev'))
+        );
+
+        $service = $definitions->build(new Name('watev'));
+
+        $this->assertInstanceOf('stdClass', $service);
+        $this->assertSame($service, $definitions->build(new Name('watev')));
+    }
+
+    public function testInstancesAreResettedWhenInjectingNewArguments()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            (new Service(
+                new Name('foo'),
+                new Constructor('stdClass')
+            ))->exposeAs(new Name('watev'))
+        );
+
+        $service = $definitions->build(new Name('watev'));
+
+        $definitions2 = $definitions->inject(new Map('string', 'mixed'));
+
+        $this->assertNotSame($service, $definitions2->build(new Name('watev')));
+        $this->assertSame($service, $definitions->build(new Name('watev')));
+    }
 }

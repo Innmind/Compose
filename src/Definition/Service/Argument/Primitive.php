@@ -5,6 +5,7 @@ namespace Innmind\Compose\Definition\Service\Argument;
 
 use Innmind\Compose\{
     Definition\Service\Argument,
+    Definition\Service\Arguments,
     Definitions
 };
 use Innmind\Immutable\StreamInterface;
@@ -21,7 +22,7 @@ final class Primitive implements Argument
     /**
      * {@inheritdoc}
      */
-    public static function fromValue($value): Argument
+    public static function fromValue($value, Arguments $arguments): Argument
     {
         return new self($value);
     }

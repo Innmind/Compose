@@ -6,6 +6,7 @@ namespace Tests\Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument\Reference,
     Definition\Service\Argument,
+    Definition\Service\Arguments as Args,
     Definition\Service\Constructor,
     Definition\Service,
     Definition\Name,
@@ -27,7 +28,7 @@ class ReferenceTest extends TestCase
 {
     public function testFromValue()
     {
-        $argument = Reference::fromValue('$foo');
+        $argument = Reference::fromValue('$foo', new Args);
 
         $this->assertInstanceOf(Reference::class, $argument);
         $this->assertInstanceOf(Argument::class, $argument);
@@ -37,7 +38,7 @@ class ReferenceTest extends TestCase
     {
         $this->expectException(ValueNotSupported::class);
 
-        Reference::fromValue(42);
+        Reference::fromValue(42, new Args);
     }
 
     public function testThrowWhenNotAReference()
@@ -45,12 +46,12 @@ class ReferenceTest extends TestCase
         $this->expectException(ValueNotSupported::class);
         $this->expectExceptionMessage('foo');
 
-        Reference::fromValue('foo');
+        Reference::fromValue('foo', new Args);
     }
 
     public function testResolveDirectDepedency()
     {
-        $value = Reference::fromValue('$baz')->resolve(
+        $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
             new Definitions(
                 new Arguments,
@@ -92,7 +93,7 @@ class ReferenceTest extends TestCase
             [[1, 2, 3]]
         ));
 
-        $value = Reference::fromValue('$baz')->resolve(
+        $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
             $definitions
         );
@@ -128,7 +129,7 @@ class ReferenceTest extends TestCase
             []
         ));
 
-        $value = Reference::fromValue('$baz')->resolve(
+        $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
             $definitions
         );
@@ -160,7 +161,7 @@ class ReferenceTest extends TestCase
             []
         ));
 
-        $value = Reference::fromValue('$baz')->resolve(
+        $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
             $definitions
         );

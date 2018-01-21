@@ -5,6 +5,7 @@ namespace Innmind\Compose\Definition\Service\Argument;
 
 use Innmind\Compose\{
     Definition\Service\Argument,
+    Definition\Service\Arguments,
     Definition\Name,
     Definitions,
     Exception\ValueNotSupported,
@@ -28,7 +29,7 @@ final class Reference implements Argument
     /**
      * {@inheritdoc}
      */
-    public static function fromValue($value): Argument
+    public static function fromValue($value, Arguments $arguments): Argument
     {
         if (!is_string($value)) {
             throw new ValueNotSupported;

@@ -6,6 +6,7 @@ namespace Tests\Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument\Primitive,
     Definition\Service\Argument,
+    Definition\Service\Arguments as Args,
     Definition\Service\Constructor,
     Definition\Service,
     Definition\Name,
@@ -23,7 +24,7 @@ class PrimitiveTest extends TestCase
 {
     public function testFromValue()
     {
-        $argument = Primitive::fromValue(42);
+        $argument = Primitive::fromValue(42, new Args);
 
         $this->assertInstanceOf(Primitive::class, $argument);
         $this->assertInstanceOf(Argument::class, $argument);
@@ -31,7 +32,7 @@ class PrimitiveTest extends TestCase
 
     public function testResolve()
     {
-        $value = Primitive::fromValue(42)->resolve(
+        $value = Primitive::fromValue(42, new Args)->resolve(
             Stream::of('mixed'),
             new Definitions(
                 new Arguments,

@@ -5,6 +5,7 @@ namespace Innmind\Compose\Definition\Service\Argument;
 
 use Innmind\Compose\{
     Definition\Service\Argument,
+    Definition\Service\Arguments,
     Definitions,
     Exception\ValueNotSupported,
     Exception\DecoratedArgumentCannotBeResolved
@@ -16,7 +17,7 @@ final class Decorate implements Argument
     /**
      * {@inheritdoc}
      */
-    public static function fromValue($value): Argument
+    public static function fromValue($value, Arguments $arguments): Argument
     {
         if ($value !== '@decorated') {
             throw new ValueNotSupported;

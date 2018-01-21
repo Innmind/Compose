@@ -6,6 +6,7 @@ namespace Tests\Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument\Decorate,
     Definition\Service\Argument,
+    Definition\Service\Arguments as Args,
     Definition\Service\Constructor,
     Definition\Service,
     Definition\Name,
@@ -24,7 +25,7 @@ class DecorateTest extends TestCase
 {
     public function testFromValue()
     {
-        $argument = Decorate::fromValue('@decorated');
+        $argument = Decorate::fromValue('@decorated', new Args);
 
         $this->assertInstanceOf(Decorate::class, $argument);
         $this->assertInstanceOf(Argument::class, $argument);
@@ -34,14 +35,14 @@ class DecorateTest extends TestCase
     {
         $this->expectException(ValueNotSupported::class);
 
-        Decorate::fromValue(42);
+        Decorate::fromValue(42, new Args);
     }
 
     public function testThrowWhenTryingToResolve()
     {
         $this->expectException(DecoratedArgumentCannotBeResolved::class);
 
-        Decorate::fromValue('@decorated')->resolve(
+        Decorate::fromValue('@decorated', new Args)->resolve(
             Stream::of('mixed'),
             new Definitions(
                 new Arguments,

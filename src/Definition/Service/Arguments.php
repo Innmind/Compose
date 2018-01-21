@@ -34,7 +34,7 @@ final class Arguments
             try {
                 $build = $argument.'::fromValue';
 
-                return $build($value);
+                return $build($value, $this);
             } catch (ValueNotSupported $e) {
                 //pass
             }

@@ -13,7 +13,7 @@ interface Argument
      *
      * @throws ValueNotSupported
      */
-    public static function fromValue($value): self;
+    public static function fromValue($value, Arguments $arguments): self;
 
     /**
      * @param StreamInterface<mixed> $built

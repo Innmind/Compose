@@ -42,7 +42,7 @@ class ArgumentsTest extends TestCase
     public function testLoadOnlyFromSpecifiedArguments()
     {
         $type = new class implements Argument {
-            public static function fromValue($value): Argument
+            public static function fromValue($value, Arguments $arguments): Argument
             {
                 if ($value !== 'foo') {
                     throw new ValueNotSupported($value);

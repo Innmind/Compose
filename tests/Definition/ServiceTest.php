@@ -8,6 +8,7 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service\Constructor,
     Definition\Service\Argument,
+    Definition\Service\Arguments as Args,
     Exception\ServiceCannotDecorateMultipleServices
 };
 use Innmind\Immutable\{
@@ -24,6 +25,13 @@ class ServiceTest extends TestCase
 {
     use TestTrait;
 
+    private $args;
+
+    public function setUp()
+    {
+        $this->args = new Args;
+    }
+
     public function testInterface()
     {
         $class = new class {};
@@ -32,8 +40,8 @@ class ServiceTest extends TestCase
         $service = new Service(
             $name = new Name('foo'),
             $constructor = Constructor\Construct::fromString(Str::of($class)),
-            $arg1 = Argument\Decorate::fromValue('@decorated'),
-            $arg2 = Argument\Reference::fromValue('$bar')
+            $arg1 = $this->args->load('@decorated'),
+            $arg2 = $this->args->load('$bar')
         );
 
         $this->assertSame($name, $service->name());
@@ -83,8 +91,8 @@ class ServiceTest extends TestCase
                 new Service(
                     new Name('foo'),
                     Constructor\Construct::fromString(Str::of($class)),
-                    Argument\Decorate::fromValue('@decorated'),
-                    Argument\Decorate::fromValue('@decorated')
+                    $this->args->load('@decorated'),
+                    $this->args->load('@decorated')
                 );
             });
     }

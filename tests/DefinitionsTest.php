@@ -12,6 +12,7 @@ use Innmind\Compose\{
     Definition\Argument\Type\Instance,
     Definition\Service,
     Definition\Service\Constructor,
+    Definition\Service\Arguments as Args,
     Exception\AtLeastOneServiceMustBeExposed,
     Exception\CircularDependency
 };
@@ -24,6 +25,13 @@ use Fixture\Innmind\Compose\ServiceFixture;
 
 class DefinitionsTest extends TestCase
 {
+    private $args;
+
+    public function setUp()
+    {
+        $this->args = new Args;
+    }
+
     public function testInterface()
     {
         $definitions = new Definitions(
@@ -92,9 +100,9 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
-                Service\Argument\Reference::fromValue('$firstArg'),
-                Service\Argument\Reference::fromValue('$secondArg'),
-                Service\Argument\Unwind::fromValue('...$thirdArg')
+                $this->args->load('$firstArg'),
+                $this->args->load('$secondArg'),
+                $this->args->load('...$thirdArg')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('defaultStd'),
@@ -164,8 +172,8 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
-                Service\Argument\Reference::fromValue('$firstArg'),
-                Service\Argument\Reference::fromValue('$defaultStd')
+                $this->args->load('$firstArg'),
+                $this->args->load('$defaultStd')
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('defaultStd'),
@@ -191,8 +199,8 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
-                Service\Argument\Primitive::fromValue(42),
-                Service\Argument\Reference::fromValue('$defaultStd')
+                $this->args->load(42),
+                $this->args->load('$defaultStd')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('defaultStd'),
@@ -216,12 +224,12 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass')),
-                Service\Argument\Reference::fromValue('$bar')
+                $this->args->load('$bar')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('bar'),
                 Constructor\Construct::fromString(Str::of('stdClass')),
-                Service\Argument\Reference::fromValue('$foo')
+                $this->args->load('$foo')
             )
         );
 
@@ -235,13 +243,13 @@ class DefinitionsTest extends TestCase
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass')),
-                Service\Argument\Reference::fromValue('$baz'),
-                Service\Argument\Reference::fromValue('$bar')
+                $this->args->load('$baz'),
+                $this->args->load('$bar')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('bar'),
                 Constructor\Construct::fromString(Str::of('stdClass')),
-                Service\Argument\Reference::fromValue('$foo')
+                $this->args->load('$foo')
             ),
             new Service(
                 new Name('baz'),

@@ -12,6 +12,7 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Definition\Service,
     Definition\Service\Constructor,
+    Definition\Service\Arguments as Args,
     Exception\NotFound
 };
 use Innmind\Immutable\{
@@ -38,8 +39,8 @@ class ContainerTest extends TestCase
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
-                Service\Argument\Reference::fromValue('$firstArg'),
-                Service\Argument\Reference::fromValue('$defaultStd')
+                Service\Argument\Reference::fromValue('$firstArg', new Args),
+                Service\Argument\Reference::fromValue('$defaultStd', new Args)
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('defaultStd'),

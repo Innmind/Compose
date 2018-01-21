@@ -6,6 +6,7 @@ namespace Tests\Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument\Unwind,
     Definition\Service\Argument,
+    Definition\Service\Arguments as Args,
     Definition\Service\Constructor,
     Definition\Service,
     Definition\Name,
@@ -27,7 +28,7 @@ class UnwindTest extends TestCase
 {
     public function testFromValue()
     {
-        $argument = Unwind::fromValue('...$foo');
+        $argument = Unwind::fromValue('...$foo', new Args);
 
         $this->assertInstanceOf(Unwind::class, $argument);
         $this->assertInstanceOf(Argument::class, $argument);
@@ -37,7 +38,7 @@ class UnwindTest extends TestCase
     {
         $this->expectException(ValueNotSupported::class);
 
-        Unwind::fromValue(42);
+        Unwind::fromValue(42, new Args);
     }
 
     public function testThrowWhenNotAUnwind()
@@ -45,7 +46,7 @@ class UnwindTest extends TestCase
         $this->expectException(ValueNotSupported::class);
         $this->expectExceptionMessage('foo');
 
-        Unwind::fromValue('foo');
+        Unwind::fromValue('foo', new Args);
     }
 
     public function testResolveArgument()
@@ -69,7 +70,7 @@ class UnwindTest extends TestCase
             [[1, 2, 3]]
         ));
 
-        $value = Unwind::fromValue('...$baz')->resolve(
+        $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
             $definitions
         );
@@ -101,7 +102,7 @@ class UnwindTest extends TestCase
             []
         ));
 
-        $value = Unwind::fromValue('...$baz')->resolve(
+        $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
             $definitions
         );
@@ -113,7 +114,7 @@ class UnwindTest extends TestCase
 
     public function testResolveDirectDepedency()
     {
-        $value = Unwind::fromValue('...$baz')->resolve(
+        $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
             new Definitions(
                 new Arguments,
@@ -158,7 +159,7 @@ class UnwindTest extends TestCase
             []
         ));
 
-        $value = Unwind::fromValue('...$baz')->resolve(
+        $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
             $definitions
         );

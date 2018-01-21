@@ -1,0 +1,22 @@
+arguments:
+    first: int
+    second: stdClass ?? $inner.fallback.forBar
+    third: '?array'
+
+expose:
+    foo: '$inner.bar'
+    baz: '$inner.baz'
+
+services:
+    inner:
+        bar Fixture\Innmind\Compose\ServiceFixture:
+            - '$first'
+            - '$second'
+            - '$third'
+
+        baz Fixture\Innmind\Compose\ServiceFixture:
+            - '$first'
+            - '$inner.fallback.forBar'
+
+        fallback:
+            forBar stdClass: []

@@ -9,7 +9,6 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
-    Exception\AtLeastOneServiceMustBeExposed,
     Exception\CircularDependency
 };
 use Innmind\Immutable\{
@@ -51,10 +50,6 @@ final class Definitions
                     $definition
                 );
             });
-
-        if ($this->exposed->size() === 0) {
-            throw new AtLeastOneServiceMustBeExposed;
-        }
 
         $this->building = Stream::of('string');
         $this->instances = new Map('string', 'object');

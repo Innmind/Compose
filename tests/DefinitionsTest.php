@@ -13,7 +13,6 @@ use Innmind\Compose\{
     Definition\Service,
     Definition\Service\Constructor,
     Definition\Service\Arguments as Args,
-    Exception\AtLeastOneServiceMustBeExposed,
     Exception\CircularDependency
 };
 use Innmind\Immutable\{
@@ -183,13 +182,6 @@ class DefinitionsTest extends TestCase
         $definitions = $definitions->inject(Map::of('string', 'mixed', ['firstArg'], [42]));
 
         $this->assertInstanceOf(ServiceFixture::class, $definitions->build(new Name('wished')));
-    }
-
-    public function testThrowWhenNoServiceExposed()
-    {
-        $this->expectException(AtLeastOneServiceMustBeExposed::class);
-
-        new Definitions(new Arguments);
     }
 
     public function testBuildWithAPrimitiveArgument()

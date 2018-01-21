@@ -15,7 +15,6 @@ use Innmind\Immutable\{
 final class Set implements Constructor
 {
     private $type;
-    private $method;
 
     private function __construct(string $type)
     {

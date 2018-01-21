@@ -42,11 +42,11 @@ final class Pair implements Argument
 
         $value = Str::of($value);
 
-        if (!$value->matches('~^<.+, ?.+>$~')) {
+        if (!$value->matches('~^<\S+, ?\S+>$~')) {
             throw new ValueNotSupported((string) $value);
         }
 
-        $components = $value->capture('~^<(?<key>.+), ?(?<value>.+)>$~');
+        $components = $value->capture('~^<(?<key>\S+), ?(?<value>\S+)>$~');
 
         return new self(
             $arguments->load((string) $components->get('key')),

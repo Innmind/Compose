@@ -13,9 +13,9 @@ use Innmind\Compose\{
 };
 use Innmind\Immutable\{
     Str,
+    StreamInterface,
     Stream
 };
-use Innmind\Immutable\StreamInterface;
 
 final class Unwind implements Argument
 {

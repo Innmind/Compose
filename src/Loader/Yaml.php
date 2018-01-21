@@ -65,20 +65,35 @@ final class Yaml implements Loader
             Stream::of('string'),
             $data['services']
         );
-        $definitions = $this->expose(
-            $definitions,
-            Map::of(
-                'string',
-                'string',
-                array_values($data['expose']),
-                array_keys($data['expose'])
-            )
+
+        $exposed = Map::of(
+            'string',
+            'string',
+            array_keys($data['expose']),
+            array_values($data['expose'])
         );
 
-        return new Definitions(
+        $definitions = new Definitions(
             $arguments,
             ...$definitions->values()
         );
+
+        return $exposed
+            ->map(static function(string $as, string $name): Pair {
+                return new Pair(
+                    $as,
+                    (string) Str::of($name)->substring(1) //remove the $ sign
+                );
+            })
+            ->reduce(
+                $definitions,
+                static function(Definitions $definitions, string $as, string $name): Definitions {
+                    return $definitions->expose(
+                        new Name($name),
+                        new Name($as)
+                    );
+                }
+            );
     }
 
     private function buildArguments(array $definitions): Arguments
@@ -182,31 +197,5 @@ final class Yaml implements Loader
             $this->constructors->load($components->get('constructor')->trim('  ')), //space and non breaking space
             ...$arguments
         );
-    }
-
-    private function expose(Map $definitions, Map $expose): Map
-    {
-        $expose = $expose
-            ->foreach(static function(string $service): void {
-                if (!Str::of($service)->matches('~^\$~')) {
-                    throw new DomainException;
-                }
-            })
-            ->map(static function(string $service, string $alias): Pair {
-                return new Pair(
-                    (string) Str::of($service)->substring(1), //remove the $ sign
-                    $alias
-                );
-            });
-
-        return $definitions->map(static function(string $name, Service $service) use ($expose): Service {
-            if ($expose->contains($name)) {
-                $service = $service->exposeAs(new Name(
-                    $expose->get($name)
-                ));
-            }
-
-            return $service;
-        });
     }
 }

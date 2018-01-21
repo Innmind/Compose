@@ -55,6 +55,23 @@ final class Definitions
         $this->instances = new Map('string', 'object');
     }
 
+    public function expose(Name $name, Name $as): self
+    {
+        $service = $this->get($name)->exposeAs($as);
+
+        $self = clone $this;
+        $self->definitions = $self->definitions->put(
+            (string) $name,
+            $service
+        );
+        $self->exposed = $self->exposed->put(
+            (string) $as,
+            $service
+        );
+
+        return $self;
+    }
+
     /**
      * @param MapInterface<string, mixed> $arguments
      */

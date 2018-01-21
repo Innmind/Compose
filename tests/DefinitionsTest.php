@@ -309,4 +309,22 @@ class DefinitionsTest extends TestCase
         $this->assertNotSame($service, $definitions2->build(new Name('watev')));
         $this->assertSame($service, $definitions->build(new Name('watev')));
     }
+
+    public function testExpose()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            $service = new Service(
+                new Name('foo'),
+                Constructor\Construct::fromString(Str::of('stdClass'))
+            )
+        );
+        $definitions2 = $definitions->expose(new Name('foo'), new Name('watev'));
+
+        $this->assertInstanceOf(Definitions::class, $definitions2);
+        $this->assertNotSame($definitions2, $definitions);
+        $this->assertFalse($definitions->get(new Name('foo'))->exposed());
+        $this->assertTrue($definitions2->get(new Name('foo'))->exposed());
+        $this->assertTrue($definitions2->get(new Name('foo'))->isExposedAs(new Name('watev')));
+    }
 }

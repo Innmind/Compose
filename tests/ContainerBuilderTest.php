@@ -12,7 +12,12 @@ use Innmind\Compose\{
     Definition\Service\Constructors
 };
 use Innmind\Url\Path;
-use Innmind\Immutable\Map;
+use Innmind\Immutable\{
+    MapInterface,
+    Map,
+    SetInterface,
+    StreamInterface
+};
 use PHPUnit\Framework\TestCase;
 use Fixture\Innmind\Compose\ServiceFixture;
 
@@ -39,5 +44,25 @@ class ContainerBuilderTest extends TestCase
         $service = $container->get('foo');
         $this->assertInstanceOf(ServiceFixture::class, $service);
         $this->assertSame(42, $service->first);
+
+        $set = $container->get('set');
+        $this->assertInstanceOf(SetInterface::class, $set);
+        $this->assertSame('int', (string) $set->type());
+        $this->assertCount(3, $set);
+        $this->assertSame([1, 2, 42], $set->toPrimitive());
+
+        $stream = $container->get('stream');
+        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertSame('string', (string) $stream->type());
+        $this->assertCount(3, $stream);
+        $this->assertSame(['foo', 'bar', 'baz'], $stream->toPrimitive());
+
+        $map = $container->get('map');
+        $this->assertInstanceOf(MapInterface::class, $map);
+        $this->assertSame('string', (string) $map->keyType());
+        $this->assertSame(ServiceFixture::class, (string) $map->valueType());
+        $this->assertCount(2, $map);
+        $this->assertSame($service, $map->get('bar'));
+        $this->assertSame($container->get('baz'), $map->get('baz'));
     }
 }

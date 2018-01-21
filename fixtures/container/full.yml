@@ -6,6 +6,9 @@ arguments:
 expose:
     foo: '$inner.bar'
     baz: '$inner.baz'
+    set: '$ints'
+    stream: '$strings'
+    map: '$fixtures'
 
 services:
     inner:
@@ -20,3 +23,17 @@ services:
 
         fallback:
             forBar stdClass: []
+
+    ints set<int>:
+        - 1
+        - 2
+        - 42
+
+    strings stream<string>:
+        - foo
+        - bar
+        - baz
+
+    fixtures map<string, Fixture\Innmind\Compose\ServiceFixture>:
+        - <bar, $inner.bar>
+        - <baz, $inner.baz>

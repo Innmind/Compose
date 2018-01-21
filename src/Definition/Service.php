@@ -97,14 +97,14 @@ final class Service
         ));
     }
 
-    public function decorate(Name $service): self
+    public function decorate(Name $service, Name $newName = null): self
     {
         if (!$this->decorates) {
             throw new LogicException;
         }
 
         $self = clone $this;
-        $self->name = new Name(
+        $self->name = $newName ?? new Name(
             $self->name.'.'.md5((string) $service)
         );
         $self->decorates = false;

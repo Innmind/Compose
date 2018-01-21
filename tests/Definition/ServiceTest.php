@@ -147,4 +147,24 @@ class ServiceTest extends TestCase
             ->decorate(new Name('bar'))
             ->decorate(new Name('baz'));
     }
+
+    public function testUseSpecificNameWhenDecoratingAnotherService()
+    {
+        $service = new Service(
+            new Name('foo'),
+            Constructor\Construct::fromString(Str::of('stdClass')),
+            $this->args->load(42),
+            $arg = $this->args->load('@decorated'),
+            $this->args->load(42)
+        );
+
+        $expected = new Name('stack');
+
+        $this->assertSame(
+            $expected,
+            $service
+                ->decorate(new Name('bar'), $expected)
+                ->name()
+        );
+    }
 }

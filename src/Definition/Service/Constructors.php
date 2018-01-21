@@ -49,6 +49,8 @@ final class Constructors
         return self::$defaults ?? self::$defaults = Stream::of(
             'string',
             Constructor\Factory::class,
+            Constructor\Set::class,
+            Constructor\Stream::class,
             Constructor\Construct::class
         );
     }

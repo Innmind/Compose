@@ -7,6 +7,8 @@ use Innmind\Compose\{
     Definition\Service\Constructors,
     Definition\Service\Constructor,
     Definition\Service\Constructor\Factory,
+    Definition\Service\Constructor\Set,
+    Definition\Service\Constructor\Stream,
     Definition\Service\Constructor\Construct,
     Definitions,
     Exception\ValueNotSupported
@@ -23,7 +25,7 @@ class ConstructorsTest extends TestCase
     {
         $this->assertInstanceOf(StreamInterface::class, Constructors::defaults());
         $this->assertSame('string', (string) Constructors::defaults()->type());
-        $this->assertCount(2, Constructors::defaults());
+        $this->assertCount(4, Constructors::defaults());
         $this->assertSame(Constructors::defaults(), Constructors::defaults());
     }
 
@@ -73,6 +75,8 @@ class ConstructorsTest extends TestCase
         return [
             [ServiceFixture::class, Construct::class],
             [ServiceFixture::class.'::make', Factory::class],
+            ['set<int>', Set::class],
+            ['stream<int>', Stream::class],
         ];
     }
 }

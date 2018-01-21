@@ -39,9 +39,9 @@ final class Yaml implements Loader
     private $constructors;
 
     public function __construct(
-        Types $types,
-        ServiceArguments $arguments,
-        Constructors $constructors
+        Types $types = null,
+        ServiceArguments $arguments = null,
+        Constructors $constructors = null
     ) {
         $this->resolver = new OptionsResolver;
         $this->resolver->setRequired(['expose', 'services']);
@@ -50,9 +50,9 @@ final class Yaml implements Loader
         $this->resolver->setAllowedTypes('expose', 'array');
         $this->resolver->setAllowedTypes('services', 'array');
         $this->resolver->setDefault('arguments', []);
-        $this->types = $types;
-        $this->arguments = $arguments;
-        $this->constructors = $constructors;
+        $this->types = $types ?? new Types;
+        $this->arguments = $arguments ?? new ServiceArguments;
+        $this->constructors = $constructors ?? new Constructors;
     }
 
     public function __invoke(PathInterface $definition): Definitions

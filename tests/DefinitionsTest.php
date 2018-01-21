@@ -20,7 +20,12 @@ use Innmind\Immutable\{
     Str
 };
 use PHPUnit\Framework\TestCase;
-use Fixture\Innmind\Compose\ServiceFixture;
+use Fixture\Innmind\Compose\{
+    ServiceFixture,
+    Stack\Low,
+    Stack\Middle,
+    Stack\High
+};
 
 class DefinitionsTest extends TestCase
 {
@@ -326,5 +331,42 @@ class DefinitionsTest extends TestCase
         $this->assertFalse($definitions->get(new Name('foo'))->exposed());
         $this->assertTrue($definitions2->get(new Name('foo'))->exposed());
         $this->assertTrue($definitions2->get(new Name('foo'))->isExposedAs(new Name('watev')));
+    }
+
+    public function testStack()
+    {
+        $definitions = new Definitions(
+            new Arguments,
+            new Service(
+                new Name('low'),
+                Constructor\Construct::fromString(Str::of(Low::class))
+            ),
+            new Service(
+                new Name('middle'),
+                Constructor\Construct::fromString(Str::of(Middle::class)),
+                $this->args->load('@decorated')
+            ),
+            new Service(
+                new Name('high'),
+                Constructor\Construct::fromString(Str::of(High::class)),
+                $this->args->load('@decorated')
+            )
+        );
+
+        $definitions2 = $definitions->stack(
+            new Name('stack'),
+            new Name('high'),
+            new Name('middle'),
+            new Name('low')
+        );
+
+        $this->assertInstanceOf(Definitions::class, $definitions2);
+        $this->assertNotSame($definitions2, $definitions);
+        $this->assertFalse($definitions->has(new Name('stack')));
+        $this->assertTrue($definitions2->has(new Name('stack')));
+        $this->assertSame(
+            'high|middle|low|middle|high',
+            $definitions2->build(new Name('stack'))()
+        );
     }
 }

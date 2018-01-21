@@ -72,6 +72,43 @@ final class Definitions
         return $self;
     }
 
+    public function stack(Name $name, Name $highest, Name $lower, Name ...$rest): self
+    {
+        $stack = Sequence::of($lower, ...$rest)->reverse();
+        $stacked = Sequence::of(
+            $this->get($stack->first())
+        );
+
+        $stacked = $stack->drop(1)->reduce(
+            $stacked,
+            function(Sequence $stacked, Name $decorator): Sequence {
+                return $stacked->add(
+                    $this
+                        ->get($decorator)
+                        ->decorate($stacked->last()->name())
+                );
+            }
+        );
+        $stacked = $stacked->add(
+            $this
+                ->get($highest)
+                ->decorate($stacked->last()->name(), $name)
+        );
+
+        $self = clone $this;
+        $self->definitions = $stacked->reduce(
+            $self->definitions,
+            static function(Map $definitions, Service $service): Map {
+                return $definitions->put(
+                    (string) $service->name(),
+                    $service
+                );
+            }
+        );
+
+        return $self;
+    }
+
     /**
      * @param MapInterface<string, mixed> $arguments
      */

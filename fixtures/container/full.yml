@@ -9,6 +9,7 @@ expose:
     set: '$ints'
     stream: '$strings'
     map: '$fixtures'
+    stack: '$fixtureStack'
 
 services:
     inner:
@@ -37,3 +38,15 @@ services:
     fixtures map<string, Fixture\Innmind\Compose\ServiceFixture>:
         - <bar, $inner.bar>
         - <baz, $inner.baz>
+
+    fixtureStack stack:
+        - $stack.high
+        - $stack.middle
+        - $stack.low
+
+    stack:
+        low Fixture\Innmind\Compose\Stack\Low: []
+        middle Fixture\Innmind\Compose\Stack\Middle:
+            - '@decorated'
+        high Fixture\Innmind\Compose\Stack\High:
+            - '@decorated'

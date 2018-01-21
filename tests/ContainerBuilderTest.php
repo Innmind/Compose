@@ -19,7 +19,10 @@ use Innmind\Immutable\{
     StreamInterface
 };
 use PHPUnit\Framework\TestCase;
-use Fixture\Innmind\Compose\ServiceFixture;
+use Fixture\Innmind\Compose\{
+    ServiceFixture,
+    Stack\High
+};
 
 class ContainerBuilderTest extends TestCase
 {
@@ -64,5 +67,9 @@ class ContainerBuilderTest extends TestCase
         $this->assertCount(2, $map);
         $this->assertSame($service, $map->get('bar'));
         $this->assertSame($container->get('baz'), $map->get('baz'));
+
+        $stack = $container->get('stack');
+        $this->assertInstanceOf(High::class, $stack);
+        $this->assertSame('high|middle|low|middle|high', $stack());
     }
 }

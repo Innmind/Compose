@@ -20,7 +20,8 @@ use Innmind\Immutable\{
     Str,
     Stream,
     Map,
-    Pair
+    Pair,
+    Sequence
 };
 use Symfony\Component\{
     Yaml\Yaml as Lib,
@@ -32,11 +33,13 @@ final class Yaml implements Loader
     private const ARGUMENT_PATTERN = '~^(?<optional>\?)?(?<type>.+)( \?\? \$.+)?$~';
     private const ARGUMENT_DEFAULT_PATTERN = '~( \?\? \$(?<default>.+))$~';
     private const SERVICE_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ](?<constructor>.+)$~"; //split on space or non breaking space
+    private const STACK_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ]stack$~"; //split on space or non breaking space
 
     private $resolver;
     private $types;
     private $arguments;
     private $constructors;
+    private $stacks;
 
     public function __construct(
         Types $types = null,
@@ -53,10 +56,13 @@ final class Yaml implements Loader
         $this->types = $types ?? new Types;
         $this->arguments = $arguments ?? new ServiceArguments;
         $this->constructors = $constructors ?? new Constructors;
+        $this->stacks = new Map(Name::class, Sequence::class);
     }
 
     public function __invoke(PathInterface $definition): Definitions
     {
+        $this->stacks->clear();
+
         $data = Lib::parseFile((string) $definition);
         $data = $this->resolver->resolve($data);
 
@@ -77,6 +83,7 @@ final class Yaml implements Loader
             $arguments,
             ...$definitions->values()
         );
+        $definitions = $this->buildStacks($definitions);
 
         return $exposed
             ->map(static function(string $as, string $name): Pair {
@@ -156,6 +163,12 @@ final class Yaml implements Loader
                 throw new DomainException;
             }
 
+            if ($key->matches(self::STACK_NAME)) {
+                $this->registerStack($namespace, $key, $value);
+
+                continue;
+            }
+
             if (!$key->matches(self::SERVICE_NAME)) {
                 $services = $services->merge(
                     $this->buildDefinitions(
@@ -196,6 +209,32 @@ final class Yaml implements Loader
             ),
             $this->constructors->load($components->get('constructor')->trim('  ')), //space and non breaking space
             ...$arguments
+        );
+    }
+
+    private function registerStack(Stream $namespace, Str $key, array $stack): void
+    {
+        $name = (string) $namespace
+            ->add((string) $key->capture(self::STACK_NAME)->get('name'))
+            ->join('.');
+
+        $this->stacks = $this->stacks->put(
+            new Name($name),
+            Sequence::of(...$stack)->map(static function(string $name): Name {
+                return new Name(
+                    (string) Str::of($name)->substring(1) //remove the $ sign
+                );
+            })
+        );
+    }
+
+    private function buildStacks(Definitions $definitions): Definitions
+    {
+        return $this->stacks->reduce(
+            $definitions,
+            function(Definitions $definitions, Name $name, Sequence $stack): Definitions {
+                return $definitions->stack($name, ...$stack);
+            }
         );
     }
 }

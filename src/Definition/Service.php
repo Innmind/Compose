@@ -6,8 +6,10 @@ namespace Innmind\Compose\Definition;
 use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service\Argument,
+    Definition\Service\Arguments,
     Definitions,
-    Exception\ServiceCannotDecorateMultipleServices
+    Exception\ServiceCannotDecorateMultipleServices,
+    Exception\LogicException
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -20,6 +22,7 @@ final class Service
     private $construct;
     private $arguments;
     private $exposeName;
+    private $decorates;
 
     public function __construct(
         Name $name,
@@ -33,6 +36,10 @@ final class Service
         $decorates = $this->arguments->filter(static function(Argument $argument): bool {
             return $argument instanceof Argument\Decorate;
         });
+
+        if ($decorates->size() > 0) {
+            $this->decorates = true;
+        }
 
         if ($decorates->size() > 1) {
             throw new ServiceCannotDecorateMultipleServices((string) $name);
@@ -88,5 +95,27 @@ final class Service
                 return $argument->resolve($arguments, $definitions);
             }
         ));
+    }
+
+    public function decorate(Name $service): self
+    {
+        if (!$this->decorates) {
+            throw new LogicException;
+        }
+
+        $self = clone $this;
+        $self->name = new Name(
+            $self->name.'.'.md5((string) $service)
+        );
+        $self->decorates = false;
+        $self->arguments = $self->arguments->map(static function(Argument $argument) use ($service): Argument {
+            if ($argument instanceof Argument\Decorate) {
+                return new Argument\Reference($service);
+            }
+
+            return $argument;
+        });
+
+        return $self;
     }
 }

@@ -9,7 +9,8 @@ use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service\Argument,
     Definition\Service\Arguments as Args,
-    Exception\ServiceCannotDecorateMultipleServices
+    Exception\ServiceCannotDecorateMultipleServices,
+    Exception\LogicException
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -95,5 +96,55 @@ class ServiceTest extends TestCase
                     $this->args->load('@decorated')
                 );
             });
+    }
+
+    public function testThrowWhenTryingToDecorateAServiceWhenNotIntendedTo()
+    {
+        $service = new Service(
+            new Name('foo'),
+            Constructor\Construct::fromString(Str::of('stdClass'))
+        );
+
+        $this->expectException(LogicException::class);
+
+        $service->decorate(new Name('bar'));
+    }
+
+    public function testDecorate()
+    {
+        $service = new Service(
+            new Name('foo'),
+            Constructor\Construct::fromString(Str::of('stdClass')),
+            $this->args->load(42),
+            $arg = $this->args->load('@decorated'),
+            $this->args->load(42)
+        );
+
+        $service2 = $service->decorate(new Name('bar'));
+
+        $this->assertInstanceOf(Service::class, $service2);
+        $this->assertNotSame($service2, $service);
+        $this->assertNotSame($service->name(), $service2->name());
+        $this->assertSame('foo.'.md5('bar'), (string) $service2->name());
+        $this->assertSame($arg, $service->arguments()->get(1));
+        $this->assertInstanceOf(
+            Argument\Reference::class,
+            $service2->arguments()->get(1)
+        );
+    }
+
+    public function testThrowWhenTryingToDecorateAServiceThatAlreadyDecorates()
+    {
+        $service = new Service(
+            new Name('foo'),
+            Constructor\Construct::fromString(Str::of('stdClass')),
+            $this->args->load('@decorated')
+        );
+
+        $this->expectException(LogicException::class);
+
+        $service
+            ->decorate(new Name('bar'))
+            ->decorate(new Name('baz'));
     }
 }

@@ -21,7 +21,7 @@ final class Reference implements Argument
 {
     private $name;
 
-    private function __construct(Name $name)
+    public function __construct(Name $name)
     {
         $this->name = $name;
     }

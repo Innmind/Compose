@@ -218,19 +218,7 @@ final class Stream implements StreamInterface
      */
     public function groupBy(callable $discriminator): MapInterface
     {
-        return $this
-            ->values
-            ->groupBy(function($value) use ($discriminator) {
-                return $discriminator($this->load($value));
-            })
-            ->map(function($key, Base $stream): Base {
-                return Base::of(
-                    (string) $this->type,
-                    ...$stream->map(function($value) {
-                        return $this->load($value);
-                    })
-                );
-            });
+        return $this->stream()->groupBy($discriminator);
     }
 
     /**
@@ -299,19 +287,7 @@ final class Stream implements StreamInterface
      */
     public function partition(callable $predicate): MapInterface
     {
-        return $this
-            ->values
-            ->partition(function($value) use ($predicate): bool {
-                return $predicate($this->load($value));
-            })
-            ->map(function($key, Base $stream): Base {
-                return Base::of(
-                    (string) $this->type,
-                    ...$stream->map(function($value) {
-                        return $this->load($value);
-                    })
-                );
-            });
+        return $this->stream()->partition($predicate);
     }
 
     /**

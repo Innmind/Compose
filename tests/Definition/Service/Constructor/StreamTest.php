@@ -12,12 +12,10 @@ use Innmind\Compose\{
     Definitions,
     Arguments,
     Lazy,
+    Lazy\Stream as LazyStream,
     Exception\ValueNotSupported
 };
-use Innmind\Immutable\{
-    Str,
-    Stream as ImmutableStream
-};
+use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
 
 class StreamTest extends TestCase
@@ -30,7 +28,7 @@ class StreamTest extends TestCase
 
         $instance = $construct(1, 2);
 
-        $this->assertInstanceOf(ImmutableStream::class, $instance);
+        $this->assertInstanceOf(LazyStream::class, $instance);
         $this->assertSame('int', (string) $instance->type());
         $this->assertCount(2, $instance);
         $this->assertSame([1, 2], $instance->toPrimitive());
@@ -61,7 +59,8 @@ class StreamTest extends TestCase
             )
         );
 
-        $this->assertInstanceOf(ImmutableStream::class, $instance);
+        $this->assertInstanceOf(LazyStream::class, $instance);
         $this->assertCount(1, $instance);
+        $this->assertInstanceOf('stdClass', $instance->current());
     }
 }

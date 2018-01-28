@@ -12,12 +12,10 @@ use Innmind\Compose\{
     Definitions,
     Arguments,
     Lazy,
+    Lazy\Set as LazySet,
     Exception\ValueNotSupported
 };
-use Innmind\Immutable\{
-    Str,
-    Set as ImmutableSet
-};
+use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
 
 class SetTest extends TestCase
@@ -30,7 +28,7 @@ class SetTest extends TestCase
 
         $instance = $construct(1, 2);
 
-        $this->assertInstanceOf(ImmutableSet::class, $instance);
+        $this->assertInstanceOf(LazySet::class, $instance);
         $this->assertSame('int', (string) $instance->type());
         $this->assertCount(2, $instance);
         $this->assertSame([1, 2], $instance->toPrimitive());
@@ -61,7 +59,8 @@ class SetTest extends TestCase
             )
         );
 
-        $this->assertInstanceOf(ImmutableSet::class, $instance);
+        $this->assertInstanceOf(LazySet::class, $instance);
         $this->assertCount(1, $instance);
+        $this->assertInstanceOf('stdClass', $instance->current());
     }
 }

@@ -20,6 +20,7 @@ final class Stream implements StreamInterface
     private $type;
     private $spec;
     private $values;
+    private $loaded;
 
     public function __construct(string $type, ...$values)
     {
@@ -418,6 +419,9 @@ final class Stream implements StreamInterface
 
     private function stream(): Base
     {
-        return Base::of((string) $this->type, ...$this->toPrimitive());
+        return $this->loaded ?? $this->loaded = Base::of(
+            (string) $this->type,
+            ...$this->toPrimitive()
+        );
     }
 }

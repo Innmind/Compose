@@ -16,6 +16,7 @@ final class Set implements SetInterface
 {
     private $type;
     private $values;
+    private $loaded;
 
     public function __construct(string $type)
     {
@@ -249,6 +250,9 @@ final class Set implements SetInterface
 
     private function set(): Base
     {
-        return Base::of((string) $this->type, ...$this->toPrimitive());
+        return $this->loaded ?? $this->loaded = Base::of(
+            (string) $this->type,
+            ...$this->toPrimitive()
+        );
     }
 }

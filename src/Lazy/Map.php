@@ -20,6 +20,7 @@ final class Map implements MapInterface
     private $keyType;
     private $valueType;
     private $values;
+    private $loaded;
 
     public function __construct(string $keyType, string $valueType)
     {
@@ -287,7 +288,7 @@ final class Map implements MapInterface
 
     private function loadedMap(): Base
     {
-        return $this->values->reduce(
+        return $this->loaded ?? $this->loaded = $this->values->reduce(
             $this->clear(),
             function(Base $map, $key, $value): Base {
                 return $map->put(

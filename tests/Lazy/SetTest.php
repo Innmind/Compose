@@ -189,11 +189,14 @@ class SetTest extends TestCase
 
     public function testForeach()
     {
-        $this->set->foreach(function($value): void {
+        $set = $this->set->foreach(function($value): void {
             $this->assertInstanceOf('stdClass', $value);
         });
 
-        $this->assertImmutability();
+        $this->assertImmutability($set);
+        $this->assertInstanceOf(Base::class, $set);
+        $this->assertSame('stdClass', (string) $set->type());
+        $this->assertCount(3, $set);
     }
 
     public function testGroupBy()

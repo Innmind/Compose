@@ -206,11 +206,7 @@ final class Stream implements StreamInterface
      */
     public function foreach(callable $function): StreamInterface
     {
-        $this->values->foreach(function($value) use ($function): void {
-            $function($this->load($value));
-        });
-
-        return $this;
+        return $this->stream()->foreach($function);
     }
 
     /**

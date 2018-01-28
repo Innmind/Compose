@@ -264,10 +264,14 @@ class StreamTest extends TestCase
 
     public function testForeach()
     {
-        $this->stream->foreach(function($value): void {
+        $stream = $this->stream->foreach(function($value): void {
             $this->assertInstanceOf('stdClass', $value);
         });
-        $this->assertImmutability();
+
+        $this->assertImmutability($stream);
+        $this->assertInstanceOf(Base::class, $stream);
+        $this->assertSame('stdClass', (string) $stream->type());
+        $this->assertCount(3, $stream);
     }
 
     public function testGroupBy()

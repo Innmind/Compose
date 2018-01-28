@@ -171,11 +171,7 @@ final class Set implements SetInterface
      */
     public function foreach(callable $function): SetInterface
     {
-        $this->values->foreach(function($value) use ($function): void {
-            $function($this->load($value));
-        });
-
-        return $this;
+        return $this->set()->foreach($function);
     }
 
     /**

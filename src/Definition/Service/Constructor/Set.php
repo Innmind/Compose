@@ -5,11 +5,13 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Lazy
 };
 use Innmind\Immutable\{
     Str,
-    Set as ImmutableSet
+    Set as ImmutableSet,
+    Sequence
 };
 
 final class Set implements Constructor
@@ -40,6 +42,14 @@ final class Set implements Constructor
      */
     public function __invoke(...$arguments): object
     {
+        $arguments = Sequence::of(...$arguments)->map(static function($argument) {
+            if ($argument instanceof Lazy) {
+                return $argument->load();
+            }
+
+            return $argument;
+        });
+
         return ImmutableSet::of($this->type, ...$arguments);
     }
 }

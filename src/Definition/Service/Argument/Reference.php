@@ -8,6 +8,7 @@ use Innmind\Compose\{
     Definition\Service\Arguments,
     Definition\Name,
     Definitions,
+    Lazy,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined
@@ -59,9 +60,10 @@ final class Reference implements Argument
             );
         } catch (ArgumentNotProvided $e) {
             if ($e->argument()->hasDefault()) {
-                return $built->add(
-                    $definitions->build($e->argument()->default())
-                );
+                return $built->add(new Lazy(
+                    $e->argument()->default(),
+                    $definitions
+                ));
             }
 
             if ($e->argument()->optional()) {
@@ -73,6 +75,6 @@ final class Reference implements Argument
             //pass
         }
 
-        return $built->add($definitions->build($this->name));
+        return $built->add(new Lazy($this->name, $definitions));
     }
 }

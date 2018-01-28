@@ -5,7 +5,8 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Lazy
 };
 use Innmind\Immutable\{
     Str,
@@ -50,9 +51,17 @@ final class Map implements Constructor
             $this->key,
             $this->value,
             array_map(static function(Pair $pair) {
+                if ($pair->key() instanceof Lazy) {
+                    return $pair->key()->load();
+                }
+
                 return $pair->key();
             }, $arguments),
             array_map(static function(Pair $pair) {
+                if ($pair->value() instanceof Lazy) {
+                    return $pair->value()->load();
+                }
+
                 return $pair->value();
             }, $arguments)
         );

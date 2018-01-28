@@ -5,11 +5,13 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Lazy
 };
 use Innmind\Immutable\{
     Str,
-    Stream as ImmutableStream
+    Stream as ImmutableStream,
+    Sequence
 };
 
 final class Stream implements Constructor
@@ -40,6 +42,14 @@ final class Stream implements Constructor
      */
     public function __invoke(...$arguments): object
     {
+        $arguments = Sequence::of(...$arguments)->map(static function($argument) {
+            if ($argument instanceof Lazy) {
+                return $argument->load();
+            }
+
+            return $argument;
+        });
+
         return ImmutableStream::of($this->type, ...$arguments);
     }
 }

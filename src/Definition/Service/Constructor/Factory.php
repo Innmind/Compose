@@ -5,9 +5,13 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Lazy
 };
-use Innmind\Immutable\Str;
+use Innmind\Immutable\{
+    Str,
+    Sequence
+};
 
 final class Factory implements Constructor
 {
@@ -39,6 +43,14 @@ final class Factory implements Constructor
      */
     public function __invoke(...$arguments): object
     {
+        $arguments = Sequence::of(...$arguments)->map(static function($argument) {
+            if ($argument instanceof Lazy) {
+                return $argument->load();
+            }
+
+            return $argument;
+        });
+
         return [$this->class, $this->method](...$arguments);
     }
 }

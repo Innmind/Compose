@@ -5,7 +5,13 @@ namespace Tests\Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor\Factory,
+    Definition\Service\Constructor\Construct,
     Definition\Service\Constructor,
+    Definition\Service,
+    Definition\Name,
+    Definitions,
+    Arguments,
+    Lazy,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\Str;
@@ -32,5 +38,26 @@ class FactoryTest extends TestCase
         $this->expectExceptionMessage(ServiceFixture::class);
 
         Factory::fromString(Str::of(ServiceFixture::class));
+    }
+
+    public function testLoadLazyService()
+    {
+        $construct = Factory::fromString(Str::of(ServiceFixture::class.'::make'));
+
+        $instance = $construct(
+            1,
+            new Lazy(
+                new Name('foo'),
+                new Definitions(
+                    new Arguments,
+                    new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    )
+                )
+            )
+        );
+
+        $this->assertInstanceOf(ServiceFixture::class, $instance);
     }
 }

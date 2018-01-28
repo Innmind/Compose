@@ -5,7 +5,13 @@ namespace Tests\Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor\Stream,
+    Definition\Service\Constructor\Construct,
     Definition\Service\Constructor,
+    Definition\Service,
+    Definition\Name,
+    Definitions,
+    Arguments,
+    Lazy,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\{
@@ -36,5 +42,26 @@ class StreamTest extends TestCase
         $this->expectExceptionMessage('foo');
 
         Stream::fromString(Str::of('foo'));
+    }
+
+    public function testLoadLazyService()
+    {
+        $construct = Stream::fromString(Str::of('stream<stdClass>'));
+
+        $instance = $construct(
+            new Lazy(
+                new Name('foo'),
+                new Definitions(
+                    new Arguments,
+                    new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    )
+                )
+            )
+        );
+
+        $this->assertInstanceOf(ImmutableStream::class, $instance);
+        $this->assertCount(1, $instance);
     }
 }

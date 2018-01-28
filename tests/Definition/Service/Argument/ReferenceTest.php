@@ -14,6 +14,7 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Definitions,
     Arguments,
+    Lazy,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided
 };
@@ -70,7 +71,8 @@ class ReferenceTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $value);
         $this->assertSame('mixed', (string) $value->type());
         $this->assertCount(1, $value);
-        $this->assertInstanceOf(\SplObjectStorage::class, $value->current());
+        $this->assertInstanceOf(Lazy::class, $value->current());
+        $this->assertInstanceOf(\SplObjectStorage::class, $value->current()->load());
     }
 
     public function testResolveArgument()
@@ -138,7 +140,8 @@ class ReferenceTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $value);
         $this->assertSame('mixed', (string) $value->type());
         $this->assertCount(1, $value);
-        $this->assertInstanceOf(\SplObjectStorage::class, $value->current());
+        $this->assertInstanceOf(Lazy::class, $value->current());
+        $this->assertInstanceOf(\SplObjectStorage::class, $value->current()->load());
     }
 
     public function testResolveOptionalArgument()

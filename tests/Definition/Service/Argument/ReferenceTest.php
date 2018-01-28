@@ -14,7 +14,8 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Definitions,
     Arguments,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Exception\ArgumentNotProvided
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -170,5 +171,28 @@ class ReferenceTest extends TestCase
         $this->assertSame('mixed', (string) $value->type());
         $this->assertCount(1, $value);
         $this->assertNull($value->current());
+    }
+
+    public function testThrowWhenArgumentNotProvided()
+    {
+        $definitions = new Definitions(
+            new Arguments(
+                new Arg(
+                    new Name('baz'),
+                    new Primitive('array')
+                )
+            ),
+            (new Service(
+                new Name('foo'),
+                Constructor\Construct::fromString(Str::of('stdClass'))
+            ))->exposeAs(new Name('foo'))
+        );
+
+        $this->expectException(ArgumentNotProvided::class);
+
+        Reference::fromValue('$baz', new Args)->resolve(
+            Stream::of('mixed'),
+            $definitions
+        );
     }
 }

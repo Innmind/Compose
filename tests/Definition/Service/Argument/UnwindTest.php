@@ -14,7 +14,8 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Definitions,
     Arguments,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Exception\ArgumentNotProvided
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -167,5 +168,28 @@ class UnwindTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $value);
         $this->assertSame('mixed', (string) $value->type());
         $this->assertCount(0, $value); //because spl object storage is empty
+    }
+
+    public function testThrowWhenArgumentNotProvided()
+    {
+        $definitions = new Definitions(
+            new Arguments(
+                new Arg(
+                    new Name('baz'),
+                    new Primitive('array')
+                )
+            ),
+            new Service(
+                new Name('bar'),
+                Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
+            )
+        );
+
+        $this->expectException(ArgumentNotProvided::class);
+
+        Unwind::fromValue('...$baz', new Args)->resolve(
+            Stream::of('mixed'),
+            $definitions
+        );
     }
 }

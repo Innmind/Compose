@@ -54,19 +54,25 @@ final class Reference implements Argument
         Definitions $definitions
     ): StreamInterface {
         try {
-            $value = $definitions->arguments()->get($this->name);
+            return $built->add(
+                $definitions->arguments()->get($this->name)
+            );
         } catch (ArgumentNotProvided $e) {
             if ($e->argument()->hasDefault()) {
-                $value = $definitions->build($e->argument()->default());
+                return $built->add(
+                    $definitions->build($e->argument()->default())
+                );
             }
 
             if ($e->argument()->optional()) {
-                $value = null;
+                return $built->add(null);
             }
+
+            throw $e;
         } catch (ArgumentNotDefined $e) {
-            $value = $definitions->build($this->name);
+            //pass
         }
 
-        return $built->add($value);
+        return $built->add($definitions->build($this->name));
     }
 }

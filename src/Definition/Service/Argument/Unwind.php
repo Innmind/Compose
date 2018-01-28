@@ -55,22 +55,30 @@ final class Unwind implements Argument
         Definitions $definitions
     ): StreamInterface {
         try {
-            $value = $definitions->arguments()->get($this->name);
+            return $built->append(Stream::of(
+                'mixed',
+                ...$definitions->arguments()->get($this->name)
+            ));
         } catch (ArgumentNotProvided $e) {
             if ($e->argument()->hasDefault()) {
-                $value = $definitions->build($e->argument()->default());
+                return $built->append(Stream::of(
+                    'mixed',
+                    ...$definitions->build($e->argument()->default())
+                ));
             }
 
             if ($e->argument()->optional()) {
-                $value = [];
+                return $built;
             }
+
+            throw $e;
         } catch (ArgumentNotDefined $e) {
-            $value = $definitions->build($this->name);
+            //pass
         }
 
         return $built->append(Stream::of(
             'mixed',
-            ...$value
+            ...$definitions->build($this->name)
         ));
     }
 }

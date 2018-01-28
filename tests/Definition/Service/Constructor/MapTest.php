@@ -12,11 +12,11 @@ use Innmind\Compose\{
     Definitions,
     Arguments,
     Lazy,
+    Lazy\Map as LazyMap,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\{
     Str,
-    Map as ImmutableMap,
     Pair
 };
 use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ class MapTest extends TestCase
             new Pair(2, 'bar')
         );
 
-        $this->assertInstanceOf(ImmutableMap::class, $instance);
+        $this->assertInstanceOf(LazyMap::class, $instance);
         $this->assertSame('int', (string) $instance->keyType());
         $this->assertSame('string', (string) $instance->valueType());
         $this->assertCount(2, $instance);
@@ -79,7 +79,7 @@ class MapTest extends TestCase
             )
         );
 
-        $this->assertInstanceOf(ImmutableMap::class, $instance);
+        $this->assertInstanceOf(LazyMap::class, $instance);
         $this->assertCount(1, $instance);
         $this->assertTrue($instance->contains($definitions->build(new Name('foo'))));
         $this->assertSame(

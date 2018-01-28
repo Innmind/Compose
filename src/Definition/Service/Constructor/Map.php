@@ -6,13 +6,9 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 use Innmind\Compose\{
     Definition\Service\Constructor,
     Exception\ValueNotSupported,
-    Lazy
+    Lazy\Map as LazyMap
 };
-use Innmind\Immutable\{
-    Str,
-    Map as ImmutableMap,
-    Pair
-};
+use Innmind\Immutable\Str;
 
 final class Map implements Constructor
 {
@@ -47,23 +43,6 @@ final class Map implements Constructor
      */
     public function __invoke(...$arguments): object
     {
-        return ImmutableMap::of(
-            $this->key,
-            $this->value,
-            array_map(static function(Pair $pair) {
-                if ($pair->key() instanceof Lazy) {
-                    return $pair->key()->load();
-                }
-
-                return $pair->key();
-            }, $arguments),
-            array_map(static function(Pair $pair) {
-                if ($pair->value() instanceof Lazy) {
-                    return $pair->value()->load();
-                }
-
-                return $pair->value();
-            }, $arguments)
-        );
+        return LazyMap::of($this->key, $this->value, ...$arguments);
     }
 }

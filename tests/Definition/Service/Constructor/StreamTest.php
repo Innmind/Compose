@@ -9,7 +9,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service,
     Definition\Name,
-    Definitions,
+    Services,
     Arguments,
     Lazy,
     Lazy\Stream as LazyStream,
@@ -49,7 +49,7 @@ class StreamTest extends TestCase
         $instance = $construct(
             new Lazy(
                 new Name('foo'),
-                new Definitions(
+                new Services(
                     new Arguments,
                     new Service(
                         new Name('foo'),

@@ -23,8 +23,8 @@ final class ContainerBuilder
         PathInterface $definition,
         MapInterface $arguments
     ): ContainerInterface {
-        $definitions = ($this->load)($definition);
+        $services = ($this->load)($definition);
 
-        return new Container($definitions->inject($arguments));
+        return new Container($services->inject($arguments));
     }
 }

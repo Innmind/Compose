@@ -5,7 +5,7 @@ namespace Tests\Innmind\Compose;
 
 use Innmind\Compose\{
     Lazy,
-    Definitions,
+    Services,
     Arguments,
     Definition\Name,
     Definition\Service,
@@ -24,7 +24,7 @@ class LazyTest extends TestCase
 
         new Lazy(
             new Name('foo'),
-            new Definitions(
+            new Services(
                 new Arguments
             )
         );
@@ -34,7 +34,7 @@ class LazyTest extends TestCase
     {
         $lazy = new Lazy(
             new Name('foo'),
-            $definitions = new Definitions(
+            $services = new Services(
                 new Arguments,
                 new Service(
                     new Name('foo'),
@@ -46,6 +46,6 @@ class LazyTest extends TestCase
         $service = $lazy->load();
 
         $this->assertInstanceOf('stdClass', $service);
-        $this->assertSame($service, $definitions->build(new Name('foo')));
+        $this->assertSame($service, $services->build(new Name('foo')));
     }
 }

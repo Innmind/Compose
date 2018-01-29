@@ -10,7 +10,6 @@ use Innmind\Compose\{
     Definition\Service\Constructor\Set,
     Definition\Service\Constructor\Stream,
     Definition\Service\Constructor\Construct,
-    Definitions,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\{

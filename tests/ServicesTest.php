@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Compose;
 
 use Innmind\Compose\{
-    Definitions,
+    Services,
     Arguments,
     Definition\Argument,
     Definition\Name,
@@ -27,7 +27,7 @@ use Fixture\Innmind\Compose\{
     Stack\High
 };
 
-class DefinitionsTest extends TestCase
+class ServicesTest extends TestCase
 {
     private $args;
 
@@ -38,7 +38,7 @@ class DefinitionsTest extends TestCase
 
     public function testInterface()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             $arguments = new Arguments,
             $service = (new Service(
                 new Name('foo'),
@@ -46,17 +46,17 @@ class DefinitionsTest extends TestCase
             ))->exposeAs(new Name('baz'))
         );
 
-        $this->assertSame($arguments, $definitions->arguments());
-        $this->assertTrue($definitions->has(new Name('foo')));
-        $this->assertTrue($definitions->has(new Name('baz')));
-        $this->assertFalse($definitions->has(new Name('bar')));
-        $this->assertSame($service, $definitions->get(new Name('foo')));
-        $this->assertSame($service, $definitions->get(new Name('baz')));
+        $this->assertSame($arguments, $services->arguments());
+        $this->assertTrue($services->has(new Name('foo')));
+        $this->assertTrue($services->has(new Name('baz')));
+        $this->assertFalse($services->has(new Name('bar')));
+        $this->assertSame($service, $services->get(new Name('foo')));
+        $this->assertSame($service, $services->get(new Name('baz')));
     }
 
     public function testInject()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             $arguments = new Arguments(
                 new Argument(
                     new Name('baz'),
@@ -69,24 +69,24 @@ class DefinitionsTest extends TestCase
             ))->exposeAs(new Name('watev'))
         );
 
-        $definitions2 = $definitions->inject(Map::of(
+        $services2 = $services->inject(Map::of(
             'string',
             'mixed',
             ['baz'],
             ['42']
         ));
 
-        $this->assertInstanceOf(Definitions::class, $definitions2);
-        $this->assertNotSame($definitions, $definitions2);
-        $this->assertNotSame($definitions->arguments(), $definitions2->arguments());
-        $this->assertSame($arguments, $definitions->arguments());
-        $this->assertNotSame($arguments, $definitions2->arguments());
-        $this->assertSame('42', $definitions2->arguments()->get(new Name('baz')));
+        $this->assertInstanceOf(Services::class, $services2);
+        $this->assertNotSame($services, $services2);
+        $this->assertNotSame($services->arguments(), $services2->arguments());
+        $this->assertSame($arguments, $services->arguments());
+        $this->assertNotSame($arguments, $services2->arguments());
+        $this->assertSame('42', $services2->arguments()->get(new Name('baz')));
     }
 
     public function testBuild()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 new Argument(
                     new Name('firstArg'),
@@ -114,7 +114,7 @@ class DefinitionsTest extends TestCase
             )
         );
 
-        $service = $definitions
+        $service = $services
             ->inject(Map::of('string', 'mixed', ['firstArg'], [42]))
             ->build(new Name('wished'));
 
@@ -123,7 +123,7 @@ class DefinitionsTest extends TestCase
         $this->assertInstanceOf('stdClass', $service->second);
         $this->assertSame([], $service->third);
 
-        $service = $definitions
+        $service = $services
             ->inject(Map::of(
                 'string',
                 'mixed',
@@ -140,7 +140,7 @@ class DefinitionsTest extends TestCase
         $this->assertSame($expected, $service->second);
         $this->assertSame([], $service->third);
 
-        $service = $definitions
+        $service = $services
             ->inject(Map::of('string', 'mixed', ['firstArg', 'thirdArg'], [42, [1, 2, 3]]))
             ->build(new Name('wished'));
 
@@ -152,7 +152,7 @@ class DefinitionsTest extends TestCase
 
     public function testBuildViaExposedName()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('foo'),
@@ -160,13 +160,13 @@ class DefinitionsTest extends TestCase
             ))->exposeAs(new Name('bar'))
         );
 
-        $this->assertInstanceOf('stdClass', $definitions->build(new Name('foo')));
-        $this->assertInstanceOf('stdClass', $definitions->build(new Name('bar')));
+        $this->assertInstanceOf('stdClass', $services->build(new Name('foo')));
+        $this->assertInstanceOf('stdClass', $services->build(new Name('bar')));
     }
 
     public function testBuildWithADirectDependencyToAnotherService()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 new Argument(
                     new Name('firstArg'),
@@ -184,14 +184,14 @@ class DefinitionsTest extends TestCase
                 Constructor\Construct::fromString(Str::of('stdClass'))
             )
         );
-        $definitions = $definitions->inject(Map::of('string', 'mixed', ['firstArg'], [42]));
+        $services = $services->inject(Map::of('string', 'mixed', ['firstArg'], [42]));
 
-        $this->assertInstanceOf(ServiceFixture::class, $definitions->build(new Name('wished')));
+        $this->assertInstanceOf(ServiceFixture::class, $services->build(new Name('wished')));
     }
 
     public function testBuildWithAPrimitiveArgument()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('wished'),
@@ -205,7 +205,7 @@ class DefinitionsTest extends TestCase
             )
         );
 
-        $service = $definitions->build(new Name('watev'));
+        $service = $services->build(new Name('watev'));
 
         $this->assertInstanceOf(ServiceFixture::class, $service);
         $this->assertSame(42, $service->first);
@@ -216,7 +216,7 @@ class DefinitionsTest extends TestCase
         $this->expectException(CircularDependency::class);
         $this->expectExceptionMessage('foo -> bar -> foo');
 
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('foo'),
@@ -230,12 +230,12 @@ class DefinitionsTest extends TestCase
             )
         );
 
-        $definitions->build(new Name('foo'));
+        $services->build(new Name('foo'));
     }
 
     public function testDoesntRethrowWhenBuildingAValidServiceAfterACircularDependencyFound()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('foo'),
@@ -255,19 +255,19 @@ class DefinitionsTest extends TestCase
         );
 
         try {
-            $definitions->build(new Name('foo'));
+            $services->build(new Name('foo'));
 
             $this->fail('it should throw');
         } catch (CircularDependency $e) {
             //pass
         }
 
-        $this->assertInstanceOf('stdClass', $definitions->build(new Name('baz')));
+        $this->assertInstanceOf('stdClass', $services->build(new Name('baz')));
     }
 
     public function testBuildAServiceOnlyOnce()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('foo'),
@@ -275,15 +275,15 @@ class DefinitionsTest extends TestCase
             ))->exposeAs(new Name('watev'))
         );
 
-        $service = $definitions->build(new Name('watev'));
+        $service = $services->build(new Name('watev'));
 
         $this->assertInstanceOf('stdClass', $service);
-        $this->assertSame($service, $definitions->build(new Name('watev')));
+        $this->assertSame($service, $services->build(new Name('watev')));
     }
 
     public function testReturnSameInstanceWhenCalledEitherByNameOrExposedName()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('foo'),
@@ -292,14 +292,14 @@ class DefinitionsTest extends TestCase
         );
 
         $this->assertSame(
-            $definitions->build(new Name('watev')),
-            $definitions->build(new Name('foo'))
+            $services->build(new Name('watev')),
+            $services->build(new Name('foo'))
         );
     }
 
     public function testInstancesAreResettedWhenInjectingNewArguments()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('foo'),
@@ -307,35 +307,35 @@ class DefinitionsTest extends TestCase
             ))->exposeAs(new Name('watev'))
         );
 
-        $service = $definitions->build(new Name('watev'));
+        $service = $services->build(new Name('watev'));
 
-        $definitions2 = $definitions->inject(new Map('string', 'mixed'));
+        $services2 = $services->inject(new Map('string', 'mixed'));
 
-        $this->assertNotSame($service, $definitions2->build(new Name('watev')));
-        $this->assertSame($service, $definitions->build(new Name('watev')));
+        $this->assertNotSame($service, $services2->build(new Name('watev')));
+        $this->assertSame($service, $services->build(new Name('watev')));
     }
 
     public function testExpose()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             $service = new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
             )
         );
-        $definitions2 = $definitions->expose(new Name('foo'), new Name('watev'));
+        $services2 = $services->expose(new Name('foo'), new Name('watev'));
 
-        $this->assertInstanceOf(Definitions::class, $definitions2);
-        $this->assertNotSame($definitions2, $definitions);
-        $this->assertFalse($definitions->get(new Name('foo'))->exposed());
-        $this->assertTrue($definitions2->get(new Name('foo'))->exposed());
-        $this->assertTrue($definitions2->get(new Name('foo'))->isExposedAs(new Name('watev')));
+        $this->assertInstanceOf(Services::class, $services2);
+        $this->assertNotSame($services2, $services);
+        $this->assertFalse($services->get(new Name('foo'))->exposed());
+        $this->assertTrue($services2->get(new Name('foo'))->exposed());
+        $this->assertTrue($services2->get(new Name('foo'))->isExposedAs(new Name('watev')));
     }
 
     public function testStack()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             new Service(
                 new Name('low'),
@@ -353,20 +353,20 @@ class DefinitionsTest extends TestCase
             )
         );
 
-        $definitions2 = $definitions->stack(
+        $services2 = $services->stack(
             new Name('stack'),
             new Name('high'),
             new Name('middle'),
             new Name('low')
         );
 
-        $this->assertInstanceOf(Definitions::class, $definitions2);
-        $this->assertNotSame($definitions2, $definitions);
-        $this->assertFalse($definitions->has(new Name('stack')));
-        $this->assertTrue($definitions2->has(new Name('stack')));
+        $this->assertInstanceOf(Services::class, $services2);
+        $this->assertNotSame($services2, $services);
+        $this->assertFalse($services->has(new Name('stack')));
+        $this->assertTrue($services2->has(new Name('stack')));
         $this->assertSame(
             'high|middle|low|middle|high',
-            $definitions2->build(new Name('stack'))()
+            $services2->build(new Name('stack'))()
         );
     }
 }

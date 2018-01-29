@@ -5,7 +5,7 @@ namespace Tests\Innmind\Compose;
 
 use Innmind\Compose\{
     Container,
-    Definitions,
+    Services,
     Arguments,
     Definition\Name,
     Definition\Argument,
@@ -29,7 +29,7 @@ class ContainerTest extends TestCase
 
     public function setUp()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 new Argument(
                     new Name('firstArg'),
@@ -49,7 +49,7 @@ class ContainerTest extends TestCase
         );
 
         $this->container = new Container(
-            $definitions->inject(Map::of('string', 'mixed', ['firstArg'], [42]))
+            $services->inject(Map::of('string', 'mixed', ['firstArg'], [42]))
         );
     }
 

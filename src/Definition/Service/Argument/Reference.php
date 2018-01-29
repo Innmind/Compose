@@ -7,7 +7,7 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
     Definition\Name,
-    Definitions,
+    Services,
     Lazy,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided,
@@ -52,17 +52,17 @@ final class Reference implements Argument
      */
     public function resolve(
         StreamInterface $built,
-        Definitions $definitions
+        Services $services
     ): StreamInterface {
         try {
             return $built->add(
-                $definitions->arguments()->get($this->name)
+                $services->arguments()->get($this->name)
             );
         } catch (ArgumentNotProvided $e) {
             if ($e->argument()->hasDefault()) {
                 return $built->add(new Lazy(
                     $e->argument()->default(),
-                    $definitions
+                    $services
                 ));
             }
 
@@ -75,6 +75,6 @@ final class Reference implements Argument
             //pass
         }
 
-        return $built->add(new Lazy($this->name, $definitions));
+        return $built->add(new Lazy($this->name, $services));
     }
 }

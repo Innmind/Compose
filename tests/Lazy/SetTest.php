@@ -6,7 +6,7 @@ namespace Tests\Innmind\Compose\Lazy;
 use Innmind\Compose\{
     Lazy\Set,
     Lazy,
-    Definitions,
+    Services,
     Arguments,
     Definition\Name,
     Definition\Service,
@@ -24,11 +24,11 @@ use PHPUnit\Framework\TestCase;
 class SetTest extends TestCase
 {
     private $set;
-    private $definitions;
+    private $services;
 
     public function setUp()
     {
-        $this->definitions = new Definitions(
+        $this->services = new Services(
             new Arguments,
             new Service(
                 new Name('foo'),
@@ -47,15 +47,15 @@ class SetTest extends TestCase
             'stdClass',
             new Lazy(
                 new Name('foo'),
-                $this->definitions
+                $this->services
             ),
             new Lazy(
                 new Name('bar'),
-                $this->definitions
+                $this->services
             ),
             new Lazy(
                 new Name('baz'),
-                $this->definitions
+                $this->services
             )
         );
     }
@@ -339,16 +339,16 @@ class SetTest extends TestCase
 
     private function foo()
     {
-        return $this->definitions->build(new Name('foo'));
+        return $this->services->build(new Name('foo'));
     }
 
     private function bar()
     {
-        return $this->definitions->build(new Name('bar'));
+        return $this->services->build(new Name('bar'));
     }
 
     private function baz()
     {
-        return $this->definitions->build(new Name('baz'));
+        return $this->services->build(new Name('baz'));
     }
 }

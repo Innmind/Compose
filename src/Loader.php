@@ -7,5 +7,5 @@ use Innmind\Url\PathInterface;
 
 interface Loader
 {
-    public function __invoke(PathInterface $definition): Definitions;
+    public function __invoke(PathInterface $definition): Services;
 }

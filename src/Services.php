@@ -19,7 +19,7 @@ use Innmind\Immutable\{
     Stream
 };
 
-final class Definitions
+final class Services
 {
     private $definitions;
     private $exposed;

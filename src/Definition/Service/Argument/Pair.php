@@ -6,7 +6,7 @@ namespace Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
-    Definitions,
+    Services,
     Exception\ValueNotSupported,
     Exception\LogicException
 };
@@ -59,20 +59,20 @@ final class Pair implements Argument
      */
     public function resolve(
         StreamInterface $built,
-        Definitions $definitions
+        Services $services
     ): StreamInterface {
         $key = $this
             ->key
             ->resolve(
                 $built->clear(),
-                $definitions
+                $services
             )
             ->current();
         $value = $this
             ->value
             ->resolve(
                 $built->clear(),
-                $definitions
+                $services
             )
             ->current();
 

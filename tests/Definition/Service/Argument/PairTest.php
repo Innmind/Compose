@@ -12,7 +12,7 @@ use Innmind\Compose\{
     Definition\Service,
     Definition\Name,
     Definition\Argument as Arg,
-    Definitions,
+    Services,
     Arguments,
     Exception\ValueNotSupported,
     Exception\LogicException
@@ -70,7 +70,7 @@ class PairTest extends TestCase
 
     public function testResolveArgument()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             (new Service(
                 new Name('foo'),
@@ -80,7 +80,7 @@ class PairTest extends TestCase
 
         $value = Pair::fromValue('<foo, bar>', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
 
         $this->assertInstanceOf(StreamInterface::class, $value);

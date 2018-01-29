@@ -10,7 +10,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service,
     Definition\Name,
-    Definitions,
+    Services,
     Arguments
 };
 use Innmind\Immutable\{
@@ -34,7 +34,7 @@ class PrimitiveTest extends TestCase
     {
         $value = Primitive::fromValue(42, new Args)->resolve(
             Stream::of('mixed'),
-            new Definitions(
+            new Services(
                 new Arguments,
                 (new Service(
                     new Name('foo'),

@@ -10,7 +10,7 @@ use Innmind\Compose\{
     Definition\Service\Argument\Primitive,
     Definition\Service\Argument\Reference,
     Definition\Service\Argument\Unwind,
-    Definitions,
+    Services,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\StreamInterface;
@@ -53,7 +53,7 @@ class ArgumentsTest extends TestCase
 
             public function resolve(
                 StreamInterface $built,
-                Definitions $definitions
+                Services $services
             ): StreamInterface {
                 return $built;
             }

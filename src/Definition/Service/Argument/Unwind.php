@@ -7,7 +7,7 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
     Definition\Name,
-    Definitions,
+    Services,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined
@@ -52,18 +52,18 @@ final class Unwind implements Argument
      */
     public function resolve(
         StreamInterface $built,
-        Definitions $definitions
+        Services $services
     ): StreamInterface {
         try {
             return $built->append(Stream::of(
                 'mixed',
-                ...$definitions->arguments()->get($this->name)
+                ...$services->arguments()->get($this->name)
             ));
         } catch (ArgumentNotProvided $e) {
             if ($e->argument()->hasDefault()) {
                 return $built->append(Stream::of(
                     'mixed',
-                    ...$definitions->build($e->argument()->default())
+                    ...$services->build($e->argument()->default())
                 ));
             }
 
@@ -78,7 +78,7 @@ final class Unwind implements Argument
 
         return $built->append(Stream::of(
             'mixed',
-            ...$definitions->build($this->name)
+            ...$services->build($this->name)
         ));
     }
 }

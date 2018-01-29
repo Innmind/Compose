@@ -6,7 +6,8 @@ namespace Tests\Innmind\Compose\Loader;
 use Innmind\Compose\{
     Loader\Yaml,
     Loader,
-    Definition\Name
+    Definition\Name,
+    Services
 };
 use Innmind\Url\Path;
 use Innmind\Immutable\Map;
@@ -27,17 +28,19 @@ class YamlTest extends TestCase
     {
         $load = new Yaml;
 
-        $definitions = $load(new Path('fixtures/container/full.yml'));
+        $services = $load(new Path('fixtures/container/full.yml'));
 
-        $definitions = $definitions->inject(Map::of(
+        $this->assertInstanceOf(Services::class, $services);
+
+        $services = $services->inject(Map::of(
             'string',
             'mixed',
             ['first'],
             [42]
         ));
 
-        $foo = $definitions->build(new Name('foo'));
-        $baz = $definitions->build(new Name('baz'));
+        $foo = $services->build(new Name('foo'));
+        $baz = $services->build(new Name('baz'));
 
         $this->assertInstanceOf(ServiceFixture::class, $foo);
         $this->assertInstanceOf(ServiceFixture::class, $baz);

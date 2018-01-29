@@ -12,11 +12,11 @@ use Psr\Container\ContainerInterface;
 
 final class Container implements ContainerInterface
 {
-    private $definitions;
+    private $services;
 
-    public function __construct(Definitions $definitions)
+    public function __construct(Services $services)
     {
-        $this->definitions = $definitions;
+        $this->services = $services;
     }
 
     /**
@@ -28,7 +28,7 @@ final class Container implements ContainerInterface
             throw new NotFound($id);
         }
 
-        return $this->definitions->build(new Name($id));
+        return $this->services->build(new Name($id));
     }
 
     /**
@@ -38,12 +38,12 @@ final class Container implements ContainerInterface
     {
         $name = new Name($id);
 
-        if (!$this->definitions->has($name)) {
+        if (!$this->services->has($name)) {
             return false;
         }
 
         $definition = $this
-            ->definitions
+            ->services
             ->get($name);
 
         if (!$definition->exposed()) {

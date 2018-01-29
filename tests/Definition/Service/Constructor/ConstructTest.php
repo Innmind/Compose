@@ -9,7 +9,7 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service,
     Lazy,
-    Definitions,
+    Services,
     Arguments
 };
 use Innmind\Immutable\Str;
@@ -38,7 +38,7 @@ class ConstructTest extends TestCase
             1,
             new Lazy(
                 new Name('foo'),
-                new Definitions(
+                new Services(
                     new Arguments,
                     new Service(
                         new Name('foo'),

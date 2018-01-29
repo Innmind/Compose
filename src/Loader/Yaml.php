@@ -5,7 +5,7 @@ namespace Innmind\Compose\Loader;
 
 use Innmind\Compose\{
     Loader,
-    Definitions,
+    Services,
     Arguments,
     Definition\Argument,
     Definition\Argument\Types,
@@ -59,7 +59,7 @@ final class Yaml implements Loader
         $this->stacks = new Map(Name::class, Sequence::class);
     }
 
-    public function __invoke(PathInterface $definition): Definitions
+    public function __invoke(PathInterface $definition): Services
     {
         $this->stacks->clear();
 
@@ -79,11 +79,11 @@ final class Yaml implements Loader
             array_values($data['expose'])
         );
 
-        $definitions = new Definitions(
+        $services = new Services(
             $arguments,
             ...$definitions->values()
         );
-        $definitions = $this->buildStacks($definitions);
+        $services = $this->buildStacks($services);
 
         return $exposed
             ->map(static function(string $as, string $name): Pair {
@@ -93,9 +93,9 @@ final class Yaml implements Loader
                 );
             })
             ->reduce(
-                $definitions,
-                static function(Definitions $definitions, string $as, string $name): Definitions {
-                    return $definitions->expose(
+                $services,
+                static function(Services $services, string $as, string $name): Services {
+                    return $services->expose(
                         new Name($name),
                         new Name($as)
                     );
@@ -228,12 +228,12 @@ final class Yaml implements Loader
         );
     }
 
-    private function buildStacks(Definitions $definitions): Definitions
+    private function buildStacks(Services $services): Services
     {
         return $this->stacks->reduce(
-            $definitions,
-            function(Definitions $definitions, Name $name, Sequence $stack): Definitions {
-                return $definitions->stack($name, ...$stack);
+            $services,
+            function(Services $services, Name $name, Sequence $stack): Services {
+                return $services->stack($name, ...$stack);
             }
         );
     }

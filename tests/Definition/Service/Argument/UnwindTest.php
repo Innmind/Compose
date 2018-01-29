@@ -12,7 +12,7 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Argument as Arg,
     Definition\Argument\Type\Primitive,
-    Definitions,
+    Services,
     Arguments,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided
@@ -52,7 +52,7 @@ class UnwindTest extends TestCase
 
     public function testResolveArgument()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 new Arg(
                     new Name('baz'),
@@ -64,7 +64,7 @@ class UnwindTest extends TestCase
                 Constructor\Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
-        $definitions = $definitions->inject(Map::of(
+        $services = $services->inject(Map::of(
             'string',
             'mixed',
             ['baz'],
@@ -73,7 +73,7 @@ class UnwindTest extends TestCase
 
         $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
 
         $this->assertInstanceOf(StreamInterface::class, $value);
@@ -84,7 +84,7 @@ class UnwindTest extends TestCase
 
     public function testResolveOptionalArgument()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 (new Arg(
                     new Name('baz'),
@@ -96,7 +96,7 @@ class UnwindTest extends TestCase
                 Constructor\Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
-        $definitions = $definitions->inject(Map::of(
+        $services = $services->inject(Map::of(
             'string',
             'mixed',
             [],
@@ -105,7 +105,7 @@ class UnwindTest extends TestCase
 
         $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
 
         $this->assertInstanceOf(StreamInterface::class, $value);
@@ -117,7 +117,7 @@ class UnwindTest extends TestCase
     {
         $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
-            new Definitions(
+            new Services(
                 new Arguments,
                 (new Service(
                     new Name('foo'),
@@ -137,7 +137,7 @@ class UnwindTest extends TestCase
 
     public function testResolveArgumentDefault()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 (new Arg(
                     new Name('baz'),
@@ -153,7 +153,7 @@ class UnwindTest extends TestCase
                 Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
             )
         );
-        $definitions = $definitions->inject(Map::of(
+        $services = $services->inject(Map::of(
             'string',
             'mixed',
             [],
@@ -162,7 +162,7 @@ class UnwindTest extends TestCase
 
         $value = Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
 
         $this->assertInstanceOf(StreamInterface::class, $value);
@@ -172,7 +172,7 @@ class UnwindTest extends TestCase
 
     public function testThrowWhenArgumentNotProvided()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 new Arg(
                     new Name('baz'),
@@ -189,7 +189,7 @@ class UnwindTest extends TestCase
 
         Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
     }
 }

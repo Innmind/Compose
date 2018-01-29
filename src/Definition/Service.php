@@ -7,7 +7,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service\Argument,
     Definition\Service\Arguments,
-    Definitions,
+    Services,
     Exception\ServiceCannotDecorateMultipleServices,
     Exception\LogicException
 };
@@ -87,12 +87,12 @@ final class Service
         return $this->arguments;
     }
 
-    public function build(Definitions $definitions): object
+    public function build(Services $services): object
     {
         return ($this->construct)(...$this->arguments->reduce(
             Stream::of('mixed'),
-            static function(Stream $arguments, Argument $argument) use ($definitions): Stream {
-                return $argument->resolve($arguments, $definitions);
+            static function(Stream $arguments, Argument $argument) use ($services): Stream {
+                return $argument->resolve($arguments, $services);
             }
         ));
     }

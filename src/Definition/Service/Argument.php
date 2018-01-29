@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Compose\Definition\Service;
 
-use Innmind\Compose\Definitions;
+use Innmind\Compose\Services;
 use Innmind\Immutable\StreamInterface;
 
 interface Argument
@@ -22,6 +22,6 @@ interface Argument
      */
     public function resolve(
         StreamInterface $built,
-        Definitions $definitions
+        Services $services
     ): StreamInterface;
 }

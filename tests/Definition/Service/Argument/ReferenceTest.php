@@ -12,7 +12,7 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Argument as Arg,
     Definition\Argument\Type\Primitive,
-    Definitions,
+    Services,
     Arguments,
     Lazy,
     Exception\ValueNotSupported,
@@ -55,7 +55,7 @@ class ReferenceTest extends TestCase
     {
         $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
-            new Definitions(
+            new Services(
                 new Arguments,
                 (new Service(
                     new Name('foo'),
@@ -77,7 +77,7 @@ class ReferenceTest extends TestCase
 
     public function testResolveArgument()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 new Arg(
                     new Name('baz'),
@@ -89,7 +89,7 @@ class ReferenceTest extends TestCase
                 Constructor\Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
-        $definitions = $definitions->inject(Map::of(
+        $services = $services->inject(Map::of(
             'string',
             'mixed',
             ['baz'],
@@ -98,7 +98,7 @@ class ReferenceTest extends TestCase
 
         $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
 
         $this->assertInstanceOf(StreamInterface::class, $value);
@@ -109,7 +109,7 @@ class ReferenceTest extends TestCase
 
     public function testResolveArgumentDefault()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 (new Arg(
                     new Name('baz'),
@@ -125,7 +125,7 @@ class ReferenceTest extends TestCase
                 Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
             )
         );
-        $definitions = $definitions->inject(Map::of(
+        $services = $services->inject(Map::of(
             'string',
             'mixed',
             [],
@@ -134,7 +134,7 @@ class ReferenceTest extends TestCase
 
         $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
 
         $this->assertInstanceOf(StreamInterface::class, $value);
@@ -146,7 +146,7 @@ class ReferenceTest extends TestCase
 
     public function testResolveOptionalArgument()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 (new Arg(
                     new Name('baz'),
@@ -158,7 +158,7 @@ class ReferenceTest extends TestCase
                 Constructor\Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
-        $definitions = $definitions->inject(Map::of(
+        $services = $services->inject(Map::of(
             'string',
             'mixed',
             [],
@@ -167,7 +167,7 @@ class ReferenceTest extends TestCase
 
         $value = Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
 
         $this->assertInstanceOf(StreamInterface::class, $value);
@@ -178,7 +178,7 @@ class ReferenceTest extends TestCase
 
     public function testThrowWhenArgumentNotProvided()
     {
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments(
                 new Arg(
                     new Name('baz'),
@@ -195,7 +195,7 @@ class ReferenceTest extends TestCase
 
         Reference::fromValue('$baz', new Args)->resolve(
             Stream::of('mixed'),
-            $definitions
+            $services
         );
     }
 }

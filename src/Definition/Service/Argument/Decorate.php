@@ -6,7 +6,7 @@ namespace Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
-    Definitions,
+    Services,
     Exception\ValueNotSupported,
     Exception\DecoratedArgumentCannotBeResolved
 };
@@ -31,7 +31,7 @@ final class Decorate implements Argument
      */
     public function resolve(
         StreamInterface $built,
-        Definitions $definitions
+        Services $services
     ): StreamInterface {
         throw new DecoratedArgumentCannotBeResolved;
     }

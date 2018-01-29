@@ -9,7 +9,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service,
     Definition\Name,
-    Definitions,
+    Services,
     Arguments,
     Lazy,
     Lazy\Map as LazyMap,
@@ -54,7 +54,7 @@ class MapTest extends TestCase
     {
         $construct = Map::fromString(Str::of('map<stdClass, stdClass>'));
 
-        $definitions = new Definitions(
+        $services = new Services(
             new Arguments,
             new Service(
                 new Name('foo'),
@@ -70,21 +70,21 @@ class MapTest extends TestCase
             new Pair(
                 new Lazy(
                     new Name('foo'),
-                    $definitions
+                    $services
                 ),
                 new Lazy(
                     new Name('bar'),
-                    $definitions
+                    $services
                 )
             )
         );
 
         $this->assertInstanceOf(LazyMap::class, $instance);
         $this->assertCount(1, $instance);
-        $this->assertTrue($instance->contains($definitions->build(new Name('foo'))));
+        $this->assertTrue($instance->contains($services->build(new Name('foo'))));
         $this->assertSame(
-            $definitions->build(new Name('bar')),
-            $instance->get($definitions->build(new Name('foo')))
+            $services->build(new Name('bar')),
+            $instance->get($services->build(new Name('foo')))
         );
     }
 }

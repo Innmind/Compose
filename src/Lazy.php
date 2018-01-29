@@ -11,22 +11,22 @@ use Innmind\Compose\{
 final class Lazy
 {
     private $name;
-    private $definitions;
+    private $services;
 
     public function __construct(
         Name $name,
-        Definitions $definitions
+        Services $services
     ) {
-        if (!$definitions->has($name)) {
+        if (!$services->has($name)) {
             throw new ReferenceNotFound((string) $name);
         }
 
         $this->name = $name;
-        $this->definitions = $definitions;
+        $this->services = $services;
     }
 
     public function load(): object
     {
-        return $this->definitions->build($this->name);
+        return $this->services->build($this->name);
     }
 }

@@ -67,14 +67,14 @@ final class Pair implements Argument
                 $built->clear(),
                 $services
             )
-            ->current();
+            ->first();
         $value = $this
             ->value
             ->resolve(
                 $built->clear(),
                 $services
             )
-            ->current();
+            ->first();
 
         return $built->add(new ImmutablePair($key, $value));
     }

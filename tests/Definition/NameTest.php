@@ -5,7 +5,8 @@ namespace Tests\Innmind\Compose\Definition;
 
 use Innmind\Compose\{
     Definition\Name,
-    Exception\NameMustContainAtLeastACharacter
+    Exception\NameMustContainAtLeastACharacter,
+    Exception\NameNotNamespaced
 };
 use PHPUnit\Framework\TestCase;
 use Eris\{
@@ -34,5 +35,45 @@ class NameTest extends TestCase
         $this->expectException(NameMustContainAtLeastACharacter::class);
 
         new Name('');
+    }
+
+    public function testRoot()
+    {
+        $name = new Name('foo.bar.baz');
+
+        $root = $name->root();
+
+        $this->assertInstanceOf(Name::class, $root);
+        $this->assertNotSame($name, $root);
+        $this->assertSame('foo', (string) $root);
+        $this->assertSame('foo.bar.baz', (string) $name);
+    }
+
+    public function testThrowWhenNoRoot()
+    {
+        $this->expectException(NameNotNamespaced::class);
+        $this->expectExceptionMessage('foo');
+
+        (new Name('foo'))->root();
+    }
+
+    public function testWithoutRoot()
+    {
+        $name = new Name('foo.bar.baz');
+
+        $name2 = $name->withoutRoot();
+
+        $this->assertInstanceOf(Name::class, $name2);
+        $this->assertNotSame($name, $name2);
+        $this->assertSame('foo.bar.baz', (string) $name);
+        $this->assertSame('bar.baz', (string) $name2);
+    }
+
+    public function testThrowWhenTryingToRemoveARootThatDoesntExist()
+    {
+        $this->expectException(NameNotNamespaced::class);
+        $this->expectExceptionMessage('foo');
+
+        (new Name('foo'))->withoutRoot();
     }
 }

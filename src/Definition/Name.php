@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Compose\Definition;
 
-use Innmind\Compose\Exception\NameMustContainAtLeastACharacter;
+use Innmind\Compose\Exception\{
+    NameMustContainAtLeastACharacter,
+    NameNotNamespaced
+};
 use Innmind\Immutable\Str;
 
 final class Name
@@ -12,15 +15,39 @@ final class Name
 
     public function __construct(string $value)
     {
-        if (Str::of($value)->empty()) {
+        $value = Str::of($value);
+
+        if ($value->empty()) {
             throw new NameMustContainAtLeastACharacter;
         }
 
         $this->value = $value;
     }
 
+    public function root(): self
+    {
+        $namespace = $this->value->split('.');
+
+        if ($namespace->size() === 1) {
+            throw new NameNotNamespaced((string) $this->value);
+        }
+
+        return new self((string) $namespace->first());
+    }
+
+    public function withoutRoot(): self
+    {
+        $namespace = $this->value->split('.');
+
+        if ($namespace->size() === 1) {
+            throw new NameNotNamespaced((string) $this->value);
+        }
+
+        return new self((string) $namespace->drop(1)->join('.'));
+    }
+
     public function __toString(): string
     {
-        return $this->value;
+        return (string) $this->value;
     }
 }

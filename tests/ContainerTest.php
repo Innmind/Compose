@@ -7,6 +7,7 @@ use Innmind\Compose\{
     Container,
     Services,
     Arguments,
+    Dependencies,
     Definition\Name,
     Definition\Argument,
     Definition\Argument\Type\Primitive,
@@ -36,6 +37,7 @@ class ContainerTest extends TestCase
                     new Primitive('int')
                 )
             ),
+            new Dependencies,
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),

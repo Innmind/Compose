@@ -32,6 +32,7 @@ class DependenciesTest extends TestCase
                 new Name('first'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     (new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))
@@ -42,6 +43,7 @@ class DependenciesTest extends TestCase
                 new Name('second'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     (new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))
@@ -67,6 +69,7 @@ class DependenciesTest extends TestCase
                 new Name('first'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     (new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))
@@ -88,6 +91,7 @@ class DependenciesTest extends TestCase
                 new Name('first'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     (new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))
@@ -109,6 +113,7 @@ class DependenciesTest extends TestCase
                 new Name('first'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     (new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))
@@ -135,6 +140,7 @@ class DependenciesTest extends TestCase
                             new Instance('stdClass')
                         )
                     ),
+                    new Dependencies,
                     (new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of(ServiceFixture::class)),
@@ -150,6 +156,7 @@ class DependenciesTest extends TestCase
         );
         $upper = new Services(
             new Arguments,
+            new Dependencies,
             new Service(
                 new Name('std'),
                 Construct::fromString(Str::of('stdClass'))

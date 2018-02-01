@@ -11,7 +11,8 @@ use Innmind\Compose\{
     Definition\Service,
     Definition\Name,
     Services,
-    Arguments
+    Arguments,
+    Dependencies
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -36,6 +37,7 @@ class PrimitiveTest extends TestCase
             Stream::of('mixed'),
             new Services(
                 new Arguments,
+                new Dependencies,
                 (new Service(
                     new Name('foo'),
                     Constructor\Construct::fromString(Str::of('stdClass'))

@@ -14,6 +14,7 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Services,
     Arguments,
+    Dependencies,
     Lazy,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided
@@ -57,6 +58,7 @@ class ReferenceTest extends TestCase
             Stream::of('mixed'),
             new Services(
                 new Arguments,
+                new Dependencies,
                 (new Service(
                     new Name('foo'),
                     Constructor\Construct::fromString(Str::of('stdClass'))
@@ -84,6 +86,7 @@ class ReferenceTest extends TestCase
                     new Primitive('array')
                 )
             ),
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -116,6 +119,7 @@ class ReferenceTest extends TestCase
                     new Primitive('array')
                 ))->defaultsTo(new Name('bar'))
             ),
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -153,6 +157,7 @@ class ReferenceTest extends TestCase
                     new Primitive('array')
                 ))->makeOptional()
             ),
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -185,6 +190,7 @@ class ReferenceTest extends TestCase
                     new Primitive('array')
                 )
             ),
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))

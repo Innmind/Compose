@@ -14,6 +14,7 @@ use Innmind\Compose\{
     Definition\Argument as Arg,
     Services,
     Arguments,
+    Dependencies,
     Exception\ValueNotSupported,
     Exception\LogicException
 };
@@ -72,6 +73,7 @@ class PairTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))

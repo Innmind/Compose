@@ -6,6 +6,7 @@ namespace Tests\Innmind\Compose;
 use Innmind\Compose\{
     Services,
     Arguments,
+    Dependencies,
     Definition\Argument,
     Definition\Name,
     Definition\Argument\Type\Primitive,
@@ -40,6 +41,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             $arguments = new Arguments,
+            $dependencies = new Dependencies,
             $service = (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -47,6 +49,7 @@ class ServicesTest extends TestCase
         );
 
         $this->assertSame($arguments, $services->arguments());
+        $this->assertSame($dependencies, $services->dependencies());
         $this->assertTrue($services->has(new Name('foo')));
         $this->assertTrue($services->has(new Name('baz')));
         $this->assertFalse($services->has(new Name('bar')));
@@ -63,6 +66,7 @@ class ServicesTest extends TestCase
                     new Primitive('string')
                 )
             ),
+            new Dependencies,
             $service = (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -101,6 +105,7 @@ class ServicesTest extends TestCase
                     new Primitive('array')
                 ))->makeOptional()
             ),
+            new Dependencies,
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
@@ -154,6 +159,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -173,6 +179,7 @@ class ServicesTest extends TestCase
                     new Primitive('int')
                 )
             ),
+            new Dependencies,
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
@@ -193,6 +200,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('wished'),
                 Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
@@ -218,6 +226,7 @@ class ServicesTest extends TestCase
 
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass')),
@@ -237,6 +246,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass')),
@@ -269,6 +279,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -285,6 +296,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -301,6 +313,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             (new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -319,6 +332,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             $service = new Service(
                 new Name('foo'),
                 Constructor\Construct::fromString(Str::of('stdClass'))
@@ -337,6 +351,7 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
+            new Dependencies,
             new Service(
                 new Name('low'),
                 Constructor\Construct::fromString(Str::of(Low::class))

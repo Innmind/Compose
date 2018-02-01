@@ -12,6 +12,7 @@ use Innmind\Compose\{
     Definition\Name,
     Services,
     Arguments,
+    Dependencies,
     Exception\ValueNotSupported,
     Exception\DecoratedArgumentCannotBeResolved
 };
@@ -46,6 +47,7 @@ class DecorateTest extends TestCase
             Stream::of('mixed'),
             new Services(
                 new Arguments,
+                new Dependencies,
                 (new Service(
                     new Name('foo'),
                     Constructor\Construct::fromString(Str::of('stdClass'))

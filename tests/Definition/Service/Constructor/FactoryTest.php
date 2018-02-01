@@ -11,6 +11,7 @@ use Innmind\Compose\{
     Definition\Name,
     Services,
     Arguments,
+    Dependencies,
     Lazy,
     Exception\ValueNotSupported
 };
@@ -50,6 +51,7 @@ class FactoryTest extends TestCase
                 new Name('foo'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))

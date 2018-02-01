@@ -11,6 +11,7 @@ use Innmind\Compose\{
     Definition\Name,
     Services,
     Arguments,
+    Dependencies,
     Lazy,
     Lazy\Map as LazyMap,
     Exception\ValueNotSupported
@@ -56,6 +57,7 @@ class MapTest extends TestCase
 
         $services = new Services(
             new Arguments,
+            new Dependencies,
             new Service(
                 new Name('foo'),
                 Construct::fromString(Str::of('stdClass'))

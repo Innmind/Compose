@@ -12,6 +12,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor\Construct,
     Services,
     Arguments,
+    Dependencies,
     Exception\ArgumentNotProvided
 };
 use Innmind\Immutable\{
@@ -33,6 +34,7 @@ class ArgumentTest extends TestCase
                     new Primitive('string')
                 )
             ),
+            new Dependencies,
             new Service(
                 new Name('bar'),
                 Construct::fromString(Str::of('stdClass'))
@@ -92,6 +94,7 @@ class ArgumentTest extends TestCase
                     new Primitive('string')
                 ))->defaultsTo(new Name('default'))
             ),
+            new Dependencies,
             new Service(
                 new Name('default'),
                 Construct::fromString(Str::of('stdClass'))
@@ -119,7 +122,8 @@ class ArgumentTest extends TestCase
                     new Name('arg'),
                     new Primitive('string')
                 ))->makeOptional()
-            )
+            ),
+            new Dependencies
         );
 
         $argument = Argument::fromValue(
@@ -140,7 +144,8 @@ class ArgumentTest extends TestCase
                     new Name('arg'),
                     new Primitive('string')
                 )
-            )
+            ),
+            new Dependencies
         );
 
         $argument = Argument::fromValue(

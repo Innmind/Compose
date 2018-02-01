@@ -24,12 +24,17 @@ final class Services
     private $definitions;
     private $exposed;
     private $arguments;
+    private $dependencies;
     private $building;
     private $instances;
 
-    public function __construct(Arguments $arguments, Service ...$definitions)
-    {
+    public function __construct(
+        Arguments $arguments,
+        Dependencies $dependencies,
+        Service ...$definitions
+    ) {
         $this->arguments = $arguments;
+        $this->dependencies = $dependencies;
         $this->definitions = Sequence::of(...$definitions)->reduce(
             new Map('string', Service::class),
             static function(Map $definitions, Service $definition): Map {
@@ -118,6 +123,7 @@ final class Services
         $self->arguments = $self->arguments->bind($arguments);
         $self->building = $self->building->clear();
         $self->instances = $self->instances->clear();
+        $self->dependencies = $self->dependencies->bind($self);
 
         return $self;
     }
@@ -159,6 +165,11 @@ final class Services
     public function arguments(): Arguments
     {
         return $this->arguments;
+    }
+
+    public function dependencies(): Dependencies
+    {
+        return $this->dependencies;
     }
 
     public function has(Name $name): bool

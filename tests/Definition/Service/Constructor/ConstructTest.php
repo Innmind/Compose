@@ -10,7 +10,8 @@ use Innmind\Compose\{
     Definition\Service,
     Lazy,
     Services,
-    Arguments
+    Arguments,
+    Dependencies
 };
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
@@ -40,6 +41,7 @@ class ConstructTest extends TestCase
                 new Name('foo'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))

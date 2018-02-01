@@ -14,6 +14,7 @@ use Innmind\Compose\{
     Definition\Service\Argument\Reference,
     Services,
     Arguments,
+    Dependencies,
     Exception\ReferenceNotFound,
     Exception\ArgumentNotProvided
 };
@@ -30,7 +31,7 @@ class DependencyTest extends TestCase
     {
         $dependency = new Dependency(
             $name = new Name('foo'),
-            new Services(new Arguments)
+            new Services(new Arguments, new Dependencies)
         );
 
         $this->assertSame($name, $dependency->name());
@@ -42,6 +43,7 @@ class DependencyTest extends TestCase
             new Name('watev'),
             $services = new Services(
                 new Arguments,
+                new Dependencies,
                 (new Service(
                     new Name('foo'),
                     Construct::fromString(Str::of('stdClass'))
@@ -61,6 +63,7 @@ class DependencyTest extends TestCase
             new Name('watev'),
             $services = new Services(
                 new Arguments,
+                new Dependencies,
                 (new Service(
                     new Name('foo'),
                     Construct::fromString(Str::of('stdClass'))
@@ -80,6 +83,7 @@ class DependencyTest extends TestCase
             new Name('watev'),
             $services = new Services(
                 new Arguments,
+                new Dependencies,
                 new Service(
                     new Name('foo'),
                     Construct::fromString(Str::of('stdClass'))
@@ -104,6 +108,7 @@ class DependencyTest extends TestCase
                         new Primitive('int')
                     )
                 ),
+                new Dependencies,
                 (new Service(
                     new Name('foo'),
                     Construct::fromString(Str::of(ServiceFixture::class)),
@@ -124,7 +129,8 @@ class DependencyTest extends TestCase
                     new Name('arg'),
                     new Primitive('int')
                 )
-            )
+            ),
+            new Dependencies
         ))->inject((new Map('string', 'mixed'))->put('arg', 42));
 
         $dependency2 = $dependency->bind($upper);

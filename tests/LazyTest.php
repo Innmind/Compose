@@ -7,6 +7,7 @@ use Innmind\Compose\{
     Lazy,
     Services,
     Arguments,
+    Dependencies,
     Definition\Name,
     Definition\Service,
     Definition\Service\Constructor\Construct,
@@ -25,7 +26,8 @@ class LazyTest extends TestCase
         new Lazy(
             new Name('foo'),
             new Services(
-                new Arguments
+                new Arguments,
+                new Dependencies
             )
         );
     }
@@ -36,6 +38,7 @@ class LazyTest extends TestCase
             new Name('foo'),
             $services = new Services(
                 new Arguments,
+                new Dependencies,
                 new Service(
                     new Name('foo'),
                     Construct::fromString(Str::of('stdClass'))

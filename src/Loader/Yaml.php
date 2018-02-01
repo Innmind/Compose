@@ -7,6 +7,7 @@ use Innmind\Compose\{
     Loader,
     Services,
     Arguments,
+    Dependencies,
     Definition\Argument,
     Definition\Argument\Types,
     Definition\Name,
@@ -81,6 +82,7 @@ final class Yaml implements Loader
 
         $services = new Services(
             $arguments,
+            new Dependencies,
             ...$definitions->values()
         );
         $services = $this->buildStacks($services);

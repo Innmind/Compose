@@ -11,6 +11,7 @@ use Innmind\Compose\{
     Definition\Name,
     Services,
     Arguments,
+    Dependencies,
     Lazy,
     Lazy\Set as LazySet,
     Exception\ValueNotSupported
@@ -51,6 +52,7 @@ class SetTest extends TestCase
                 new Name('foo'),
                 new Services(
                     new Arguments,
+                    new Dependencies,
                     new Service(
                         new Name('foo'),
                         Construct::fromString(Str::of('stdClass'))

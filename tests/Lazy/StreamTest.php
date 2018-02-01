@@ -8,6 +8,7 @@ use Innmind\Compose\{
     Lazy,
     Services,
     Arguments,
+    Dependencies,
     Definition\Name,
     Definition\Service,
     Definition\Service\Constructor\Construct
@@ -32,6 +33,7 @@ class StreamTest extends TestCase
     {
         $this->services = new Services(
             new Arguments,
+            new Dependencies,
             new Service(
                 new Name('foo'),
                 Construct::fromString(Str::of('stdClass'))

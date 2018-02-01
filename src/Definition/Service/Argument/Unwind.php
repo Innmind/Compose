@@ -10,7 +10,8 @@ use Innmind\Compose\{
     Services,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided,
-    Exception\ArgumentNotDefined
+    Exception\ArgumentNotDefined,
+    Exception\ReferenceNotFound
 };
 use Innmind\Immutable\{
     Str,
@@ -73,6 +74,15 @@ final class Unwind implements Argument
 
             throw $e;
         } catch (ArgumentNotDefined $e) {
+            //pass
+        }
+
+        try {
+            return $built->append(Stream::of(
+                'mixed',
+                ...$services->dependencies()->build($this->name)
+            ));
+        } catch (ReferenceNotFound $e) {
             //pass
         }
 

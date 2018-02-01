@@ -7,11 +7,12 @@ use Innmind\Compose\{
     Definition\Service\Argument\Reference,
     Definition\Service\Argument,
     Definition\Service\Arguments as Args,
-    Definition\Service\Constructor,
+    Definition\Service\Constructor\Construct,
     Definition\Service,
     Definition\Name,
     Definition\Argument as Arg,
     Definition\Argument\Type\Primitive,
+    Definition\Dependency,
     Services,
     Arguments,
     Dependencies,
@@ -61,11 +62,11 @@ class ReferenceTest extends TestCase
                 new Dependencies,
                 (new Service(
                     new Name('foo'),
-                    Constructor\Construct::fromString(Str::of('stdClass'))
+                    Construct::fromString(Str::of('stdClass'))
                 ))->exposeAs(new Name('foo')),
                 new Service(
                     new Name('baz'),
-                    Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
+                    Construct::fromString(Str::of(\SplObjectStorage::class))
                 )
             )
         );
@@ -89,7 +90,7 @@ class ReferenceTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
         $services = $services->inject(Map::of(
@@ -122,11 +123,11 @@ class ReferenceTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('bar'),
-                Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
+                Construct::fromString(Str::of(\SplObjectStorage::class))
             )
         );
         $services = $services->inject(Map::of(
@@ -160,7 +161,7 @@ class ReferenceTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
         $services = $services->inject(Map::of(
@@ -193,7 +194,7 @@ class ReferenceTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
 
@@ -203,5 +204,35 @@ class ReferenceTest extends TestCase
             Stream::of('mixed'),
             $services
         );
+    }
+
+    public function testResolveContainerDependency()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies(
+                new Dependency(
+                    new Name('inner'),
+                    new Services(
+                        new Arguments,
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of('stdClass'))
+                        ))->exposeAs(new Name('bar'))
+                    )
+                )
+            )
+        );
+
+        $value = Reference::fromValue('$inner.bar', new Args)->resolve(
+            Stream::of('mixed'),
+            $services
+        );
+
+        $this->assertInstanceOf(StreamInterface::class, $value);
+        $this->assertSame('mixed', (string) $value->type());
+        $this->assertCount(1, $value);
+        $this->assertInstanceOf('stdClass', $value->current());
     }
 }

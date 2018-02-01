@@ -7,11 +7,12 @@ use Innmind\Compose\{
     Definition\Service\Argument\Unwind,
     Definition\Service\Argument,
     Definition\Service\Arguments as Args,
-    Definition\Service\Constructor,
+    Definition\Service\Constructor\Construct,
     Definition\Service,
     Definition\Name,
     Definition\Argument as Arg,
     Definition\Argument\Type\Primitive,
+    Definition\Dependency,
     Services,
     Arguments,
     Dependencies,
@@ -25,6 +26,7 @@ use Innmind\Immutable\{
     Str
 };
 use PHPUnit\Framework\TestCase;
+use Fixture\Innmind\Compose\Iterator;
 
 class UnwindTest extends TestCase
 {
@@ -63,7 +65,7 @@ class UnwindTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
         $services = $services->inject(Map::of(
@@ -96,7 +98,7 @@ class UnwindTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo'))
         );
         $services = $services->inject(Map::of(
@@ -125,11 +127,11 @@ class UnwindTest extends TestCase
                 new Dependencies,
                 (new Service(
                     new Name('foo'),
-                    Constructor\Construct::fromString(Str::of('stdClass'))
+                    Construct::fromString(Str::of('stdClass'))
                 ))->exposeAs(new Name('foo')),
                 new Service(
                     new Name('baz'),
-                    Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
+                    Construct::fromString(Str::of(\SplObjectStorage::class))
                 )
             )
         );
@@ -151,11 +153,11 @@ class UnwindTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('bar'),
-                Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
+                Construct::fromString(Str::of(\SplObjectStorage::class))
             )
         );
         $services = $services->inject(Map::of(
@@ -187,7 +189,7 @@ class UnwindTest extends TestCase
             new Dependencies,
             new Service(
                 new Name('bar'),
-                Constructor\Construct::fromString(Str::of(\SplObjectStorage::class))
+                Construct::fromString(Str::of(\SplObjectStorage::class))
             )
         );
 
@@ -196,6 +198,42 @@ class UnwindTest extends TestCase
         Unwind::fromValue('...$baz', new Args)->resolve(
             Stream::of('mixed'),
             $services
+        );
+    }
+
+    public function testResolveContainerDependency()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies(
+                new Dependency(
+                    new Name('inner'),
+                    new Services(
+                        new Arguments,
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(Iterator::class)),
+                            new Argument\Primitive(24),
+                            new Argument\Primitive(42),
+                            new Argument\Primitive(66)
+                        ))->exposeAs(new Name('bar'))
+                    )
+                )
+            )
+        );
+
+        $value = Unwind::fromValue('...$inner.bar', new Args)->resolve(
+            Stream::of('mixed'),
+            $services
+        );
+
+        $this->assertInstanceOf(StreamInterface::class, $value);
+        $this->assertSame('mixed', (string) $value->type());
+        $this->assertCount(3, $value);
+        $this->assertSame(
+            [24, 42, 66],
+            $value->toPrimitive()
         );
     }
 }

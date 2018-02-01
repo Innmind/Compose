@@ -11,7 +11,8 @@ use Innmind\Compose\{
     Lazy,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided,
-    Exception\ArgumentNotDefined
+    Exception\ArgumentNotDefined,
+    Exception\ReferenceNotFound
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -72,6 +73,14 @@ final class Reference implements Argument
 
             throw $e;
         } catch (ArgumentNotDefined $e) {
+            //pass
+        }
+
+        try {
+            return $built->add(
+                $services->dependencies()->build($this->name)
+            );
+        } catch (ReferenceNotFound $e) {
             //pass
         }
 

@@ -12,8 +12,10 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Definition\Argument\Type\Instance,
     Definition\Service,
-    Definition\Service\Constructor,
+    Definition\Service\Constructor\Construct,
     Definition\Service\Arguments as Args,
+    Definition\Service\Argument\Reference,
+    Definition\Dependency,
     Exception\CircularDependency
 };
 use Innmind\Immutable\{
@@ -25,7 +27,8 @@ use Fixture\Innmind\Compose\{
     ServiceFixture,
     Stack\Low,
     Stack\Middle,
-    Stack\High
+    Stack\High,
+    Iterator
 };
 
 class ServicesTest extends TestCase
@@ -44,7 +47,7 @@ class ServicesTest extends TestCase
             $dependencies = new Dependencies,
             $service = (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('baz'))
         );
 
@@ -63,21 +66,50 @@ class ServicesTest extends TestCase
             $arguments = new Arguments(
                 new Argument(
                     new Name('baz'),
-                    new Primitive('string')
+                    new Primitive('int')
                 )
             ),
-            new Dependencies,
-            $service = (new Service(
+            $dependencies = new Dependencies(
+                new Dependency(
+                    new Name('inner'),
+                    new Services(
+                        new Arguments(
+                            new Argument(
+                                new Name('arg'),
+                                new Primitive('int')
+                            )
+                        ),
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(ServiceFixture::class)),
+                            new Reference(new Name('arg')),
+                            new Reference(new Name('std'))
+                        ))->exposeAs(new Name('bar')),
+                        new Service(
+                            new Name('std'),
+                            Construct::fromString(Str::of('stdClass'))
+                        )
+                    ),
+                    Dependency\Argument::fromValue(new Name('arg'), '$baz')
+                )
+            ),
+            (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
-            ))->exposeAs(new Name('watev'))
+                Construct::fromString(Str::of('stdClass'))
+            ))->exposeAs(new Name('watev')),
+            (new Service(
+                new Name('iter'),
+                Construct::fromString(Str::of(Iterator::class)),
+                new Reference(new Name('inner.bar'))
+            ))->exposeAs(new Name('iter'))
         );
 
         $services2 = $services->inject(Map::of(
             'string',
             'mixed',
             ['baz'],
-            ['42']
+            [42]
         ));
 
         $this->assertInstanceOf(Services::class, $services2);
@@ -85,7 +117,15 @@ class ServicesTest extends TestCase
         $this->assertNotSame($services->arguments(), $services2->arguments());
         $this->assertSame($arguments, $services->arguments());
         $this->assertNotSame($arguments, $services2->arguments());
-        $this->assertSame('42', $services2->arguments()->get(new Name('baz')));
+        $this->assertNotSame($services->dependencies(), $services2->dependencies());
+        $this->assertSame($dependencies, $services->dependencies());
+        $this->assertNotSame($dependencies, $services2->dependencies());
+        $this->assertSame(42, $services2->arguments()->get(new Name('baz')));
+        $iter = $services2->build(new Name('iter'));
+        $this->assertInstanceOf(Iterator::class, $iter);
+        $this->assertCount(1, $iter);
+        $this->assertInstanceOf(ServiceFixture::class, $iter->getIterator()[0]);
+        $this->assertSame(42, $iter->getIterator()[0]->first);
     }
 
     public function testBuild()
@@ -108,14 +148,14 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('wished'),
-                Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
+                Construct::fromString(Str::of(ServiceFixture::class)),
                 $this->args->load('$firstArg'),
                 $this->args->load('$secondArg'),
                 $this->args->load('...$thirdArg')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('defaultStd'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             )
         );
 
@@ -162,7 +202,7 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('bar'))
         );
 
@@ -182,13 +222,13 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('wished'),
-                Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
+                Construct::fromString(Str::of(ServiceFixture::class)),
                 $this->args->load('$firstArg'),
                 $this->args->load('$defaultStd')
             ))->exposeAs(new Name('foo')),
             new Service(
                 new Name('defaultStd'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             )
         );
         $services = $services->inject(Map::of('string', 'mixed', ['firstArg'], [42]));
@@ -203,13 +243,13 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('wished'),
-                Constructor\Construct::fromString(Str::of(ServiceFixture::class)),
+                Construct::fromString(Str::of(ServiceFixture::class)),
                 $this->args->load(42),
                 $this->args->load('$defaultStd')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('defaultStd'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             )
         );
 
@@ -229,12 +269,12 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass')),
+                Construct::fromString(Str::of('stdClass')),
                 $this->args->load('$bar')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('bar'),
-                Constructor\Construct::fromString(Str::of('stdClass')),
+                Construct::fromString(Str::of('stdClass')),
                 $this->args->load('$foo')
             )
         );
@@ -249,18 +289,18 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass')),
+                Construct::fromString(Str::of('stdClass')),
                 $this->args->load('$baz'),
                 $this->args->load('$bar')
             ))->exposeAs(new Name('watev')),
             new Service(
                 new Name('bar'),
-                Constructor\Construct::fromString(Str::of('stdClass')),
+                Construct::fromString(Str::of('stdClass')),
                 $this->args->load('$foo')
             ),
             new Service(
                 new Name('baz'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             )
         );
 
@@ -282,7 +322,7 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('watev'))
         );
 
@@ -299,7 +339,7 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('watev'))
         );
 
@@ -316,7 +356,7 @@ class ServicesTest extends TestCase
             new Dependencies,
             (new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             ))->exposeAs(new Name('watev'))
         );
 
@@ -335,7 +375,7 @@ class ServicesTest extends TestCase
             new Dependencies,
             $service = new Service(
                 new Name('foo'),
-                Constructor\Construct::fromString(Str::of('stdClass'))
+                Construct::fromString(Str::of('stdClass'))
             )
         );
         $services2 = $services->expose(new Name('foo'), new Name('watev'));
@@ -354,16 +394,16 @@ class ServicesTest extends TestCase
             new Dependencies,
             new Service(
                 new Name('low'),
-                Constructor\Construct::fromString(Str::of(Low::class))
+                Construct::fromString(Str::of(Low::class))
             ),
             new Service(
                 new Name('middle'),
-                Constructor\Construct::fromString(Str::of(Middle::class)),
+                Construct::fromString(Str::of(Middle::class)),
                 $this->args->load('@decorated')
             ),
             new Service(
                 new Name('high'),
-                Constructor\Construct::fromString(Str::of(High::class)),
+                Construct::fromString(Str::of(High::class)),
                 $this->args->load('@decorated')
             )
         );

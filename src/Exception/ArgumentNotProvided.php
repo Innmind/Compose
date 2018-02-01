@@ -12,7 +12,7 @@ class ArgumentNotProvided extends RuntimeException
     public function __construct(Argument $argument)
     {
         $this->argument = $argument;
-        parent::__construct();
+        parent::__construct((string) $argument->name());
     }
 
     public function argument(): Argument

@@ -44,7 +44,7 @@ final class Dependencies
         return $self;
     }
 
-    public function build(Name $name): object
+    public function lazy(Name $name): Lazy
     {
         try {
             $root = $name->root();
@@ -60,9 +60,14 @@ final class Dependencies
             return $this
                 ->dependencies
                 ->get((string) $root)
-                ->build($name->withoutRoot());
+                ->lazy($name->withoutRoot());
         } catch (ReferenceNotFound $e) {
             throw new ReferenceNotFound((string) $name, 0, $e);
         }
+    }
+
+    public function build(Name $name): object
+    {
+        return $this->lazy($name)->load();
     }
 }

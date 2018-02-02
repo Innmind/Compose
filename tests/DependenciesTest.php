@@ -16,6 +16,7 @@ use Innmind\Compose\{
     Definition\Argument\Type\Instance,
     Services,
     Arguments,
+    Lazy,
     Exception\ReferenceNotFound,
     Exception\ArgumentNotProvided
 };
@@ -177,5 +178,132 @@ class DependenciesTest extends TestCase
         $this->expectExceptionMessage('arg');
 
         $dependencies->build(new Name('first.bar'));
+    }
+
+    public function testLazy()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('first'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                )
+            ),
+            new Dependency(
+                new Name('second'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+
+        $this->assertInstanceOf(Lazy::class, $dependencies->lazy(new Name('first.bar')));
+        $this->assertInstanceOf(Lazy::class, $dependencies->lazy(new Name('second.bar')));
+        $this->assertSame(
+            $dependencies->build(new Name('first.bar')),
+            $dependencies->lazy(new Name('first.bar'))->load()
+        );
+        $this->assertSame(
+            $dependencies->build(new Name('second.bar')),
+            $dependencies->lazy(new Name('second.bar'))->load()
+        );
+    }
+
+    public function testThrowWhenTryingToLazyLoadNonNamespacedName()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('first'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('first');
+
+        $dependencies->lazy(new Name('first'));
+    }
+
+    public function testThrowWhenTryingToLazyLoadServiceWithItsInnerName()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('first'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('first.foo');
+
+        $dependencies->lazy(new Name('first.foo'));
+    }
+
+    public function testThrowWhenTryingToLazyLoadUnknownDependency()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('first'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('second.bar');
+
+        $dependencies->lazy(new Name('second.bar'));
+    }
+
+    public function testThrowWhenTryingToLazyLoadNonExposedService()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('first'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    )
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('first.foo');
+
+        $dependencies->lazy(new Name('first.foo'));
     }
 }

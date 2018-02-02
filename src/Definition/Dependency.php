@@ -6,6 +6,7 @@ namespace Innmind\Compose\Definition;
 use Innmind\Compose\{
     Definition\Dependency\Argument,
     Services,
+    Lazy,
     Exception\ReferenceNotFound
 };
 use Innmind\Immutable\{
@@ -54,14 +55,26 @@ final class Dependency
         return $self;
     }
 
-    public function build(Name $name): object
+    public function lazy(Name $name): Lazy
     {
+        if (!$this->services->has($name)) {
+            throw new ReferenceNotFound((string) $name);
+        }
+
         $service = $this->services->get($name);
 
         if (!$service->exposed() || !$service->isExposedAs($name)) {
             throw new ReferenceNotFound((string) $name);
         }
 
-        return $this->services->build($name);
+        return new Lazy(
+            $name,
+            $this->services
+        );
+    }
+
+    public function build(Name $name): object
+    {
+        return $this->lazy($name)->load();
     }
 }

@@ -15,6 +15,7 @@ use Innmind\Compose\{
     Services,
     Arguments,
     Dependencies,
+    Lazy,
     Exception\ReferenceNotFound,
     Exception\ArgumentNotProvided
 };
@@ -149,5 +150,65 @@ class DependencyTest extends TestCase
         $this->expectException(ArgumentNotProvided::class);
 
         $dependency->build(new Name('bar'));
+    }
+
+    public function testLazy()
+    {
+        $dependency = new Dependency(
+            new Name('foo'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                (new Service(
+                    new Name('foo'),
+                    Construct::fromString(Str::of('stdClass'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $service = $dependency->lazy(new Name('bar'));
+
+        $this->assertInstanceOf(Lazy::class, $service);
+        $this->assertInstanceOf('stdClass', $service->load());
+    }
+
+    public function testThrowWhenTryingToLazyLoadNonExposedService()
+    {
+        $dependency = new Dependency(
+            new Name('foo'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('foo'),
+                    Construct::fromString(Str::of('stdClass'))
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('bar');
+
+        $dependency->lazy(new Name('bar'));
+    }
+
+    public function testThrowWhenTryingToLazyLoadServiceWithItsInnerName()
+    {
+        $dependency = new Dependency(
+            new Name('foo'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                (new Service(
+                    new Name('foo'),
+                    Construct::fromString(Str::of('stdClass'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        $dependency->lazy(new Name('foo'));
     }
 }

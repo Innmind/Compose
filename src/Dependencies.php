@@ -7,7 +7,8 @@ use Innmind\Compose\{
     Definition\Dependency,
     Definition\Name,
     Exception\ReferenceNotFound,
-    Exception\NameNotNamespaced
+    Exception\NameNotNamespaced,
+    Exception\CircularDependency
 };
 use Innmind\Immutable\{
     Sequence,
@@ -29,7 +30,7 @@ final class Dependencies
                 );
             }
         );
-        // todo: ensure no circular dependency when cross dependency argument supported
+        $this->assertNoCircularDependency();
     }
 
     public function bind(Services $services): self
@@ -69,5 +70,30 @@ final class Dependencies
     public function build(Name $name): object
     {
         return $this->lazy($name)->load();
+    }
+
+    private function assertNoCircularDependency(): void
+    {
+        $this->dependencies->foreach(function(string $name, Dependency $dependency): void {
+            $this
+                ->dependencies
+                ->remove($name)
+                ->foreach(static function(string $name, Dependency $other) use ($dependency): void {
+                    if (!$dependency->dependsOn($other)) {
+                        return;
+                    }
+
+                    if (!$other->dependsOn($dependency)) {
+                        return;
+                    }
+
+                    throw new CircularDependency(sprintf(
+                        '%s -> %s -> %s',
+                        $dependency->name(),
+                        $other->name(),
+                        $dependency->name()
+                    ));
+                });
+        });
     }
 }

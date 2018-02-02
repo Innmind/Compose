@@ -5,9 +5,11 @@ namespace Innmind\Compose\Definition\Dependency;
 
 use Innmind\Compose\{
     Definition\Name,
+    Definition\Dependency,
     Services,
     Exception\ArgumentNotProvided,
-    Exception\ArgumentNotDefined
+    Exception\ArgumentNotDefined,
+    Exception\NameNotNamespaced
 };
 use Innmind\Immutable\Str;
 
@@ -76,5 +78,24 @@ final class Argument
         // todo: allow to resolve services from other dependencies
 
         return $services->build($this->reference);
+    }
+
+    public function refersTo(Dependency $dependeny): bool
+    {
+        if (!$this->reference instanceof Name) {
+            return false;
+        }
+
+        try {
+            $root = $this->reference->root();
+        } catch (NameNotNamespaced $e) {
+            return false;
+        }
+
+        if (!$root->equals($dependeny->name())) {
+            return false;
+        }
+
+        return $dependeny->has($this->reference->withoutRoot());
     }
 }

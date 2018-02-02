@@ -211,4 +211,51 @@ class DependencyTest extends TestCase
 
         $dependency->lazy(new Name('foo'));
     }
+
+    public function testHas()
+    {
+        $dependency = new Dependency(
+            new Name('foo'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                (new Service(
+                    new Name('foo'),
+                    Construct::fromString(Str::of('stdClass'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $this->assertTrue($dependency->has(new Name('bar')));
+        $this->assertFalse($dependency->has(new Name('foo')));
+        $this->assertFalse($dependency->has(new Name('baz')));
+    }
+
+    public function testDependsOn()
+    {
+        $dependency = new Dependency(
+            new Name('foo'),
+            new Services(
+                new Arguments,
+                new Dependencies
+            ),
+            Argument::fromValue(new Name('first'), 42),
+            Argument::fromValue(new Name('seconf'), '$bar.bar'),
+            Argument::fromValue(new Name('thrid'), 24)
+        );
+        $other = new Dependency(
+            new Name('bar'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                (new Service(
+                    new Name('foo'),
+                    Construct::fromString(Str::of('stdClass'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $this->assertTrue($dependency->dependsOn($other));
+        $this->assertFalse($dependency->dependsOn($dependency));
+    }
 }

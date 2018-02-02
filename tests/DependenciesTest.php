@@ -18,7 +18,8 @@ use Innmind\Compose\{
     Arguments,
     Lazy,
     Exception\ReferenceNotFound,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Exception\CircularDependency
 };
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
@@ -305,5 +306,45 @@ class DependenciesTest extends TestCase
         $this->expectExceptionMessage('first.foo');
 
         $dependencies->lazy(new Name('first.foo'));
+    }
+
+    public function testThrowWhenCircularDependencyFound()
+    {
+        $this->expectException(CircularDependency::class);
+        $this->expectExceptionMessage('foo -> baz -> foo');
+
+        new Dependencies(
+            new Dependency(
+                new Name('foo'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                ),
+                Argument::fromValue(new Name('watev'), '$baz.bar')
+            ),
+            new Dependency(
+                new Name('bar'),
+                new Services(
+                    new Arguments,
+                    new Dependencies
+                )
+            ),
+            new Dependency(
+                new Name('baz'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                ),
+                Argument::fromValue(new Name('watev'), '$foo.bar')
+            )
+        );
     }
 }

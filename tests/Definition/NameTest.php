@@ -76,4 +76,10 @@ class NameTest extends TestCase
 
         (new Name('foo'))->withoutRoot();
     }
+
+    public function testEquals()
+    {
+        $this->assertTrue((new Name('foo.bar'))->equals(new Name('foo.bar')));
+        $this->assertFalse((new Name('foo.bar'))->equals(new Name('bar.foo')));
+    }
 }

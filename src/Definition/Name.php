@@ -46,6 +46,11 @@ final class Name
         return new self((string) $namespace->drop(1)->join('.'));
     }
 
+    public function equals(self $other): bool
+    {
+        return (string) $this === (string) $other;
+    }
+
     public function __toString(): string
     {
         return (string) $this->value;

@@ -5,6 +5,7 @@ namespace Tests\Innmind\Compose\Definition\Dependency;
 
 use Innmind\Compose\{
     Definition\Dependency\Argument,
+    Definition\Dependency,
     Definition\Argument as Arg,
     Definition\Argument\Type\Primitive,
     Definition\Name,
@@ -174,5 +175,89 @@ class ArgumentTest extends TestCase
             $this->services->build(new Name('bar')),
             $argument->resolve($this->services)
         );
+    }
+
+    public function testDoesntReferToWhenArgumentIsRawValue()
+    {
+        $argument = Argument::fromValue(
+            new Name('foo'),
+            42
+        );
+
+        $this->assertFalse($argument->refersTo(
+            new Dependency(
+                new Name('foo'),
+                new Services(
+                    new Arguments,
+                    new Dependencies
+                )
+            )
+        ));
+    }
+
+    public function testDoesntReferToWhenArgumentReferenceIsNotNamespaced()
+    {
+        $argument = Argument::fromValue(
+            new Name('foo'),
+            '$foo'
+        );
+
+        $this->assertFalse($argument->refersTo(
+            new Dependency(
+                new Name('foo'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('bar'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('foo'))
+                )
+            )
+        ));
+    }
+
+    public function testDoesntReferToWhenArgumentReferenceRootDifferentThanDependencyName()
+    {
+        $argument = Argument::fromValue(
+            new Name('foo'),
+            '$bar.foo'
+        );
+
+        $this->assertFalse($argument->refersTo(
+            new Dependency(
+                new Name('foo'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('bar'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('foo'))
+                )
+            )
+        ));
+    }
+
+    public function testRefersTo()
+    {
+        $argument = Argument::fromValue(
+            new Name('foo'),
+            '$foo.foo'
+        );
+
+        $this->assertTrue($argument->refersTo(
+            new Dependency(
+                new Name('foo'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('bar'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('foo'))
+                )
+            )
+        ));
     }
 }

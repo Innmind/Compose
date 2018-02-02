@@ -57,13 +57,7 @@ final class Dependency
 
     public function lazy(Name $name): Lazy
     {
-        if (!$this->services->has($name)) {
-            throw new ReferenceNotFound((string) $name);
-        }
-
-        $service = $this->services->get($name);
-
-        if (!$service->exposed() || !$service->isExposedAs($name)) {
+        if (!$this->has($name)) {
             throw new ReferenceNotFound((string) $name);
         }
 
@@ -76,5 +70,30 @@ final class Dependency
     public function build(Name $name): object
     {
         return $this->lazy($name)->load();
+    }
+
+    public function has(Name $name): bool
+    {
+        if (!$this->services->has($name)) {
+            return false;
+        }
+
+        $service = $this->services->get($name);
+
+        if (!$service->exposed() || !$service->isExposedAs($name)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function dependsOn(self $other): bool
+    {
+        return $this->arguments->reduce(
+            false,
+            function(bool $dependsOn, Argument $argument) use ($other): bool {
+                return $dependsOn || $argument->refersTo($other);
+            }
+        );
     }
 }

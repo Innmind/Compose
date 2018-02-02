@@ -233,6 +233,7 @@ class ReferenceTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $value);
         $this->assertSame('mixed', (string) $value->type());
         $this->assertCount(1, $value);
-        $this->assertInstanceOf('stdClass', $value->current());
+        $this->assertInstanceOf(Lazy::class, $value->current());
+        $this->assertInstanceOf('stdClass', $value->current()->load());
     }
 }

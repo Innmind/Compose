@@ -78,7 +78,7 @@ final class Reference implements Argument
 
         try {
             return $built->add(
-                $services->dependencies()->build($this->name)
+                $services->dependencies()->lazy($this->name)
             );
         } catch (ReferenceNotFound $e) {
             //pass

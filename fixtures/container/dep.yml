@@ -1,0 +1,23 @@
+arguments:
+    first: int
+    second: stdClass
+
+expose:
+    fixture: $fixture
+
+services:
+    fixture Fixture\Innmind\Compose\ServiceFixture:
+        - $first
+        - $second
+
+    depStack stack:
+        - $stack.high
+        - $stack.middle
+        - $stack.low
+
+    stack:
+        low Fixture\Innmind\Compose\Stack\Low: []
+        middle Fixture\Innmind\Compose\Stack\Middle:
+            - '@decorated'
+        high Fixture\Innmind\Compose\Stack\High:
+            - '@decorated'

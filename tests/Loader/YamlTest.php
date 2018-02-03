@@ -32,6 +32,8 @@ class YamlTest extends TestCase
 
         $this->assertInstanceOf(Services::class, $services);
 
+        $this->assertFalse($services->has(new Name('depStack')));
+
         $services = $services->inject(Map::of(
             'string',
             'mixed',
@@ -41,9 +43,17 @@ class YamlTest extends TestCase
 
         $foo = $services->build(new Name('foo'));
         $baz = $services->build(new Name('baz'));
+        $fromDep = $services->build(new Name('fromDep'));
+        $dep = $services->dependencies()->build(new Name('dep.fixture'));
 
         $this->assertInstanceOf(ServiceFixture::class, $foo);
         $this->assertInstanceOf(ServiceFixture::class, $baz);
+        $this->assertInstanceOf(ServiceFixture::class, $fromDep);
+        $this->assertInstanceOf(ServiceFixture::class, $dep);
         $this->assertSame($foo->second, $baz->second);
+        $this->assertSame($foo->second, $fromDep->second);
+        $this->assertSame($foo->second, $dep->second);
+        $this->assertSame(24, $dep->first);
+        $this->assertSame($dep, $fromDep->third[0]);
     }
 }

@@ -5,6 +5,7 @@ namespace Innmind\Compose\Loader;
 
 use Innmind\Compose\{
     Loader,
+    Loader\PathResolver\Relative,
     Services,
     Arguments,
     Dependencies,
@@ -14,9 +15,14 @@ use Innmind\Compose\{
     Definition\Service,
     Definition\Service\Arguments as ServiceArguments,
     Definition\Service\Constructors,
+    Definition\Dependency,
+    Definition\Dependency\Parameter,
     Exception\DomainException
 };
-use Innmind\Url\PathInterface;
+use Innmind\Url\{
+    PathInterface,
+    Path
+};
 use Innmind\Immutable\{
     Str,
     Stream,
@@ -35,6 +41,7 @@ final class Yaml implements Loader
     private const ARGUMENT_DEFAULT_PATTERN = '~( \?\? \$(?<default>.+))$~';
     private const SERVICE_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ](?<constructor>.+)$~"; //split on space or non breaking space
     private const STACK_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ]stack$~"; //split on space or non breaking space
+    private const DEPENDENCY_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ](?<path>.+)$~"; //split on space or non breaking space
 
     private $resolver;
     private $types;
@@ -45,27 +52,36 @@ final class Yaml implements Loader
     public function __construct(
         Types $types = null,
         ServiceArguments $arguments = null,
-        Constructors $constructors = null
+        Constructors $constructors = null,
+        PathResolver $pathResolver = null
     ) {
         $this->resolver = new OptionsResolver;
         $this->resolver->setRequired(['expose', 'services']);
-        $this->resolver->setDefined('arguments');
+        $this->resolver->setDefined(['arguments', 'dependencies']);
         $this->resolver->setAllowedTypes('arguments', 'array');
+        $this->resolver->setAllowedTypes('dependencies', 'array');
         $this->resolver->setAllowedTypes('expose', 'array');
         $this->resolver->setAllowedTypes('services', 'array');
         $this->resolver->setDefault('arguments', []);
+        $this->resolver->setDefault('dependencies', []);
         $this->types = $types ?? new Types;
         $this->arguments = $arguments ?? new ServiceArguments;
         $this->constructors = $constructors ?? new Constructors;
+        $this->resolvePath = $pathResolver ?? new Relative;
         $this->stacks = new Map(Name::class, Sequence::class);
     }
 
     public function __invoke(PathInterface $definition): Services
     {
-        $this->stacks->clear();
-
         $data = Lib::parseFile((string) $definition);
         $data = $this->resolver->resolve($data);
+
+        $dependencies = $this->buildDependencies(
+            $definition,
+            $data['dependencies']
+        );
+
+        $this->stacks = $this->stacks->clear();
 
         $arguments = $this->buildArguments($data['arguments']);
         $definitions = $this->buildDefinitions(
@@ -82,7 +98,7 @@ final class Yaml implements Loader
 
         $services = new Services(
             $arguments,
-            new Dependencies,
+            $dependencies,
             ...$definitions->values()
         );
         $services = $this->buildStacks($services);
@@ -237,6 +253,48 @@ final class Yaml implements Loader
             function(Services $services, Name $name, Sequence $stack): Services {
                 return $services->stack($name, ...$stack);
             }
+        );
+    }
+
+    private function buildDependencies(
+        PathInterface $origin,
+        array $dependencies
+    ): Dependencies {
+        $deps = [];
+
+        foreach ($dependencies as $name => $parameters) {
+            $deps[] = $this->buildDependency($origin, $name, $parameters);
+        }
+
+        return new Dependencies(...$deps);
+    }
+
+    private function buildDependency(
+        PathInterface $origin,
+        string $name,
+        array $parameters
+    ): Dependency {
+        $name = Str::of($name);
+
+        if (!$name->matches(self::DEPENDENCY_NAME)) {
+            throw new DomainException;
+        }
+
+        $components = $name->capture(self::DEPENDENCY_NAME);
+        $services = $this(($this->resolvePath)(
+            $origin,
+            new Path((string) $components->get('path'))
+        ));
+        $params = [];
+
+        foreach ($parameters as $param => $value) {
+            $params[] = Parameter::fromValue(new Name($param), $value);
+        }
+
+        return new Dependency(
+            new Name((string) $components->get('name')),
+            $services,
+            ...$params
         );
     }
 }

@@ -22,7 +22,7 @@ final class Service
     private $construct;
     private $arguments;
     private $exposeName;
-    private $decorates;
+    private $decorates = false;
 
     public function __construct(
         Name $name,
@@ -44,6 +44,11 @@ final class Service
         if ($decorates->size() > 1) {
             throw new ServiceCannotDecorateMultipleServices((string) $name);
         }
+    }
+
+    public function decorates(): bool
+    {
+        return $this->decorates;
     }
 
     public function exposeAs(Name $name): self
@@ -117,5 +122,33 @@ final class Service
         });
 
         return $self;
+    }
+
+    public function tunnel(
+        Name $dependency,
+        Name $decorated,
+        Name $newName = null
+    ): self {
+        if (
+            !$this->decorates() ||
+            !$this->exposed()
+        ) {
+            throw new LogicException;
+        }
+
+        return new self(
+            $newName ?? new Name(md5($dependency.'.'.$this->exposeName)),
+            $this->construct,
+            ...$this->arguments->map(function(Argument $argument) use ($dependency, $decorated): Argument {
+                if ($argument instanceof Argument\Decorate) {
+                    return new Argument\Reference($decorated);
+                }
+
+                return new Argument\Tunnel(
+                    $dependency->add($this->exposeName),
+                    $argument
+                );
+            })
+        );
     }
 }

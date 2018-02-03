@@ -131,6 +131,8 @@ class ServiceTest extends TestCase
             Argument\Reference::class,
             $service2->arguments()->get(1)
         );
+        $this->assertTrue($service->decorates());
+        $this->assertFalse($service2->decorates());
     }
 
     public function testThrowWhenTryingToDecorateAServiceThatAlreadyDecorates()
@@ -165,6 +167,98 @@ class ServiceTest extends TestCase
             $service
                 ->decorate(new Name('bar'), $expected)
                 ->name()
+        );
+    }
+
+    public function testTunnel()
+    {
+        $service = new Service(
+            new Name('foo'),
+            $this->createMock(Constructor::class),
+            $this->createMock(Argument::class),
+            $this->args->load('@decorated'),
+            $this->createMock(Argument::class)
+        );
+        $service = $service->exposeAs(new Name('bar'));
+
+        $service2 = $service->tunnel(
+            new Name('dep'),
+            new Name('decorated')
+        );
+
+        $this->assertInstanceOf(Service::class, $service2);
+        $this->assertNotSame($service2, $service);
+        $this->assertSame(md5('dep.bar'), (string) $service2->name());
+        $this->assertSame('foo', (string) $service->name());
+        $this->assertSame($service->constructor(), $service2->constructor());
+        $this->assertTrue($service->decorates());
+        $this->assertFalse($service2->decorates());
+        $this->assertNotSame($service->arguments(), $service2->arguments());
+        $this->assertCount(3, $service2->arguments());
+        $this->assertInstanceOf(
+            Argument\Tunnel::class,
+            $service2->arguments()->get(0)
+        );
+        $this->assertInstanceOf(
+            Argument\Reference::class,
+            $service2->arguments()->get(1)
+        );
+        $this->assertInstanceOf(
+            Argument\Tunnel::class,
+            $service2->arguments()->get(2)
+        );
+    }
+
+    public function testTunnelWithASpecificName()
+    {
+        $service = new Service(
+            new Name('foo'),
+            $this->createMock(Constructor::class),
+            $this->createMock(Argument::class),
+            $this->args->load('@decorated'),
+            $this->createMock(Argument::class)
+        );
+        $service = $service->exposeAs(new Name('bar'));
+
+        $service2 = $service->tunnel(
+            new Name('dep'),
+            new Name('decorated'),
+            $expected = new Name('decorator')
+        );
+
+        $this->assertSame($expected, $service2->name());
+    }
+
+    public function testThrowWhenTunnellingAServiceThatDoNotDecorate()
+    {
+        $service = new Service(
+            new Name('foo'),
+            $this->createMock(Constructor::class),
+            $this->createMock(Argument::class)
+        );
+        $service = $service->exposeAs(new Name('bar'));
+
+        $this->expectException(LogicException::class);
+
+        $service->tunnel(
+            new Name('dep'),
+            new Name('decorated')
+        );
+    }
+
+    public function testThrowWhenTunnellingANonExposedService()
+    {
+        $service = new Service(
+            new Name('foo'),
+            $this->createMock(Constructor::class),
+            $this->args->load('@decorated')
+        );
+
+        $this->expectException(LogicException::class);
+
+        $service->tunnel(
+            new Name('dep'),
+            new Name('decorated')
         );
     }
 }

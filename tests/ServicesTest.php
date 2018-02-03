@@ -393,15 +393,23 @@ class ServicesTest extends TestCase
     {
         $services = new Services(
             new Arguments,
-            new Dependencies,
+            new Dependencies(
+                new Dependency(
+                    new Name('dep'),
+                    new Services(
+                        new Arguments,
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(Middle::class)),
+                            $this->args->load('@decorated')
+                        ))->exposeAs(new Name('bar'))
+                    )
+                )
+            ),
             new Service(
                 new Name('low'),
                 Construct::fromString(Str::of(Low::class))
-            ),
-            new Service(
-                new Name('middle'),
-                Construct::fromString(Str::of(Middle::class)),
-                $this->args->load('@decorated')
             ),
             new Service(
                 new Name('high'),
@@ -413,7 +421,7 @@ class ServicesTest extends TestCase
         $services2 = $services->stack(
             new Name('stack'),
             new Name('high'),
-            new Name('middle'),
+            new Name('dep.bar'),
             new Name('low')
         );
 

@@ -70,6 +70,6 @@ class ContainerBuilderTest extends TestCase
 
         $stack = $container->get('stack');
         $this->assertInstanceOf(High::class, $stack);
-        $this->assertSame('high|middle|low|middle|high', $stack());
+        $this->assertSame('high|milieu|low|milieu|high', $stack());
     }
 }

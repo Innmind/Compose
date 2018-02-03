@@ -5,13 +5,16 @@ namespace Innmind\Compose\Definition;
 
 use Innmind\Compose\{
     Definition\Dependency\Parameter,
+    Definition\Service\Argument,
     Services,
     Lazy,
-    Exception\ReferenceNotFound
+    Exception\ReferenceNotFound,
+    Exception\ArgumentNotExtractable
 };
 use Innmind\Immutable\{
     Set,
-    Map
+    Map,
+    StreamInterface
 };
 
 final class Dependency
@@ -94,6 +97,49 @@ final class Dependency
             function(bool $dependsOn, Parameter $parameter) use ($other): bool {
                 return $dependsOn || $parameter->refersTo($other);
             }
+        );
+    }
+
+    public function decorate(
+        Name $decorator,
+        Name $decorated,
+        Name $newName = null
+    ): Service {
+        if (!$this->has($decorator)) {
+            throw new ReferenceNotFound((string) $decorator);
+        }
+
+        $service = $this->services->get($decorator);
+
+        return $service->tunnel($this->name, $decorated, $newName);
+    }
+
+    /**
+     * @param StreamInterface<mixed> $arguments
+     *
+     * @return StreamInterface<mixed>
+     */
+    public function extract(
+        Name $name,
+        StreamInterface $arguments,
+        Argument $argument
+    ): StreamInterface {
+        if (!$this->has($name)) {
+            throw new ReferenceNotFound((string) $name);
+        }
+
+        $service = $this->services->get($name);
+
+        if (
+            !$service->decorates() ||
+            !$service->arguments()->contains($argument)
+        ) {
+            throw new ArgumentNotExtractable;
+        }
+
+        return $argument->resolve(
+            $arguments,
+            $this->services
         );
     }
 }

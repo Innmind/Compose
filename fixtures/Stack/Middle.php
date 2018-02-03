@@ -8,17 +8,21 @@ use Fixture\Innmind\Compose\Stack;
 final class Middle implements Stack
 {
     private $stack;
+    private $text;
 
-    public function __construct(Stack $stack)
+    public function __construct(Stack $stack, string $text = 'middle')
     {
         $this->stack = $stack;
+        $this->text = $text;
     }
 
     public function __invoke(): string
     {
         return sprintf(
-            'middle|%s|middle',
-            ($this->stack)()
+            '%s|%s|%s',
+            $this->text,
+            ($this->stack)(),
+            $this->text
         );
     }
 }

@@ -11,17 +11,23 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service,
     Definition\Service\Constructor\Construct,
+    Definition\Service\Constructor,
     Definition\Service\Argument\Reference,
+    Definition\Service\Argument\Decorate,
+    Definition\Service\Argument\Tunnel,
     Services,
     Arguments,
     Dependencies,
     Lazy,
     Exception\ReferenceNotFound,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Exception\ArgumentNotExtractable
 };
 use Innmind\Immutable\{
     Map,
-    Str
+    Str,
+    StreamInterface,
+    Stream
 };
 use PHPUnit\Framework\TestCase;
 use Fixture\Innmind\Compose\ServiceFixture;
@@ -257,5 +263,276 @@ class DependencyTest extends TestCase
 
         $this->assertTrue($dependency->dependsOn($other));
         $this->assertFalse($dependency->dependsOn($dependency));
+    }
+
+    public function testDecorate()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                (new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    new Decorate,
+                    new Reference(new Name('unknown'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+        $service = $dependency->decorate(
+            new Name('bar'),
+            new Name('decorated'),
+            new Name('watev')
+        );
+
+        $this->assertInstanceOf(Service::class, $service);
+        $this->assertSame('watev', (string) $service->name());
+        $this->assertInstanceOf(Reference::class, $service->arguments()->first());
+        $this->assertInstanceOf(Tunnel::class, $service->arguments()->last());
+    }
+
+    public function testThrowWhenDecoratingUnknownService()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('bar');
+
+        $dependency->decorate(
+            new Name('bar'),
+            new Name('decorated'),
+            new Name('watev')
+        );
+    }
+
+    public function testThrowWhenDecoratingNonExposedService()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    new Decorate,
+                    new Reference(new Name('unknown'))
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        $dependency->decorate(
+            new Name('foo'),
+            new Name('decorated'),
+            new Name('watev')
+        );
+    }
+
+    public function testThrowWhenDecoratingServiceViaItsInnerName()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                (new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    new Decorate,
+                    new Reference(new Name('unknown'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        $dependency->decorate(
+            new Name('foo'),
+            new Name('decorated'),
+            new Name('watev')
+        );
+    }
+
+    public function testExtract()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('std'),
+                    Construct::fromString(Str::of('stdClass'))
+                ),
+                (new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    new Decorate,
+                    $argument = new Reference(new Name('std'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $arguments = $dependency->extract(
+            new Name('bar'),
+            new Stream('mixed'),
+            $argument
+        );
+
+        $this->assertInstanceOf(StreamInterface::class, $arguments);
+        $this->assertSame('mixed', (string) $arguments->type());
+        $this->assertCount(1, $arguments);
+        $this->assertInstanceOf(Lazy::class, $arguments->first());
+        $this->assertInstanceOf('stdClass', $arguments->first()->load());
+    }
+
+    public function testThrowWhenExtractingArgumentFromADifferentService()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('std'),
+                    Construct::fromString(Str::of('stdClass'))
+                ),
+                (new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    new Decorate,
+                    new Reference(new Name('std'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $this->expectException(ArgumentNotExtractable::class);
+
+        $dependency->extract(
+            new Name('bar'),
+            new Stream('mixed'),
+            $this->createMock(Service\Argument::class)
+        );
+    }
+
+    public function testThrowWhenExtractingArgumentFromAServiceThatDoNotDecorates()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('std'),
+                    Construct::fromString(Str::of('stdClass'))
+                ),
+                (new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    $argument = new Reference(new Name('std'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $this->expectException(ArgumentNotExtractable::class);
+
+        $dependency->extract(
+            new Name('bar'),
+            new Stream('mixed'),
+            $argument
+        );
+    }
+
+    public function testThrowWhenExtractingArgumentFromAServiceViaItsInnerName()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('std'),
+                    Construct::fromString(Str::of('stdClass'))
+                ),
+                (new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    $argument = new Reference(new Name('std'))
+                ))->exposeAs(new Name('bar'))
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        $dependency->extract(
+            new Name('foo'),
+            new Stream('mixed'),
+            $argument
+        );
+    }
+
+    public function testThrowWhenExtractingArgumentFromNonExposedService()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('std'),
+                    Construct::fromString(Str::of('stdClass'))
+                ),
+                new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class),
+                    $argument = new Reference(new Name('std'))
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        $dependency->extract(
+            new Name('foo'),
+            new Stream('mixed'),
+            $argument
+        );
+    }
+
+    public function testThrowWhenExtractingArgumentFromUnknownService()
+    {
+        $dependency = new Dependency(
+            new Name('dep'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('std'),
+                    Construct::fromString(Str::of('stdClass'))
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        $dependency->extract(
+            new Name('foo'),
+            new Stream('mixed'),
+            new Reference(new Name('std'))
+        );
     }
 }

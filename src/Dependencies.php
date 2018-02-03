@@ -6,6 +6,8 @@ namespace Innmind\Compose;
 use Innmind\Compose\{
     Definition\Dependency,
     Definition\Name,
+    Definition\Service,
+    Definition\Service\Argument,
     Exception\ReferenceNotFound,
     Exception\NameNotNamespaced,
     Exception\CircularDependency,
@@ -13,7 +15,8 @@ use Innmind\Compose\{
 };
 use Innmind\Immutable\{
     Sequence,
-    Map
+    Map,
+    StreamInterface
 };
 
 final class Dependencies
@@ -64,19 +67,8 @@ final class Dependencies
     public function lazy(Name $name): Lazy
     {
         try {
-            $root = $name->root();
-        } catch (NameNotNamespaced $e) {
-            throw new ReferenceNotFound((string) $name);
-        }
-
-        if (!$this->dependencies->contains((string) $root)) {
-            throw new ReferenceNotFound((string) $name);
-        }
-
-        try {
             return $this
-                ->dependencies
-                ->get((string) $root)
+                ->get($name)
                 ->lazy($name->withoutRoot());
         } catch (ReferenceNotFound $e) {
             throw new ReferenceNotFound((string) $name, 0, $e);
@@ -86,6 +78,54 @@ final class Dependencies
     public function build(Name $name): object
     {
         return $this->lazy($name)->load();
+    }
+
+    public function decorate(
+        Name $decorator,
+        Name $decorated,
+        Name $newName = null
+    ): Service {
+        try {
+            return $this
+                ->get($decorator)
+                ->decorate($decorator->withoutRoot(), $decorated, $newName);
+        } catch (ReferenceNotFound $e) {
+            throw new ReferenceNotFound((string) $decorator, 0, $e);
+        }
+    }
+
+    /**
+     * @param StreamInterface<mixed> $arguments
+     *
+     * @return StreamInterface<mixed>
+     */
+    public function extract(
+        Name $name,
+        StreamInterface $arguments,
+        Argument $argument
+    ): StreamInterface {
+        try {
+            return $this
+                ->get($name)
+                ->extract($name->withoutRoot(), $arguments, $argument);
+        } catch (ReferenceNotFound $e) {
+            throw new ReferenceNotFound((string) $name, 0, $e);
+        }
+    }
+
+    private function get(Name $name): Dependency
+    {
+        try {
+            $root = $name->root();
+        } catch (NameNotNamespaced $e) {
+            throw new ReferenceNotFound((string) $name);
+        }
+
+        if (!$this->dependencies->contains((string) $root)) {
+            throw new ReferenceNotFound((string) $name);
+        }
+
+        return $this->dependencies->get((string) $root);
     }
 
     private function assertNoCircularDependency(): void

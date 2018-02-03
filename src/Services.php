@@ -89,16 +89,12 @@ final class Services
             $stacked,
             function(Sequence $stacked, Name $decorator): Sequence {
                 return $stacked->add(
-                    $this
-                        ->get($decorator)
-                        ->decorate($stacked->last()->name())
+                    $this->decorate($decorator, $stacked->last()->name())
                 );
             }
         );
         $stacked = $stacked->add(
-            $this
-                ->get($highest)
-                ->decorate($stacked->last()->name(), $name)
+            $this->decorate($highest, $stacked->last()->name(), $name)
         );
 
         $self = clone $this;
@@ -203,5 +199,17 @@ final class Services
         } catch (\Exception $e) {
             return $this->exposed->get((string) $name);
         }
+    }
+
+    private function decorate(
+        Name $decorator,
+        Name $decorated,
+        Name $newName = null
+    ): Service {
+        if ($this->has($decorator)) {
+            return $this->get($decorator)->decorate($decorated, $newName);
+        }
+
+        return $this->dependencies->decorate($decorator, $decorated, $newName);
     }
 }

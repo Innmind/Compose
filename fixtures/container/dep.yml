@@ -1,9 +1,11 @@
 arguments:
     first: int
     second: stdClass
+    middleText: string
 
 expose:
     fixture: $fixture
+    middle: $stack.middle
 
 services:
     fixture Fixture\Innmind\Compose\ServiceFixture:
@@ -19,5 +21,6 @@ services:
         low Fixture\Innmind\Compose\Stack\Low: []
         middle Fixture\Innmind\Compose\Stack\Middle:
             - '@decorated'
+            - '$middleText'
         high Fixture\Innmind\Compose\Stack\High:
             - '@decorated'

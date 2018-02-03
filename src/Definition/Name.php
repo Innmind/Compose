@@ -24,6 +24,11 @@ final class Name
         $this->value = $value;
     }
 
+    public function add(self $name): self
+    {
+        return new self($this->value.'.'.$name);
+    }
+
     public function root(): self
     {
         $namespace = $this->value->split('.');

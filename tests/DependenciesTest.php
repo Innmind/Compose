@@ -10,8 +10,11 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service,
     Definition\Service\Constructor\Construct,
+    Definition\Service\Constructor,
     Definition\Service\Argument\Primitive,
     Definition\Service\Argument\Reference,
+    Definition\Service\Argument\Decorate,
+    Definition\Service\Argument\Tunnel,
     Definition\Argument,
     Definition\Argument\Type\Instance,
     Services,
@@ -22,7 +25,11 @@ use Innmind\Compose\{
     Exception\CircularDependency,
     Exception\LogicException
 };
-use Innmind\Immutable\Str;
+use Innmind\Immutable\{
+    Str,
+    StreamInterface,
+    Stream
+};
 use PHPUnit\Framework\TestCase;
 use Fixture\Innmind\Compose\ServiceFixture;
 
@@ -487,5 +494,244 @@ class DependenciesTest extends TestCase
         $this->expectException(ArgumentNotProvided::class);
 
         $dependencies->build(new Name('first.bar'));
+    }
+
+    public function testDecorate()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('dep'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class),
+                        new Decorate,
+                        new Primitive(24)
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+
+        $service = $dependencies->decorate(
+            new Name('dep.bar'),
+            new Name('decorated')
+        );
+
+        $this->assertInstanceOf(Service::class, $service);
+        $this->assertFalse($service->decorates());
+        $this->assertInstanceOf(Tunnel::class, $service->arguments()->last());
+    }
+
+    public function testDecorateWithSpecificName()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('dep'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class),
+                        new Decorate,
+                        new Primitive(24)
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+
+        $service = $dependencies->decorate(
+            new Name('dep.bar'),
+            new Name('decorated'),
+            new Name('watev')
+        );
+
+        $this->assertInstanceOf(Service::class, $service);
+        $this->assertFalse($service->decorates());
+        $this->assertSame('watev', (string) $service->name());
+        $this->assertInstanceOf(Tunnel::class, $service->arguments()->last());
+    }
+
+    public function testThrowWhenDecoratingUnknownService()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('dep'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class),
+                        new Decorate,
+                        new Primitive(24)
+                    )
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('dep.bar');
+
+        $dependencies->decorate(
+            new Name('dep.bar'),
+            new Name('decorated')
+        );
+    }
+
+    public function testThrowWhenDecoratingUnknownDependency()
+    {
+        $dependencies = new Dependencies;
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('dep.bar');
+
+        $dependencies->decorate(
+            new Name('dep.bar'),
+            new Name('decorated')
+        );
+    }
+
+    public function testThrowWhenDecoratingNonNamespacedName()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('dep'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class),
+                        new Decorate,
+                        new Primitive(24)
+                    )
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('dep');
+
+        $dependencies->decorate(
+            new Name('dep'),
+            new Name('decorated')
+        );
+    }
+
+    public function testExtract()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('dep'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class),
+                        new Decorate,
+                        $argument = new Primitive(24)
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+
+        $arguments = $dependencies->extract(
+            new Name('dep.bar'),
+            new Stream('mixed'),
+            $argument
+        );
+
+        $this->assertInstanceOf(StreamInterface::class, $arguments);
+        $this->assertSame('mixed', (string) $arguments->type());
+        $this->assertCount(1, $arguments);
+        $this->assertSame(24, $arguments->first());
+    }
+
+    public function testThrowWhenExtractingArgumentFromNonExposedService()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('dep'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class),
+                        new Decorate,
+                        $argument = new Primitive(24)
+                    )
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('dep.foo');
+
+        $arguments = $dependencies->extract(
+            new Name('dep.foo'),
+            new Stream('mixed'),
+            $argument
+        );
+    }
+
+    public function testThrowWhenExtractingArgumentFromUnknownService()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('dep'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class),
+                        new Decorate,
+                        $argument = new Primitive(24)
+                    )
+                )
+            )
+        );
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('dep.bar');
+
+        $arguments = $dependencies->extract(
+            new Name('dep.bar'),
+            new Stream('mixed'),
+            $argument
+        );
+    }
+
+    public function testThrowWhenExtractingArgumentFromUnknownDependency()
+    {
+        $dependencies = new Dependencies;
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('dep.bar');
+
+        $arguments = $dependencies->extract(
+            new Name('dep.bar'),
+            new Stream('mixed'),
+            new Primitive(42)
+        );
+    }
+
+    public function testThrowWhenExtractingArgumentWithNonNamespacedName()
+    {
+        $dependencies = new Dependencies;
+
+        $this->expectException(ReferenceNotFound::class);
+        $this->expectExceptionMessage('dep');
+
+        $arguments = $dependencies->extract(
+            new Name('dep'),
+            new Stream('mixed'),
+            new Primitive(42)
+        );
     }
 }

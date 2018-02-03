@@ -29,6 +29,20 @@ class NameTest extends TestCase
                 $this->assertSame($string, (string) new Name($string));
             });
     }
+    public function testAdd()
+    {
+        $this
+            ->forAll(
+                Generator\string(),
+                Generator\string()
+            )
+            ->when(static function(string $root, string $add): bool {
+                return strlen($root) > 0 && strlen($add) > 0;
+            })
+            ->then(function(string $root, string $add): void {
+                $this->assertSame($root.'.'.$add, (string) (new Name($root))->add(new Name($add)));
+            });
+    }
 
     public function testThrowOnEmptyName()
     {

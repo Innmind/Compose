@@ -7,6 +7,7 @@ dependencies:
     dep dep.yml:
         first: 24
         second: '$inner.fallback.forBar'
+        middleText: 'milieu'
 
 expose:
     foo: '$inner.bar'
@@ -47,13 +48,11 @@ services:
 
     fixtureStack stack:
         - $stack.high
-        - $stack.middle
+        - $dep.middle
         - $stack.low
 
     stack:
         low Fixture\Innmind\Compose\Stack\Low: []
-        middle Fixture\Innmind\Compose\Stack\Middle:
-            - '@decorated'
         high Fixture\Innmind\Compose\Stack\High:
             - '@decorated'
 

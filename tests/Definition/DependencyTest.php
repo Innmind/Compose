@@ -5,8 +5,8 @@ namespace Tests\Innmind\Compose\Definition;
 
 use Innmind\Compose\{
     Definition\Dependency,
-    Definition\Dependency\Argument,
-    Definition\Argument as Arg,
+    Definition\Dependency\Parameter,
+    Definition\Argument,
     Definition\Argument\Type\Primitive,
     Definition\Name,
     Definition\Service,
@@ -104,7 +104,7 @@ class DependencyTest extends TestCase
             new Name('watev'),
             new Services(
                 new Arguments(
-                    new Arg(
+                    new Argument(
                         new Name('innerArg'),
                         new Primitive('int')
                     )
@@ -121,12 +121,12 @@ class DependencyTest extends TestCase
                     Construct::fromString(Str::of('stdClass'))
                 )
             ),
-            Argument::fromValue(new Name('innerArg'), '$arg')
+            Parameter::fromValue(new Name('innerArg'), '$arg')
         );
 
         $upper = (new Services(
             new Arguments(
-                new Arg(
+                new Argument(
                     new Name('arg'),
                     new Primitive('int')
                 )
@@ -239,9 +239,9 @@ class DependencyTest extends TestCase
                 new Arguments,
                 new Dependencies
             ),
-            Argument::fromValue(new Name('first'), 42),
-            Argument::fromValue(new Name('seconf'), '$bar.bar'),
-            Argument::fromValue(new Name('thrid'), 24)
+            Parameter::fromValue(new Name('first'), 42),
+            Parameter::fromValue(new Name('seconf'), '$bar.bar'),
+            Parameter::fromValue(new Name('thrid'), 24)
         );
         $other = new Dependency(
             new Name('bar'),

@@ -6,13 +6,13 @@ namespace Tests\Innmind\Compose;
 use Innmind\Compose\{
     Dependencies,
     Definition\Dependency,
-    Definition\Dependency\Argument,
+    Definition\Dependency\Parameter,
     Definition\Name,
     Definition\Service,
     Definition\Service\Constructor\Construct,
     Definition\Service\Argument\Primitive,
     Definition\Service\Argument\Reference,
-    Definition\Argument as Arg,
+    Definition\Argument,
     Definition\Argument\Type\Instance,
     Services,
     Arguments,
@@ -138,7 +138,7 @@ class DependenciesTest extends TestCase
                 new Name('first'),
                 new Services(
                     new Arguments(
-                        new Arg(
+                        new Argument(
                             new Name('arg'),
                             new Instance('stdClass')
                         )
@@ -151,7 +151,7 @@ class DependenciesTest extends TestCase
                         new Reference(new Name('arg'))
                     ))->exposeAs(new Name('bar'))
                 ),
-                Argument::fromValue(
+                Parameter::fromValue(
                     new Name('arg'),
                     '$std'
                 )
@@ -196,7 +196,7 @@ class DependenciesTest extends TestCase
                 new Name('first'),
                 new Services(
                     new Arguments(
-                        new Arg(
+                        new Argument(
                             new Name('arg'),
                             new Instance('stdClass')
                         )
@@ -209,17 +209,17 @@ class DependenciesTest extends TestCase
                         new Reference(new Name('arg'))
                     ))->exposeAs(new Name('bar'))
                 ),
-                Argument::fromValue(new Name('arg'), '$third.bar')
+                Parameter::fromValue(new Name('arg'), '$third.bar')
             ),
             new Dependency(
                 new Name('second'),
                 new Services(
                     new Arguments(
-                        new Arg(
+                        new Argument(
                             new Name('foo'),
                             new Instance(ServiceFixture::class)
                         ),
-                        new Arg(
+                        new Argument(
                             new Name('bar'),
                             new Instance('stdClass')
                         )
@@ -233,8 +233,8 @@ class DependenciesTest extends TestCase
                         new Reference(new Name('foo'))
                     ))->exposeAs(new Name('bar'))
                 ),
-                Argument::fromValue(new Name('foo'), '$first.bar'),
-                Argument::fromValue(new Name('bar'), '$third.bar')
+                Parameter::fromValue(new Name('foo'), '$first.bar'),
+                Parameter::fromValue(new Name('bar'), '$third.bar')
             ),
             new Dependency(
                 new Name('third'),
@@ -415,7 +415,7 @@ class DependenciesTest extends TestCase
                         Construct::fromString(Str::of('stdClass'))
                     ))->exposeAs(new Name('bar'))
                 ),
-                Argument::fromValue(new Name('watev'), '$baz.bar')
+                Parameter::fromValue(new Name('watev'), '$baz.bar')
             ),
             new Dependency(
                 new Name('bar'),
@@ -434,7 +434,7 @@ class DependenciesTest extends TestCase
                         Construct::fromString(Str::of('stdClass'))
                     ))->exposeAs(new Name('bar'))
                 ),
-                Argument::fromValue(new Name('watev'), '$foo.bar')
+                Parameter::fromValue(new Name('watev'), '$foo.bar')
             )
         );
     }
@@ -446,7 +446,7 @@ class DependenciesTest extends TestCase
                 new Name('first'),
                 new Services(
                     new Arguments(
-                        new Arg(
+                        new Argument(
                             new Name('std'),
                             new Instance('stdClass')
                         )
@@ -459,7 +459,7 @@ class DependenciesTest extends TestCase
                         new Reference(new Name('std'))
                     ))->exposeAs(new Name('bar'))
                 ),
-                Argument::fromValue(new Name('std'), '$foo')
+                Parameter::fromValue(new Name('std'), '$foo')
             )
         );
         $services = new Services(

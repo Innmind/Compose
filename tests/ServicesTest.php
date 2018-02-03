@@ -93,7 +93,7 @@ class ServicesTest extends TestCase
                             Construct::fromString(Str::of('stdClass'))
                         )
                     ),
-                    Dependency\Argument::fromValue(new Name('arg'), '$baz')
+                    Dependency\Parameter::fromValue(new Name('arg'), '$baz')
                 )
             ),
             (new Service(
@@ -449,7 +449,7 @@ class ServicesTest extends TestCase
                             new Reference(new Name('stdArg'))
                         ))->exposeAs(new Name('bar'))
                     ),
-                    Dependency\Argument::fromValue(new Name('stdArg'), '$std')
+                    Dependency\Parameter::fromValue(new Name('stdArg'), '$std')
                 )
             ),
             (new Service(

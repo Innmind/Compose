@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Compose\Definition;
 
 use Innmind\Compose\{
-    Definition\Dependency\Argument,
+    Definition\Dependency\Parameter,
     Services,
     Lazy,
     Exception\ReferenceNotFound
@@ -18,16 +18,16 @@ final class Dependency
 {
     private $name;
     private $services;
-    private $arguments;
+    private $parameters;
 
     public function __construct(
         Name $name,
         Services $services,
-        Argument ...$arguments
+        Parameter ...$parameters
     ) {
         $this->name = $name;
         $this->services = $services;
-        $this->arguments = Set::of(Argument::class, ...$arguments);
+        $this->parameters = Set::of(Parameter::class, ...$parameters);
     }
 
     public function name(): Name
@@ -37,20 +37,20 @@ final class Dependency
 
     public function bind(Services $services): self
     {
-        $arguments = $this
-            ->arguments
+        $parameters = $this
+            ->parameters
             ->reduce(
                 new Map('string', 'mixed'),
-                static function(Map $arguments, Argument $argument) use ($services): Map {
-                    return $arguments->put(
-                        (string) $argument->name(),
-                        $argument->resolve($services)
+                static function(Map $parameters, Parameter $parameter) use ($services): Map {
+                    return $parameters->put(
+                        (string) $parameter->name(),
+                        $parameter->resolve($services)
                     );
                 }
             );
 
         $self = clone $this;
-        $self->services = $self->services->inject($arguments);
+        $self->services = $self->services->inject($parameters);
 
         return $self;
     }
@@ -89,10 +89,10 @@ final class Dependency
 
     public function dependsOn(self $other): bool
     {
-        return $this->arguments->reduce(
+        return $this->parameters->reduce(
             false,
-            function(bool $dependsOn, Argument $argument) use ($other): bool {
-                return $dependsOn || $argument->refersTo($other);
+            function(bool $dependsOn, Parameter $parameter) use ($other): bool {
+                return $dependsOn || $parameter->refersTo($other);
             }
         );
     }

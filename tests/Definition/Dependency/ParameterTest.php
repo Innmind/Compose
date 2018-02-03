@@ -4,9 +4,9 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Compose\Definition\Dependency;
 
 use Innmind\Compose\{
-    Definition\Dependency\Argument,
+    Definition\Dependency\Parameter,
     Definition\Dependency,
-    Definition\Argument as Arg,
+    Definition\Argument,
     Definition\Argument\Type\Primitive,
     Definition\Name,
     Definition\Service,
@@ -22,7 +22,7 @@ use Innmind\Immutable\{
 };
 use PHPUnit\Framework\TestCase;
 
-class ArgumentTest extends TestCase
+class ParameterTest extends TestCase
 {
     private $services;
 
@@ -30,7 +30,7 @@ class ArgumentTest extends TestCase
     {
         $services = new Services(
             new Arguments(
-                new Arg(
+                new Argument(
                     new Name('arg'),
                     new Primitive('string')
                 )
@@ -49,40 +49,40 @@ class ArgumentTest extends TestCase
 
     public function testBuildRawValue()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             $name = new Name('foo'),
             42
         );
 
-        $this->assertInstanceOf(Argument::class, $argument);
-        $this->assertSame($name, $argument->name());
-        $this->assertSame(42, $argument->resolve($this->services));
+        $this->assertInstanceOf(Parameter::class, $parameter);
+        $this->assertSame($name, $parameter->name());
+        $this->assertSame(42, $parameter->resolve($this->services));
     }
 
     public function testBuildStringValue()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             $name = new Name('foo'),
             '42'
         );
 
-        $this->assertInstanceOf(Argument::class, $argument);
-        $this->assertSame($name, $argument->name());
-        $this->assertSame('42', $argument->resolve($this->services));
+        $this->assertInstanceOf(Parameter::class, $parameter);
+        $this->assertSame($name, $parameter->name());
+        $this->assertSame('42', $parameter->resolve($this->services));
     }
 
     public function testBuildArgumentReference()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             $name = new Name('foo'),
             '$arg'
         );
 
-        $this->assertInstanceOf(Argument::class, $argument);
-        $this->assertSame($name, $argument->name());
+        $this->assertInstanceOf(Parameter::class, $parameter);
+        $this->assertSame($name, $parameter->name());
         $this->assertSame(
             'some random arg',
-            $argument->resolve($this->services)
+            $parameter->resolve($this->services)
         );
     }
 
@@ -90,7 +90,7 @@ class ArgumentTest extends TestCase
     {
         $services = new Services(
             new Arguments(
-                (new Arg(
+                (new Argument(
                     new Name('arg'),
                     new Primitive('string')
                 ))->defaultsTo(new Name('default'))
@@ -102,16 +102,16 @@ class ArgumentTest extends TestCase
             )
         );
 
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             $name = new Name('foo'),
             '$arg'
         );
 
-        $this->assertInstanceOf(Argument::class, $argument);
-        $this->assertSame($name, $argument->name());
+        $this->assertInstanceOf(Parameter::class, $parameter);
+        $this->assertSame($name, $parameter->name());
         $this->assertSame(
             $services->build(new Name('default')),
-            $argument->resolve($services)
+            $parameter->resolve($services)
         );
     }
 
@@ -119,7 +119,7 @@ class ArgumentTest extends TestCase
     {
         $services = new Services(
             new Arguments(
-                (new Arg(
+                (new Argument(
                     new Name('arg'),
                     new Primitive('string')
                 ))->makeOptional()
@@ -127,21 +127,21 @@ class ArgumentTest extends TestCase
             new Dependencies
         );
 
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             $name = new Name('foo'),
             '$arg'
         );
 
-        $this->assertInstanceOf(Argument::class, $argument);
-        $this->assertSame($name, $argument->name());
-        $this->assertNull($argument->resolve($services));
+        $this->assertInstanceOf(Parameter::class, $parameter);
+        $this->assertSame($name, $parameter->name());
+        $this->assertNull($parameter->resolve($services));
     }
 
     public function testThrowWhenResolvingNonProvidedArgument()
     {
         $services = new Services(
             new Arguments(
-                new Arg(
+                new Argument(
                     new Name('arg'),
                     new Primitive('string')
                 )
@@ -149,37 +149,37 @@ class ArgumentTest extends TestCase
             new Dependencies
         );
 
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             $name = new Name('foo'),
             '$arg'
         );
 
-        $this->assertInstanceOf(Argument::class, $argument);
-        $this->assertSame($name, $argument->name());
+        $this->assertInstanceOf(Parameter::class, $parameter);
+        $this->assertSame($name, $parameter->name());
 
         $this->expectException(ArgumentNotProvided::class);
 
-        $argument->resolve($services);
+        $parameter->resolve($services);
     }
 
     public function testBuildServiceReference()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             $name = new Name('foo'),
             '$bar'
         );
 
-        $this->assertInstanceOf(Argument::class, $argument);
-        $this->assertSame($name, $argument->name());
+        $this->assertInstanceOf(Parameter::class, $parameter);
+        $this->assertSame($name, $parameter->name());
         $this->assertSame(
             $this->services->build(new Name('bar')),
-            $argument->resolve($this->services)
+            $parameter->resolve($this->services)
         );
     }
 
     public function testBuildServiceFromAnotherDependency()
     {
-        $value = Argument::fromValue(new Name('foo'), '$dep.bar')->resolve(new Services(
+        $value = Parameter::fromValue(new Name('foo'), '$dep.bar')->resolve(new Services(
             new Arguments,
             $dependencies = new Dependencies(
                 new Dependency(
@@ -202,12 +202,12 @@ class ArgumentTest extends TestCase
 
     public function testDoesntReferToWhenArgumentIsRawValue()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             new Name('foo'),
             42
         );
 
-        $this->assertFalse($argument->refersTo(
+        $this->assertFalse($parameter->refersTo(
             new Dependency(
                 new Name('foo'),
                 new Services(
@@ -220,12 +220,12 @@ class ArgumentTest extends TestCase
 
     public function testDoesntReferToWhenArgumentReferenceIsNotNamespaced()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             new Name('foo'),
             '$foo'
         );
 
-        $this->assertFalse($argument->refersTo(
+        $this->assertFalse($parameter->refersTo(
             new Dependency(
                 new Name('foo'),
                 new Services(
@@ -242,12 +242,12 @@ class ArgumentTest extends TestCase
 
     public function testDoesntReferToWhenArgumentReferenceRootDifferentThanDependencyName()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             new Name('foo'),
             '$bar.foo'
         );
 
-        $this->assertFalse($argument->refersTo(
+        $this->assertFalse($parameter->refersTo(
             new Dependency(
                 new Name('foo'),
                 new Services(
@@ -264,12 +264,12 @@ class ArgumentTest extends TestCase
 
     public function testRefersTo()
     {
-        $argument = Argument::fromValue(
+        $parameter = Parameter::fromValue(
             new Name('foo'),
             '$foo.foo'
         );
 
-        $this->assertTrue($argument->refersTo(
+        $this->assertTrue($parameter->refersTo(
             new Dependency(
                 new Name('foo'),
                 new Services(

@@ -14,7 +14,7 @@ use Innmind\Compose\{
 };
 use Innmind\Immutable\Str;
 
-final class Argument
+final class Parameter
 {
     private $name;
     private $value;

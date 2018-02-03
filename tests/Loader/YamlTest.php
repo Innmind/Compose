@@ -64,4 +64,11 @@ class YamlTest extends TestCase
 
         (new Yaml)(new Path('fixtures/container/invalidServiceStructure.yml'));
     }
+
+    public function testThrowWhenInvalidDependenciesDefinition()
+    {
+        $this->expectException(DomainException::class);
+
+        (new Yaml)(new Path('fixtures/container/invalidDependenciesStructure.yml'));
+    }
 }

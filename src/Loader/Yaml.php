@@ -175,7 +175,7 @@ final class Yaml implements Loader
         $services = new Map('string', Service::class);
 
         foreach ($definitions as $key => $value) {
-            $key = Str::of($key);
+            $key = Str::of((string) $key);
 
             if (!is_array($value)) {
                 throw new DomainException;

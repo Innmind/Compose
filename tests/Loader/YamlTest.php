@@ -7,7 +7,8 @@ use Innmind\Compose\{
     Loader\Yaml,
     Loader,
     Definition\Name,
-    Services
+    Services,
+    Exception\DomainException
 };
 use Innmind\Url\Path;
 use Innmind\Immutable\Map;
@@ -55,5 +56,12 @@ class YamlTest extends TestCase
         $this->assertSame($foo->second, $dep->second);
         $this->assertSame(24, $dep->first);
         $this->assertSame($dep, $fromDep->third[0]);
+    }
+
+    public function testThrowWhenInvalidServiceDefinition()
+    {
+        $this->expectException(DomainException::class);
+
+        (new Yaml)(new Path('fixtures/container/invalidServiceStructure.yml'));
     }
 }

@@ -15,8 +15,10 @@ use Innmind\Compose\{
     Definition\Service\Constructor\Construct,
     Definition\Service\Arguments as Args,
     Definition\Service\Argument\Reference,
+    Definition\Service\Argument\Primitive as ServicePrimitive,
     Definition\Dependency,
-    Exception\CircularDependency
+    Exception\CircularDependency,
+    Exception\ArgumentNotProvided
 };
 use Innmind\Immutable\{
     Map,
@@ -423,5 +425,61 @@ class ServicesTest extends TestCase
             'high|middle|low|middle|high',
             $services2->build(new Name('stack'))()
         );
+    }
+
+    public function testFeed()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies(
+                new Dependency(
+                    new Name('first'),
+                    new Services(
+                        new Arguments(
+                            new Argument(
+                                new Name('stdArg'),
+                                new Instance('stdClass')
+                            )
+                        ),
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(ServiceFixture::class)),
+                            new ServicePrimitive(24),
+                            new Reference(new Name('stdArg'))
+                        ))->exposeAs(new Name('bar'))
+                    ),
+                    Dependency\Argument::fromValue(new Name('stdArg'), '$std')
+                )
+            ),
+            (new Service(
+                new Name('std'),
+                Construct::fromString(Str::of('stdClass'))
+            ))->exposeAs(new Name('std')),
+            (new Service(
+                new Name('foo'),
+                Construct::fromString(Str::of(ServiceFixture::class)),
+                new ServicePrimitive(42),
+                new Reference(new Name('std')),
+                new Reference(new Name('first.bar'))
+            ))->exposeAs(new Name('bar'))
+        );
+
+        $services2 = $services->feed(new Name('first'));
+
+        $this->assertInstanceOf(Services::class, $services2);
+        $this->assertNotSame($services2, $services);
+        $service = $services2->build(new Name('bar'));
+        $this->assertInstanceOf(ServiceFixture::class, $service);
+        $this->assertSame(42, $service->first);
+        $this->assertSame($services2->build(new Name('std')), $service->second);
+        $this->assertCount(1, $service->third);
+        $this->assertInstanceOf(ServiceFixture::class, $service->third[0]);
+        $this->assertSame(24, $service->third[0]->first);
+        $this->assertSame($service->second, $service->third[0]->second);
+
+        $this->expectException(ArgumentNotProvided::class);
+
+        $services->build(new Name('bar'));
     }
 }

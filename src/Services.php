@@ -7,6 +7,7 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service,
     Definition\Service\Argument,
+    Definition\Dependency,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
     Exception\CircularDependency
@@ -115,6 +116,21 @@ final class Services
     }
 
     /**
+     * This method must only be called from Dependencies::bind() through self::inject()
+     *
+     * The goal is to iteratively replace in Services the initial Dependency
+     * instance by its resolved version, so other Dependency instances can rely
+     * on it
+     */
+    public function feed(Name $dependency): self
+    {
+        $self = clone $this;
+        $self->dependencies = $self->dependencies->feed($dependency, $self);
+
+        return $self;
+    }
+
+    /**
      * @param MapInterface<string, mixed> $arguments
      */
     public function inject(MapInterface $arguments): self
@@ -123,9 +139,8 @@ final class Services
         $self->arguments = $self->arguments->bind($arguments);
         $self->building = $self->building->clear();
         $self->instances = $self->instances->clear();
-        $self->dependencies = $self->dependencies->bind($self);
 
-        return $self;
+        return $self->dependencies->bind($self);
     }
 
     public function build(Name $name): object

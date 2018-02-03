@@ -8,7 +8,8 @@ use Innmind\Compose\{
     Definition\Name,
     Exception\ReferenceNotFound,
     Exception\NameNotNamespaced,
-    Exception\CircularDependency
+    Exception\CircularDependency,
+    Exception\LogicException
 };
 use Innmind\Immutable\{
     Sequence,
@@ -33,16 +34,31 @@ final class Dependencies
         $this->assertNoCircularDependency();
     }
 
-    public function bind(Services $services): self
+    public function feed(Name $name, Services $services): self
     {
         $self = clone $this;
-        $self->dependencies = $self
-            ->dependencies
-            ->map(static function(string $name, Dependency $dependency) use ($services): Dependency {
-                return $dependency->bind($services);
-            });
+        $self->dependencies = $self->dependencies->put(
+            (string) $name,
+            $self->dependencies->get((string) $name)->bind($services)
+        );
 
         return $self;
+    }
+
+    public function bind(Services $services): Services
+    {
+        return $this
+            ->dependencies
+            ->values()
+            ->sort(static function(Dependency $a, Dependency $b): bool {
+                return $a->dependsOn($b);
+            })
+            ->reduce(
+                $services,
+                static function(Services $services, Dependency $dependency): Services {
+                    return $services->feed($dependency->name());
+                }
+            );
     }
 
     public function lazy(Name $name): Lazy

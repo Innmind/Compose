@@ -9,7 +9,8 @@ use Innmind\Compose\{
     Services,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
-    Exception\NameNotNamespaced
+    Exception\NameNotNamespaced,
+    Exception\ReferenceNotFound
 };
 use Innmind\Immutable\Str;
 
@@ -75,7 +76,11 @@ final class Argument
             //pass
         }
 
-        // todo: allow to resolve services from other dependencies
+        try {
+            return $services->dependencies()->build($this->reference);
+        } catch (ReferenceNotFound $e) {
+            //pass
+        }
 
         return $services->build($this->reference);
     }

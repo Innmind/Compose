@@ -177,6 +177,29 @@ class ArgumentTest extends TestCase
         );
     }
 
+    public function testBuildServiceFromAnotherDependency()
+    {
+        $value = Argument::fromValue(new Name('foo'), '$dep.bar')->resolve(new Services(
+            new Arguments,
+            $dependencies = new Dependencies(
+                new Dependency(
+                    new Name('dep'),
+                    new Services(
+                        new Arguments,
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of('stdClass'))
+                        ))->exposeAs(new Name('bar'))
+                    )
+                )
+            )
+        ));
+
+        $this->assertInstanceOf('stdClass', $value);
+        $this->assertSame($dependencies->build(new Name('dep.bar')), $value);
+    }
+
     public function testDoesntReferToWhenArgumentIsRawValue()
     {
         $argument = Argument::fromValue(

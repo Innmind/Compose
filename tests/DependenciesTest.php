@@ -19,7 +19,8 @@ use Innmind\Compose\{
     Lazy,
     Exception\ReferenceNotFound,
     Exception\ArgumentNotProvided,
-    Exception\CircularDependency
+    Exception\CircularDependency,
+    Exception\LogicException
 };
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
@@ -158,19 +159,26 @@ class DependenciesTest extends TestCase
         );
         $upper = new Services(
             new Arguments,
-            new Dependencies,
+            $dependencies,
             new Service(
                 new Name('std'),
                 Construct::fromString(Str::of('stdClass'))
-            )
+            ),
+            (new Service(
+                new Name('foo'),
+                Construct::fromString(Str::of(ServiceFixture::class)),
+                new Primitive(24),
+                new Reference(new Name('std')),
+                new Reference(new Name('first.bar'))
+            ))->exposeAs(new Name('bar'))
         );
 
-        $dependencies2 = $dependencies->bind($upper);
+        $services = $dependencies->bind($upper);
 
-        $this->assertInstanceOf(Dependencies::class, $dependencies2);
-        $this->assertNotSame($dependencies2, $dependencies);
+        $this->assertInstanceOf(Services::class, $services);
+        $this->assertNotSame($services, $upper);
 
-        $service = $dependencies2->build(new Name('first.bar'));
+        $service = $services->build(new Name('bar'));
 
         $this->assertInstanceOf(ServiceFixture::class, $service);
 
@@ -179,6 +187,89 @@ class DependenciesTest extends TestCase
         $this->expectExceptionMessage('arg');
 
         $dependencies->build(new Name('first.bar'));
+    }
+
+    public function testBindDependenciesInTheRightOrderWhenCrossDependenciesDependency()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('first'),
+                new Services(
+                    new Arguments(
+                        new Arg(
+                            new Name('arg'),
+                            new Instance('stdClass')
+                        )
+                    ),
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of(ServiceFixture::class)),
+                        new Primitive(24),
+                        new Reference(new Name('arg'))
+                    ))->exposeAs(new Name('bar'))
+                ),
+                Argument::fromValue(new Name('arg'), '$third.bar')
+            ),
+            new Dependency(
+                new Name('second'),
+                new Services(
+                    new Arguments(
+                        new Arg(
+                            new Name('foo'),
+                            new Instance(ServiceFixture::class)
+                        ),
+                        new Arg(
+                            new Name('bar'),
+                            new Instance('stdClass')
+                        )
+                    ),
+                    new Dependencies,
+                    (new Service(
+                        new Name('watev'),
+                        Construct::fromString(Str::of(ServiceFixture::class)),
+                        new Primitive(42),
+                        new Reference(new Name('bar')),
+                        new Reference(new Name('foo'))
+                    ))->exposeAs(new Name('bar'))
+                ),
+                Argument::fromValue(new Name('foo'), '$first.bar'),
+                Argument::fromValue(new Name('bar'), '$third.bar')
+            ),
+            new Dependency(
+                new Name('third'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of('stdClass'))
+                    ))->exposeAs(new Name('bar'))
+                )
+            )
+        );
+        $upper = new Services(
+            new Arguments,
+            $dependencies
+        );
+
+        $services = $dependencies->bind($upper);
+
+        $this->assertInstanceOf(Services::class, $services);
+        $this->assertNotSame($dependencies, $services->dependencies());
+        $deps = $services->dependencies();
+        $this->assertSame(
+            $deps->build(new Name('third.bar')),
+            $deps->build(new Name('first.bar'))->second
+        );
+        $this->assertSame(
+            $deps->build(new Name('third.bar')),
+            $deps->build(new Name('second.bar'))->second
+        );
+        $this->assertSame(
+            $deps->build(new Name('first.bar')),
+            $deps->build(new Name('second.bar'))->third[0]
+        );
     }
 
     public function testLazy()
@@ -346,5 +437,55 @@ class DependenciesTest extends TestCase
                 Argument::fromValue(new Name('watev'), '$foo.bar')
             )
         );
+    }
+
+    public function testFeed()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                new Name('first'),
+                new Services(
+                    new Arguments(
+                        new Arg(
+                            new Name('std'),
+                            new Instance('stdClass')
+                        )
+                    ),
+                    new Dependencies,
+                    (new Service(
+                        new Name('foo'),
+                        Construct::fromString(Str::of(ServiceFixture::class)),
+                        new Primitive(24),
+                        new Reference(new Name('std'))
+                    ))->exposeAs(new Name('bar'))
+                ),
+                Argument::fromValue(new Name('std'), '$foo')
+            )
+        );
+        $services = new Services(
+            new Arguments,
+            new Dependencies,
+            (new Service(
+                new Name('foo'),
+                Construct::fromString(Str::of('stdClass'))
+            ))->exposeAs(new Name('bar'))
+        );
+
+        $dependencies2 = $dependencies->feed(new Name('first'), $services);
+
+        $this->assertInstanceOf(Dependencies::class, $dependencies2);
+        $this->assertNotSame($dependencies2, $dependencies);
+        $service = $dependencies2->build(new Name('first.bar'));
+        $this->assertInstanceOf(ServiceFixture::class, $service);
+        $this->assertSame(24, $service->first);
+        $this->assertInstanceOf('stdClass', $service->second);
+        $this->assertSame(
+            $services->build(new Name('bar')),
+            $service->second
+        );
+
+        $this->expectException(ArgumentNotProvided::class);
+
+        $dependencies->build(new Name('first.bar'));
     }
 }

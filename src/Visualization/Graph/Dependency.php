@@ -38,7 +38,9 @@ final class Dependency implements Graph
         }
 
         $this->graph = $services->reduce(
-            Graph\Graph::directed((string) $dependency)->displayAs((string) $dependency),
+            Graph\Graph::directed((string) $dependency)
+                ->fillWithColor(RGBA::fromString('#ffb600'))
+                ->displayAs((string) $dependency),
             static function(Graph $graph, ServiceName $service, Constructor $constructor) use ($dependency): Graph {
                 return $graph->add(Service::dependency(
                     $dependency,

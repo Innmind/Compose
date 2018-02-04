@@ -5,6 +5,8 @@ namespace Innmind\Compose\Loader;
 
 use Innmind\Compose\{
     Loader,
+    Loader\PathResolver\Delegate,
+    Loader\PathResolver\Composer,
     Loader\PathResolver\Relative,
     Services,
     Arguments,
@@ -67,7 +69,10 @@ final class Yaml implements Loader
         $this->types = $types ?? new Types;
         $this->arguments = $arguments ?? new ServiceArguments;
         $this->constructors = $constructors ?? new Constructors;
-        $this->resolvePath = $pathResolver ?? new Relative;
+        $this->resolvePath = $pathResolver ?? new Delegate(
+            new Composer,
+            new Relative
+        );
         $this->stacks = new Map(Name::class, Sequence::class);
     }
 

@@ -38,7 +38,7 @@ final class Element implements Node
     ): self {
         $constructor = Str::of((string) $constructor)->replace('\\', '\\\\');
 
-        $node = self::buildNode($dependency->add($name));
+        $node = self::build($dependency->add($name));
         $node->displayAs(
             (string) Str::of((string) $name)->append(
                 '\n('.$constructor.')'
@@ -52,7 +52,7 @@ final class Element implements Node
     {
         $constructor = Str::of((string) $service->constructor())->replace('\\', '\\\\');
 
-        $node = self::buildNode($service->name());
+        $node = self::build($service->name());
         $node->displayAs(
             (string) Str::of((string) $service->name())->append(
                 '\n('.$constructor.')'
@@ -113,7 +113,7 @@ final class Element implements Node
         return $this->node->attributes();
     }
 
-    public static function buildNode(ServiceName $name): Node
+    public static function build(ServiceName $name): Node
     {
         return Node\Node::named(
             (string) Str::of((string) $name)->replace('.', '_')

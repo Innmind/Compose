@@ -52,6 +52,7 @@ final class Constructors
             Constructor\Set::class,
             Constructor\Stream::class,
             Constructor\Map::class,
+            Constructor\Merge::class,
             Constructor\Construct::class
         );
     }

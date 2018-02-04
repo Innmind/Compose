@@ -10,6 +10,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor\Set,
     Definition\Service\Constructor\Stream,
     Definition\Service\Constructor\Construct,
+    Definition\Service\Constructor\Merge,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\{
@@ -24,7 +25,7 @@ class ConstructorsTest extends TestCase
     {
         $this->assertInstanceOf(StreamInterface::class, Constructors::defaults());
         $this->assertSame('string', (string) Constructors::defaults()->type());
-        $this->assertCount(5, Constructors::defaults());
+        $this->assertCount(6, Constructors::defaults());
         $this->assertSame(Constructors::defaults(), Constructors::defaults());
     }
 
@@ -76,6 +77,7 @@ class ConstructorsTest extends TestCase
             [ServiceFixture::class.'::make', Factory::class],
             ['set<int>', Set::class],
             ['stream<int>', Stream::class],
+            ['merge', Merge::class],
         ];
     }
 }

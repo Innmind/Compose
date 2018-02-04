@@ -19,6 +19,7 @@ class StreamTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(Type::class, new Stream('foo'));
+        $this->assertSame('stream<foo>', (string) new Stream('foo'));
     }
 
     public function testAccepts()

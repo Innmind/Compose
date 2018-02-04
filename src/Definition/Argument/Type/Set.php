@@ -47,4 +47,12 @@ final class Set implements Type
 
         return new self((string) $components->get('type'));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString(): string
+    {
+        return sprintf('set<%s>', $this->type);
+    }
 }

@@ -42,4 +42,12 @@ final class Primitive implements Type
             throw new ValueNotSupported((string) $value, 0, $e);
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString(): string
+    {
+        return substr($this->function, 3);
+    }
 }

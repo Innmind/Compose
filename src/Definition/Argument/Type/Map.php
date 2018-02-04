@@ -53,4 +53,12 @@ final class Map implements Type
             (string) $components->get('value')
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString(): string
+    {
+        return sprintf('map<%s, %s>', $this->key, $this->value);
+    }
 }

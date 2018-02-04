@@ -19,6 +19,7 @@ class SequenceTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(Type::class, new Sequence);
+        $this->assertSame('sequence', (string) new Sequence);
     }
 
     public function testAccepts()

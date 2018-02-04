@@ -19,6 +19,7 @@ class SetTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(Type::class, new Set('foo'));
+        $this->assertSame('set<foo>', (string) new Set('foo'));
     }
 
     public function testAccepts()

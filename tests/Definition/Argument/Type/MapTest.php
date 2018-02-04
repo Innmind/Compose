@@ -19,6 +19,7 @@ class MapTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(Type::class, new Map('foo', 'bar'));
+        $this->assertSame('map<foo, bar>', (string) new Map('foo', 'bar'));
     }
 
     public function testAccepts()

@@ -33,4 +33,12 @@ final class Sequence implements Type
 
         return new self;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString(): string
+    {
+        return 'sequence';
+    }
 }

@@ -17,6 +17,7 @@ class PrimitiveTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(Type::class, new Primitive('int'));
+        $this->assertSame('int', (string) new Primitive('int'));
     }
 
     public function testAccepts()

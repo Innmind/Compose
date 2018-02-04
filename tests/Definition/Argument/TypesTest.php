@@ -59,6 +59,11 @@ class TypesTest extends TestCase
 
                 return new self;
             }
+
+            public function __toString(): string
+            {
+                return '';
+            }
         };
         $class = get_class($type);
 

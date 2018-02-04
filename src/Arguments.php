@@ -13,7 +13,9 @@ use Innmind\Compose\{
 use Innmind\Immutable\{
     Sequence,
     MapInterface,
-    Map
+    Map,
+    SetInterface,
+    Set
 };
 
 final class Arguments
@@ -90,5 +92,13 @@ final class Arguments
         }
 
         return $this->values->get((string) $name);
+    }
+
+    /**
+     * @return SetInterface<Argument>
+     */
+    public function all(): SetInterface
+    {
+        return Set::of(Argument::class, ...$this->arguments->values());
     }
 }

@@ -40,7 +40,7 @@ final class Service implements Node
         $node = self::buildNode($dependency->add($name));
         $node->displayAs(
             (string) Str::of((string) $name)->append(
-                ' ('.$constructor.')'
+                '\n('.$constructor.')'
             )
         );
 
@@ -54,7 +54,7 @@ final class Service implements Node
         $node = self::buildNode($service->name());
         $node->displayAs(
             (string) Str::of((string) $service->name())->append(
-                ' ('.$constructor.')'
+                '\n('.$constructor.')'
             )
         );
 

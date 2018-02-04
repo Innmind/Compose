@@ -47,7 +47,7 @@ class ArgumentsTest extends TestCase
         $this->assertSame('foo', (string) $this->graph->roots()->current()->name());
         $this->assertCount(1, $this->graph->roots()->current()->attributes());
         $this->assertSame(
-            'foo (stdClass)',
+            'foo\n(stdClass)',
             $this->graph->roots()->current()->attributes()->get('label')
         );
     }

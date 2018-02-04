@@ -39,7 +39,7 @@ class ServiceTest extends TestCase
         $this->assertCount(1, $this->node->attributes());
         $this->assertTrue($this->node->attributes()->contains('label'));
         $this->assertSame(
-            'foo (Fixture\\\\Innmind\\\\Compose\\\\ServiceFixture)',
+            'foo\n(Fixture\\\\Innmind\\\\Compose\\\\ServiceFixture)',
             $this->node->attributes()->get('label')
         );
     }
@@ -59,7 +59,7 @@ class ServiceTest extends TestCase
         $this->assertCount(1, $node->attributes());
         $this->assertTrue($node->attributes()->contains('label'));
         $this->assertSame(
-            'foo (Fixture\\\\Innmind\\\\Compose\\\\ServiceFixture)',
+            'foo\n(Fixture\\\\Innmind\\\\Compose\\\\ServiceFixture)',
             $node->attributes()->get('label')
         );
     }

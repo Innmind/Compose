@@ -33,7 +33,7 @@ final class Arguments implements Graph
                     Node\Node::named((string) $argument->name())
                         ->displayAs(
                             (string) Str::of((string) $argument->name())
-                                ->append(' ('.$argument->type().')')
+                                ->append('\n('.$argument->type().')')
                         )
                 );
             }

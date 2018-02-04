@@ -24,7 +24,8 @@ use Innmind\Compose\{
 use Innmind\Immutable\{
     MapInterface,
     Map,
-    Str
+    Str,
+    SetInterface
 };
 use PHPUnit\Framework\TestCase;
 use Fixture\Innmind\Compose\{
@@ -515,5 +516,27 @@ class ServicesTest extends TestCase
         $this->assertSame(Constructor::class, (string) $exposed->valueType());
         $this->assertCount(1, $exposed);
         $this->assertSame($expected, $exposed->get($key));
+    }
+
+    public function testAll()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies,
+            $service1 = new Service(
+                new Name('foo'),
+                $this->createMock(Constructor::class)
+            ),
+            $service2 = (new Service(
+                new Name('bar'),
+                $this->createMock(Constructor::class)
+            ))->exposeAs(new Name('baz'))
+        );
+
+        $all = $services->all();
+
+        $this->assertInstanceOf(SetInterface::class, $all);
+        $this->assertSame(Service::class, (string) $all->type());
+        $this->assertSame([$service1, $service2], $all->toPrimitive());
     }
 }

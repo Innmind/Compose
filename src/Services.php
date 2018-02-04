@@ -18,7 +18,9 @@ use Innmind\Immutable\{
     MapInterface,
     Map,
     Pair,
-    Stream
+    Stream,
+    SetInterface,
+    Set
 };
 
 final class Services
@@ -218,6 +220,14 @@ final class Services
                 );
             }
         );
+    }
+
+    /**
+     * @return SetInterface<Service>
+     */
+    public function all(): SetInterface
+    {
+        return Set::of(Service::class, ...$this->definitions->values());
     }
 
     private function decorate(

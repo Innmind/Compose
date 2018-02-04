@@ -80,6 +80,13 @@ final class Element implements Node
         return new self($node);
     }
 
+    public static function build(ServiceName $name): Node
+    {
+        return Node\Node::named(
+            (string) Str::of((string) $name)->replace('.', '_')
+        );
+    }
+
     public function name(): Name
     {
         return $this->node->name();
@@ -123,12 +130,5 @@ final class Element implements Node
     public function attributes(): MapInterface
     {
         return $this->node->attributes();
-    }
-
-    public static function build(ServiceName $name): Node
-    {
-        return Node\Node::named(
-            (string) Str::of((string) $name)->replace('.', '_')
-        );
     }
 }

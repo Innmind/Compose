@@ -15,6 +15,7 @@ use Innmind\Graphviz\{
     Node\Shape
 };
 use Innmind\Url\UrlInterface;
+use Innmind\Colour\Colour;
 use Innmind\Immutable\{
     MapInterface,
     SetInterface,
@@ -57,6 +58,12 @@ final class Service implements Node
                 '\n('.$constructor.')'
             )
         );
+
+        if ($service->exposed()) {
+            $node->shaped(
+                Shape::house()->fillWithColor(Colour::fromString('#0f0'))
+            );
+        }
 
         return new self($node);
     }

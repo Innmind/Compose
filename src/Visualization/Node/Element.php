@@ -16,7 +16,7 @@ use Innmind\Graphviz\{
     Node\Shape
 };
 use Innmind\Url\UrlInterface;
-use Innmind\Colour\Colour;
+use Innmind\Colour\RGBA;
 use Innmind\Immutable\{
     MapInterface,
     SetInterface,
@@ -62,7 +62,7 @@ final class Element implements Node
 
         if ($service->exposed()) {
             $node->shaped(
-                Shape::house()->fillWithColor(Colour::fromString('#0f0'))
+                Shape::house()->fillWithColor(RGBA::fromString('#0f0'))
             );
         }
 

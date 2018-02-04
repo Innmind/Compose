@@ -6,7 +6,8 @@ namespace Innmind\Compose\Visualization\Node;
 use Innmind\Compose\Definition\{
     Name as ServiceName,
     Service,
-    Service\Constructor
+    Service\Constructor,
+    Argument
 };
 use Innmind\Graphviz\{
     Node,
@@ -64,6 +65,17 @@ final class Element implements Node
                 Shape::house()->fillWithColor(Colour::fromString('#0f0'))
             );
         }
+
+        return new self($node);
+    }
+
+    public static function argument(Argument $argument): self
+    {
+        $node = self::build($argument->name());
+        $node->displayAs(
+            (string) Str::of((string) $argument->name())
+                ->append('\n('.$argument->type().')')
+        );
 
         return new self($node);
     }

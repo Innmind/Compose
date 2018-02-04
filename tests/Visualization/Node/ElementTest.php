@@ -7,7 +7,9 @@ use Innmind\Compose\{
     Visualization\Node\Element,
     Definition\Name,
     Definition\Service,
-    Definition\Service\Constructor\Construct
+    Definition\Service\Constructor\Construct,
+    Definition\Argument,
+    Definition\Argument\Type\Primitive
 };
 use Innmind\Graphviz\{
     Node,
@@ -60,6 +62,26 @@ class ElementTest extends TestCase
         $this->assertTrue($node->attributes()->contains('label'));
         $this->assertSame(
             'foo\n(Fixture\\\\Innmind\\\\Compose\\\\ServiceFixture)',
+            $node->attributes()->get('label')
+        );
+    }
+
+    public function testArgument()
+    {
+        $node = Element::argument(
+            new Argument(
+                new Name('foo'),
+                new Primitive('int')
+            )
+        );
+
+        $this->assertInstanceOf(Element::class, $node);
+        $this->assertSame('foo', (string) $node->name());
+        $this->assertTrue($node->hasAttributes());
+        $this->assertCount(1, $node->attributes());
+        $this->assertTrue($node->attributes()->contains('label'));
+        $this->assertSame(
+            'foo\n(int)',
             $node->attributes()->get('label')
         );
     }

@@ -5,7 +5,8 @@ namespace Innmind\Compose\Visualization\Graph;
 
 use Innmind\Compose\{
     Arguments as Args,
-    Definition\Argument
+    Definition\Argument,
+    Visualization\Node\Element
 };
 use Innmind\Graphviz\{
     Graph,
@@ -31,13 +32,7 @@ final class Arguments implements Graph
                 ->fillWithColor(RGBA::fromString('#3399ff'))
                 ->displayAs('Arguments'),
             static function(Graph $graph, Argument $argument): Graph {
-                return $graph->add(
-                    Node\Node::named((string) $argument->name())
-                        ->displayAs(
-                            (string) Str::of((string) $argument->name())
-                                ->append('\n('.$argument->type().')')
-                        )
-                );
+                return $graph->add(Element::argument($argument));
             }
         );
     }

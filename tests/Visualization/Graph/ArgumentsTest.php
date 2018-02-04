@@ -41,8 +41,10 @@ class ArgumentsTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(Graph::class, $this->graph);
-        $this->assertCount(1, $this->graph->attributes());
+        $this->assertCount(3, $this->graph->attributes());
         $this->assertSame('Arguments', $this->graph->attributes()->get('label'));
+        $this->assertSame('filled', $this->graph->attributes()->get('style'));
+        $this->assertSame('#3399ff', $this->graph->attributes()->get('fillcolor'));
         $this->assertCount(1, $this->graph->roots());
         $this->assertSame('foo', (string) $this->graph->roots()->current()->name());
         $this->assertCount(1, $this->graph->roots()->current()->attributes());
@@ -129,6 +131,6 @@ class ArgumentsTest extends TestCase
             Graph::class,
             $this->graph->target($this->createMock(UrlInterface::class))
         );
-        $this->assertCount(2, $this->graph->attributes());
+        $this->assertCount(4, $this->graph->attributes());
     }
 }

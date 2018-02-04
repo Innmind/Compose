@@ -27,7 +27,9 @@ final class Arguments implements Graph
     public function __construct(Args $arguments)
     {
         $this->graph = $arguments->all()->reduce(
-            Graph\Graph::directed('arguments')->displayAs('Arguments'),
+            Graph\Graph::directed('arguments')
+                ->fillWithColor(RGBA::fromString('#3399ff'))
+                ->displayAs('Arguments'),
             static function(Graph $graph, Argument $argument): Graph {
                 return $graph->add(
                     Node\Node::named((string) $argument->name())

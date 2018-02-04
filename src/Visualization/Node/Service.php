@@ -37,11 +37,7 @@ final class Service implements Node
     ): self {
         $constructor = Str::of((string) $constructor)->replace('\\', '\\\\');
 
-        $node = Node\Node::named(
-            (string) Str::of((string) $dependency)
-                ->append('_'.$name)
-                ->replace('.', '_')
-        );
+        $node = self::buildNode($dependency->add($name));
         $node->displayAs(
             (string) Str::of((string) $name)->append(
                 ' ('.$constructor.')'
@@ -55,9 +51,7 @@ final class Service implements Node
     {
         $constructor = Str::of((string) $service->constructor())->replace('\\', '\\\\');
 
-        $node = Node\Node::named(
-            (string) Str::of((string) $service->name())->replace('.', '_')
-        );
+        $node = self::buildNode($service->name());
         $node->displayAs(
             (string) Str::of((string) $service->name())->append(
                 ' ('.$constructor.')'
@@ -110,5 +104,12 @@ final class Service implements Node
     public function attributes(): MapInterface
     {
         return $this->node->attributes();
+    }
+
+    public static function buildNode(ServiceName $name): Node
+    {
+        return Node\Node::named(
+            (string) Str::of((string) $name)->replace('.', '_')
+        );
     }
 }

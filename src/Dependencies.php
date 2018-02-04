@@ -15,6 +15,7 @@ use Innmind\Compose\{
 };
 use Innmind\Immutable\{
     Sequence,
+    MapInterface,
     Map,
     StreamInterface
 };
@@ -126,6 +127,24 @@ final class Dependencies
         }
 
         return $this->dependencies->get((string) $root);
+    }
+
+    /**
+     * Return the list of exposed services per dependency
+     *
+     * @return MapInterface<Name, MapInterface<Name, Constructor>>
+     */
+    public function exposed(): MapInterface
+    {
+        return $this->dependencies->reduce(
+            new Map(Name::class, MapInterface::class),
+            static function(Map $exposed, string $name, Dependency $dependency): Map {
+                return $exposed->put(
+                    $dependency->name(),
+                    $dependency->exposed()
+                );
+            }
+        );
     }
 
     private function assertNoCircularDependency(): void

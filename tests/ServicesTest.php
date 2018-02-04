@@ -12,6 +12,7 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Definition\Argument\Type\Instance,
     Definition\Service,
+    Definition\Service\Constructor,
     Definition\Service\Constructor\Construct,
     Definition\Service\Arguments as Args,
     Definition\Service\Argument\Reference,
@@ -21,6 +22,7 @@ use Innmind\Compose\{
     Exception\ArgumentNotProvided
 };
 use Innmind\Immutable\{
+    MapInterface,
     Map,
     Str
 };
@@ -489,5 +491,29 @@ class ServicesTest extends TestCase
         $this->expectException(ArgumentNotProvided::class);
 
         $services->build(new Name('bar'));
+    }
+
+    public function testExposed()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies,
+            new Service(
+                new Name('foo'),
+                $this->createMock(Constructor::class)
+            ),
+            (new Service(
+                new Name('bar'),
+                $expected = $this->createMock(Constructor::class)
+            ))->exposeAs($key = new Name('baz'))
+        );
+
+        $exposed = $services->exposed();
+
+        $this->assertInstanceOf(MapInterface::class, $exposed);
+        $this->assertSame(Name::class, (string) $exposed->keyType());
+        $this->assertSame(Constructor::class, (string) $exposed->valueType());
+        $this->assertCount(1, $exposed);
+        $this->assertSame($expected, $exposed->get($key));
     }
 }

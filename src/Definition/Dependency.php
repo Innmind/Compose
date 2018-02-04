@@ -13,6 +13,7 @@ use Innmind\Compose\{
 };
 use Innmind\Immutable\{
     Set,
+    MapInterface,
     Map,
     StreamInterface
 };
@@ -141,5 +142,15 @@ final class Dependency
             $arguments,
             $this->services
         );
+    }
+
+    /**
+     * The list of exposed services name with their constructor
+     *
+     * @return MapInterface<Name, Constructor>
+     */
+    public function exposed(): MapInterface
+    {
+        return $this->services->exposed();
     }
 }

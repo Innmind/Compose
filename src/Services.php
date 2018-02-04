@@ -7,6 +7,7 @@ use Innmind\Compose\{
     Definition\Name,
     Definition\Service,
     Definition\Service\Argument,
+    Definition\Service\Constructor,
     Definition\Dependency,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
@@ -199,6 +200,24 @@ final class Services
         } catch (\Exception $e) {
             return $this->exposed->get((string) $name);
         }
+    }
+
+    /**
+     * The list of exposed services name with their constructor
+     *
+     * @return MapInterface<Name, Constructor>
+     */
+    public function exposed(): MapInterface
+    {
+        return $this->exposed->reduce(
+            new Map(Name::class, Constructor::class),
+            static function(Map $exposed, string $name, Service $service): Map {
+                return $exposed->put(
+                    $service->exposedAs(),
+                    $service->constructor()
+                );
+            }
+        );
     }
 
     private function decorate(

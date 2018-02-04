@@ -24,6 +24,7 @@ use Innmind\Compose\{
     Exception\ArgumentNotExtractable
 };
 use Innmind\Immutable\{
+    MapInterface,
     Map,
     Str,
     StreamInterface,
@@ -534,5 +535,32 @@ class DependencyTest extends TestCase
             new Stream('mixed'),
             new Reference(new Name('std'))
         );
+    }
+
+    public function testExposed()
+    {
+        $dependency = new Dependency(
+            new Name('foo'),
+            new Services(
+                new Arguments,
+                new Dependencies,
+                new Service(
+                    new Name('foo'),
+                    $this->createMock(Constructor::class)
+                ),
+                (new Service(
+                    new Name('bar'),
+                    $expected = $this->createMock(Constructor::class)
+                ))->exposeAs($key = new Name('baz'))
+            )
+        );
+
+        $exposed = $dependency->exposed();
+
+        $this->assertInstanceOf(MapInterface::class, $exposed);
+        $this->assertSame(Name::class, (string) $exposed->keyType());
+        $this->assertSame(Constructor::class, (string) $exposed->valueType());
+        $this->assertCount(1, $exposed);
+        $this->assertSame($expected, $exposed->get($key));
     }
 }

@@ -28,7 +28,8 @@ use Innmind\Compose\{
 use Innmind\Immutable\{
     Str,
     StreamInterface,
-    Stream
+    Stream,
+    MapInterface
 };
 use PHPUnit\Framework\TestCase;
 use Fixture\Innmind\Compose\ServiceFixture;
@@ -733,5 +734,36 @@ class DependenciesTest extends TestCase
             new Stream('mixed'),
             new Primitive(42)
         );
+    }
+
+    public function testExposed()
+    {
+        $dependencies = new Dependencies(
+            new Dependency(
+                $dep = new Name('foo'),
+                new Services(
+                    new Arguments,
+                    new Dependencies,
+                    new Service(
+                        new Name('foo'),
+                        $this->createMock(Constructor::class)
+                    ),
+                    (new Service(
+                        new Name('bar'),
+                        $expected = $this->createMock(Constructor::class)
+                    ))->exposeAs($key = new Name('baz'))
+                )
+            )
+        );
+
+        $exposed = $dependencies->exposed();
+
+        $this->assertInstanceOf(MapInterface::class, $exposed);
+        $this->assertSame(Name::class, (string) $exposed->keyType());
+        $this->assertSame(MapInterface::class, (string) $exposed->valueType());
+        $this->assertCount(1, $exposed);
+        $this->assertSame(Name::class, (string) $exposed->get($dep)->keyType());
+        $this->assertSame(Constructor::class, (string) $exposed->get($dep)->valueType());
+        $this->assertSame($expected, $exposed->get($dep)->get($key));
     }
 }

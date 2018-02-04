@@ -11,6 +11,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor\Stream,
     Definition\Service\Constructor\Construct,
     Definition\Service\Constructor\Merge,
+    Definition\Service\Constructor\Map,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\{
@@ -76,6 +77,7 @@ class ConstructorsTest extends TestCase
             [ServiceFixture::class, Construct::class],
             [ServiceFixture::class.'::make', Factory::class],
             ['set<int>', Set::class],
+            ['map<int, int>', Map::class],
             ['stream<int>', Stream::class],
             ['merge', Merge::class],
         ];

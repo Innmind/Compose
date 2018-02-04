@@ -30,4 +30,12 @@ final class Instance implements Type
     {
         return new self((string) $value);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString(): string
+    {
+        return $this->class;
+    }
 }

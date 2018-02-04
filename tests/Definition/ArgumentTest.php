@@ -17,10 +17,11 @@ class ArgumentTest extends TestCase
     {
         $argument = new Argument(
             $name = new Name('foo'),
-            $this->createMock(Type::class)
+            $type = $this->createMock(Type::class)
         );
 
         $this->assertSame($name, $argument->name());
+        $this->assertSame($type, $argument->type());
     }
 
     public function testOptionalArgument()

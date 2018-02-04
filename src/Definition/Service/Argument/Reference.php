@@ -19,7 +19,7 @@ use Innmind\Immutable\{
     Str
 };
 
-final class Reference implements Argument
+final class Reference implements Argument, HoldReference
 {
     private $name;
 
@@ -85,5 +85,10 @@ final class Reference implements Argument
         }
 
         return $built->add(new Lazy($this->name, $services));
+    }
+
+    public function reference(): Name
+    {
+        return $this->name;
     }
 }

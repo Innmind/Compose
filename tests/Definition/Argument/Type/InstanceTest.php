@@ -15,6 +15,7 @@ class InstanceTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(Type::class, new Instance('foo'));
+        $this->assertSame('foo', (string) new Instance('foo'));
     }
 
     public function testAccepts()

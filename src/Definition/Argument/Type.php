@@ -16,4 +16,9 @@ interface Type
      * @throws ValueNotSupported
      */
     public static function fromString(Str $value): self;
+
+    /**
+     * Return the type handled
+     */
+    public function __toString(): string;
 }

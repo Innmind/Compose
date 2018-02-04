@@ -5,6 +5,7 @@ namespace Tests\Innmind\Compose\Definition\Service\Argument;
 
 use Innmind\Compose\{
     Definition\Service\Argument\Unwind,
+    Definition\Service\Argument\HoldReference,
     Definition\Service\Argument,
     Definition\Service\Arguments as Args,
     Definition\Service\Constructor\Construct,
@@ -36,6 +37,9 @@ class UnwindTest extends TestCase
 
         $this->assertInstanceOf(Unwind::class, $argument);
         $this->assertInstanceOf(Argument::class, $argument);
+        $this->assertInstanceOf(HoldReference::class, $argument);
+        $this->assertInstanceOf(Name::class, $argument->reference());
+        $this->assertSame('foo', (string) $argument->reference());
     }
 
     public function testThrowWhenNotAString()

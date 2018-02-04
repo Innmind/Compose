@@ -19,7 +19,7 @@ use Innmind\Immutable\{
     Stream
 };
 
-final class Unwind implements Argument
+final class Unwind implements Argument, HoldReference
 {
     private $name;
 
@@ -90,5 +90,10 @@ final class Unwind implements Argument
             'mixed',
             ...$services->build($this->name)
         ));
+    }
+
+    public function reference(): Name
+    {
+        return $this->name;
     }
 }

@@ -12,7 +12,10 @@ use Innmind\Compose\{
     Exception\InvalidArgument,
     Exception\ArgumentNotProvided
 };
-use Innmind\Immutable\Map;
+use Innmind\Immutable\{
+    Map,
+    SetInterface
+};
 use PHPUnit\Framework\TestCase;
 
 class ArgumentsTest extends TestCase
@@ -143,6 +146,30 @@ class ArgumentsTest extends TestCase
         } catch (ArgumentNotProvided $e) {
             $this->assertSame($argument, $e->argument());
         }
+    }
+
+    public function testAll()
+    {
+        $arguments = new Arguments(
+            $arg1 = new Argument(
+                new Name('foo'),
+                new Primitive('int')
+            ),
+            $arg2 = (new Argument(
+                new Name('bar'),
+                new Primitive('string')
+            ))->makeOptional(),
+            $arg3 = (new Argument(
+                new Name('baz'),
+                new Primitive('string')
+            ))->defaultsTo(new Name('foobar'))
+        );
+
+        $all = $arguments->all();
+
+        $this->assertInstanceOf(SetInterface::class, $all);
+        $this->assertSame(Argument::class, (string) $all->type());
+        $this->assertSame([$arg1, $arg2, $arg3], $all->toPrimitive());
     }
 
     public function arguments(): array

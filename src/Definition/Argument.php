@@ -26,6 +26,11 @@ final class Argument
         return $this->name;
     }
 
+    public function type(): Type
+    {
+        return $this->type;
+    }
+
     public function makeOptional(): self
     {
         $self = clone $this;

@@ -188,7 +188,7 @@ class ServiceTest extends TestCase
 
         $this->assertInstanceOf(Service::class, $service2);
         $this->assertNotSame($service2, $service);
-        $this->assertSame(md5('dep.bar'), (string) $service2->name());
+        $this->assertSame('tunnel_'.md5('dep.bar'), (string) $service2->name());
         $this->assertSame('foo', (string) $service->name());
         $this->assertSame($service->constructor(), $service2->constructor());
         $this->assertTrue($service->decorates());

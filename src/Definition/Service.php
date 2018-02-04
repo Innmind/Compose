@@ -137,7 +137,7 @@ final class Service
         }
 
         return new self(
-            $newName ?? new Name(md5($dependency.'.'.$this->exposeName)),
+            $newName ?? new Name('tunnel_'.md5($dependency.'.'.$this->exposeName)),
             $this->construct,
             ...$this->arguments->map(function(Argument $argument) use ($dependency, $decorated): Argument {
                 if ($argument instanceof Argument\Decorate) {

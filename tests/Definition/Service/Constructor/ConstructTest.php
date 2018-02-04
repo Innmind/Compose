@@ -24,6 +24,7 @@ class ConstructTest extends TestCase
         $construct = Construct::fromString(Str::of(ServiceFixture::class));
 
         $this->assertInstanceOf(Constructor::class, $construct);
+        $this->assertSame(ServiceFixture::class, (string) $construct);
 
         $instance = $construct(1, new \stdClass);
 

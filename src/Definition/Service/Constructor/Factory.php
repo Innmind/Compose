@@ -53,4 +53,9 @@ final class Factory implements Constructor
 
         return [$this->class, $this->method](...$arguments);
     }
+
+    public function __toString(): string
+    {
+        return sprintf('%s::%s', $this->class, $this->method);
+    }
 }

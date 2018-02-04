@@ -26,6 +26,7 @@ class SetTest extends TestCase
         $construct = Set::fromString(Str::of('set<int>'));
 
         $this->assertInstanceOf(Constructor::class, $construct);
+        $this->assertSame('set<int>', (string) $construct);
 
         $instance = $construct(1, 2);
 

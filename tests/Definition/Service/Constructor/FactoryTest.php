@@ -26,6 +26,7 @@ class FactoryTest extends TestCase
         $construct = Factory::fromString(Str::of(ServiceFixture::class.'::make'));
 
         $this->assertInstanceOf(Constructor::class, $construct);
+        $this->assertSame(ServiceFixture::class.'::make', (string) $construct);
 
         $instance = $construct(1, new \stdClass);
 

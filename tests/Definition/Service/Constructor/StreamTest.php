@@ -26,6 +26,7 @@ class StreamTest extends TestCase
         $construct = Stream::fromString(Str::of('stream<int>'));
 
         $this->assertInstanceOf(Constructor::class, $construct);
+        $this->assertSame('stream<int>', (string) $construct);
 
         $instance = $construct(1, 2);
 

@@ -58,6 +58,11 @@ class ConstructorsTest extends TestCase
             public function __invoke(...$arguments): object
             {
             }
+
+            public function __toString(): string
+            {
+                return '';
+            }
         };
         $class = get_class($type);
 

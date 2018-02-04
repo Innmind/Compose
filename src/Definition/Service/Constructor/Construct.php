@@ -46,4 +46,9 @@ final class Construct implements Constructor
 
         return new $class(...$arguments);
     }
+
+    public function __toString(): string
+    {
+        return $this->value;
+    }
 }

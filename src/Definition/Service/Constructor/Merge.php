@@ -49,4 +49,9 @@ final class Merge implements Constructor
                 }
             );
     }
+
+    public function __toString(): string
+    {
+        return 'merge';
+    }
 }

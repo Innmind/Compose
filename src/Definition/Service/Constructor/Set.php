@@ -40,4 +40,9 @@ final class Set implements Constructor
     {
         return LazySet::of($this->type, ...$arguments);
     }
+
+    public function __toString(): string
+    {
+        return sprintf('set<%s>', $this->type);
+    }
 }

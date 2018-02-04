@@ -40,4 +40,9 @@ final class Stream implements Constructor
     {
         return new LazyStream($this->type, ...$arguments);
     }
+
+    public function __toString(): string
+    {
+        return sprintf('stream<%s>', $this->type);
+    }
 }

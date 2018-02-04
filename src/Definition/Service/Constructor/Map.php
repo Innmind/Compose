@@ -45,4 +45,9 @@ final class Map implements Constructor
     {
         return LazyMap::of($this->key, $this->value, ...$arguments);
     }
+
+    public function __toString(): string
+    {
+        return sprintf('map<%s, %s>', $this->key, $this->value);
+    }
 }

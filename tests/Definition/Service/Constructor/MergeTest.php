@@ -23,6 +23,7 @@ class MergeTest extends TestCase
         $merge = Merge::fromString(Str::of('merge'));
 
         $this->assertInstanceOf(Constructor::class, $merge);
+        $this->assertSame('merge', (string) $merge);
 
         $structure = $merge(
             Set::of('int', 1),

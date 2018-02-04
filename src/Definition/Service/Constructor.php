@@ -16,4 +16,5 @@ interface Constructor
      * @param mixed $arguments
      */
     public function __invoke(...$arguments): object;
+    public function __toString(): string;
 }

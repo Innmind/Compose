@@ -29,6 +29,7 @@ class MapTest extends TestCase
         $construct = Map::fromString(Str::of('map<int, string>'));
 
         $this->assertInstanceOf(Constructor::class, $construct);
+        $this->assertSame('map<int, string>', (string) $construct);
 
         $instance = $construct(
             new Pair(1, 'foo'),

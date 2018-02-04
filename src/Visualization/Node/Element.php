@@ -71,10 +71,12 @@ final class Element implements Node
 
     public static function argument(Argument $argument): self
     {
+        $type = Str::of((string) $argument->type())->replace('\\', '\\\\');
+
         $node = self::build($argument->name());
         $node->displayAs(
             (string) Str::of((string) $argument->name())
-                ->append('\n('.$argument->type().')')
+                ->append('\n('.$type.')')
         );
 
         return new self($node);

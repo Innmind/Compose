@@ -5,6 +5,7 @@ namespace Innmind\Compose\Visualization\Node;
 
 use Innmind\Compose\Definition\{
     Name as ServiceName,
+    Service as Definition,
     Service\Constructor
 };
 use Innmind\Graphviz\{
@@ -43,6 +44,22 @@ final class Service implements Node
         );
         $node->displayAs(
             (string) Str::of((string) $name)->append(
+                ' ('.$constructor.')'
+            )
+        );
+
+        return new self($node);
+    }
+
+    public static function own(Definition $service): self
+    {
+        $constructor = Str::of((string) $service->constructor())->replace('\\', '\\\\');
+
+        $node = Node\Node::named(
+            (string) Str::of((string) $service->name())->replace('.', '_')
+        );
+        $node->displayAs(
+            (string) Str::of((string) $service->name())->append(
                 ' ('.$constructor.')'
             )
         );

@@ -5,7 +5,8 @@ namespace Tests\Innmind\Compose\Visualization\Node;
 
 use Innmind\Compose\{
     Visualization\Node\Service,
-    Definition\Name as ServiceName,
+    Definition\Name,
+    Definition\Service as Definition,
     Definition\Service\Constructor\Construct
 };
 use Innmind\Graphviz\{
@@ -25,8 +26,8 @@ class ServiceTest extends TestCase
     public function setUp()
     {
         $this->node = Service::dependency(
-            new ServiceName('dep'),
-            new ServiceName('foo'),
+            new Name('dep'),
+            new Name('foo'),
             Construct::fromString(Str::of(ServiceFixture::class))
         );
     }
@@ -40,6 +41,26 @@ class ServiceTest extends TestCase
         $this->assertSame(
             'foo (Fixture\\\\Innmind\\\\Compose\\\\ServiceFixture)',
             $this->node->attributes()->get('label')
+        );
+    }
+
+    public function testOwn()
+    {
+        $node = Service::own(
+            new Definition(
+                new Name('foo'),
+                Construct::fromString(Str::of(ServiceFixture::class))
+            )
+        );
+
+        $this->assertInstanceOf(Service::class, $node);
+        $this->assertSame('foo', (string) $node->name());
+        $this->assertTrue($node->hasAttributes());
+        $this->assertCount(1, $node->attributes());
+        $this->assertTrue($node->attributes()->contains('label'));
+        $this->assertSame(
+            'foo (Fixture\\\\Innmind\\\\Compose\\\\ServiceFixture)',
+            $node->attributes()->get('label')
         );
     }
 

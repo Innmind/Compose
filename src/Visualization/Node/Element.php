@@ -5,7 +5,7 @@ namespace Innmind\Compose\Visualization\Node;
 
 use Innmind\Compose\Definition\{
     Name as ServiceName,
-    Service as Definition,
+    Service,
     Service\Constructor
 };
 use Innmind\Graphviz\{
@@ -22,7 +22,7 @@ use Innmind\Immutable\{
     Str
 };
 
-final class Service implements Node
+final class Element implements Node
 {
     private $node;
 
@@ -48,7 +48,7 @@ final class Service implements Node
         return new self($node);
     }
 
-    public static function own(Definition $service): self
+    public static function service(Service $service): self
     {
         $constructor = Str::of((string) $service->constructor())->replace('\\', '\\\\');
 

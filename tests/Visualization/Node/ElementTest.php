@@ -4,9 +4,9 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Compose\Visualization\Node;
 
 use Innmind\Compose\{
-    Visualization\Node\Service,
+    Visualization\Node\Element,
     Definition\Name,
-    Definition\Service as Definition,
+    Definition\Service,
     Definition\Service\Constructor\Construct
 };
 use Innmind\Graphviz\{
@@ -19,13 +19,13 @@ use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
 use Fixture\Innmind\Compose\ServiceFixture;
 
-class ServiceTest extends TestCase
+class ElementTest extends TestCase
 {
     private $node;
 
     public function setUp()
     {
-        $this->node = Service::dependency(
+        $this->node = Element::dependency(
             new Name('dep'),
             new Name('foo'),
             Construct::fromString(Str::of(ServiceFixture::class))
@@ -44,16 +44,16 @@ class ServiceTest extends TestCase
         );
     }
 
-    public function testOwn()
+    public function testService()
     {
-        $node = Service::own(
-            new Definition(
+        $node = Element::service(
+            new Service(
                 new Name('foo'),
                 Construct::fromString(Str::of(ServiceFixture::class))
             )
         );
 
-        $this->assertInstanceOf(Service::class, $node);
+        $this->assertInstanceOf(Element::class, $node);
         $this->assertSame('foo', (string) $node->name());
         $this->assertTrue($node->hasAttributes());
         $this->assertCount(1, $node->attributes());

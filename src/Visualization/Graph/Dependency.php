@@ -6,7 +6,7 @@ namespace Innmind\Compose\Visualization\Graph;
 use Innmind\Compose\{
     Definition\Name as ServiceName,
     Definition\Service\Constructor,
-    Visualization\Node\Service
+    Visualization\Node\Element
 };
 use Innmind\Graphviz\{
     Graph,
@@ -42,7 +42,7 @@ final class Dependency implements Graph
                 ->fillWithColor(RGBA::fromString('#ffb600'))
                 ->displayAs((string) $dependency),
             static function(Graph $graph, ServiceName $service, Constructor $constructor) use ($dependency): Graph {
-                return $graph->add(Service::dependency(
+                return $graph->add(Element::dependency(
                     $dependency,
                     $service,
                     $constructor

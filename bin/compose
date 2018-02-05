@@ -1,0 +1,49 @@
+#!/usr/bin/env php
+<?php
+
+foreach ([__DIR__ . '/../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+    if (file_exists($file)) {
+        require $file;
+
+        break;
+    }
+}
+
+use Innmind\Compose\{
+    Loader\Yaml,
+    Visualize
+};
+use Innmind\Url\Path;
+use Innmind\Graphviz\Layout\Dot;
+use Innmind\Server\Control\{
+    ServerFactory,
+    Server\Command
+};
+use Innmind\Filesystem\Stream\StringStream;
+use Symfony\Component\Console\Output\OutputInterface;
+
+$app = new Silly\Application;
+$app->command('visualize path [-o|--out=]', function(string $path, ?string $out, OutputInterface $output): void {
+    $services = (new Yaml)(new Path($path));
+    $graph = (new Visualize)($services);
+    $dot = (new Dot)($graph);
+
+    if (!is_string($out)) {
+        $output->writeln((string) $dot);
+
+        return;
+    }
+
+    $type = pathinfo($out, PATHINFO_EXTENSION);
+    (new ServerFactory)
+        ->make()
+        ->processes()
+        ->execute(
+            Command::foreground('dot')
+                ->withShortOption('T'.$type)
+                ->withShortOption('o', $out)
+                ->withInput(new StringStream((string) $dot))
+        )
+        ->wait();
+});
+$app->run();

@@ -183,7 +183,10 @@ final class Yaml implements Loader
             $key = Str::of((string) $key);
 
             if (!is_array($value)) {
-                throw new DomainException;
+                throw new DomainException(sprintf(
+                    'The key %s doesn\'t contain a valid structure',
+                    $namespace->join('.')
+                ));
             }
 
             if ($key->matches(self::STACK_NAME)) {
@@ -282,7 +285,10 @@ final class Yaml implements Loader
         $name = Str::of($name);
 
         if (!$name->matches(self::DEPENDENCY_NAME)) {
-            throw new DomainException;
+            throw new DomainException(sprintf(
+                'Invalid dependency name %s',
+                $name
+            ));
         }
 
         $components = $name->capture(self::DEPENDENCY_NAME);

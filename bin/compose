@@ -74,9 +74,22 @@ $app->command('watch path out', function(string $path, string $out, OutputInterf
         )
         ->output()
         ->foreach(function() use ($processes, $path, $out, $output): void {
-            $dot = buildDot($path);
-            generateFile($processes, $dot, $out);
-            $output->writeln('Graphed generated');
+            try {
+                $dot = buildDot($path);
+                generateFile($processes, $dot, $out);
+                $output->writeln('Graphed generated');
+            } catch (\Throwable $e) {
+                $class = get_class($e);
+                $message = Str::of($e->getMessage())->replace('"', '');
+                $dot = <<<DOT
+digraph G {
+    error [shape="doubleoctagon", style="filled", fillcolor="red", label="$class\n$message"]
+}
+DOT;
+                $dot = Str::of($dot)->replace('\\', '\\\\');
+                generateFile($processes, $dot, $out);
+                $output->writeln('<error>Definition error</>');
+            }
         });
 });
 $app->run();

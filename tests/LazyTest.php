@@ -51,4 +51,15 @@ class LazyTest extends TestCase
         $this->assertInstanceOf('stdClass', $service);
         $this->assertSame($service, $services->build(new Name('foo')));
     }
+
+    public function testCallableIsNotCalledAtConstructTime()
+    {
+        $lazy = new Lazy(static function() {
+            throw new \Exception;
+        });
+
+        $this->expectException(\Exception::class);
+
+        $lazy->load();
+    }
 }

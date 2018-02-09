@@ -71,11 +71,11 @@ class MapTest extends TestCase
 
         $instance = $construct(
             new Pair(
-                new Lazy(
+                Lazy::service(
                     new Name('foo'),
                     $services
                 ),
-                new Lazy(
+                Lazy::service(
                     new Name('bar'),
                     $services
                 )

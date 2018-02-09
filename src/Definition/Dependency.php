@@ -65,7 +65,7 @@ final class Dependency
             throw new ReferenceNotFound((string) $name);
         }
 
-        return new Lazy(
+        return Lazy::service(
             $name,
             $this->services
         );

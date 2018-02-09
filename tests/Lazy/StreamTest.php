@@ -49,15 +49,15 @@ class StreamTest extends TestCase
         );
         $this->stream = new Stream(
             'stdClass',
-            new Lazy(
+            Lazy::service(
                 new Name('foo'),
                 $this->services
             ),
-            new Lazy(
+            Lazy::service(
                 new Name('bar'),
                 $this->services
             ),
-            new Lazy(
+            Lazy::service(
                 new Name('baz'),
                 $this->services
             )

@@ -23,7 +23,7 @@ class LazyTest extends TestCase
         $this->expectException(ReferenceNotFound::class);
         $this->expectExceptionMessage('foo');
 
-        new Lazy(
+        Lazy::service(
             new Name('foo'),
             new Services(
                 new Arguments,
@@ -34,7 +34,7 @@ class LazyTest extends TestCase
 
     public function testLoad()
     {
-        $lazy = new Lazy(
+        $lazy = Lazy::service(
             new Name('foo'),
             $services = new Services(
                 new Arguments,

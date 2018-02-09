@@ -38,7 +38,7 @@ class ConstructTest extends TestCase
 
         $instance = $construct(
             1,
-            new Lazy(
+            Lazy::service(
                 new Name('foo'),
                 new Services(
                     new Arguments,

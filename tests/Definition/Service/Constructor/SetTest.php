@@ -49,7 +49,7 @@ class SetTest extends TestCase
         $construct = Set::fromString(Str::of('set<stdClass>'));
 
         $instance = $construct(
-            new Lazy(
+            Lazy::service(
                 new Name('foo'),
                 new Services(
                     new Arguments,

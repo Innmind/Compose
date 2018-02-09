@@ -47,15 +47,15 @@ class SetTest extends TestCase
         );
         $this->set = Set::of(
             'stdClass',
-            new Lazy(
+            Lazy::service(
                 new Name('foo'),
                 $this->services
             ),
-            new Lazy(
+            Lazy::service(
                 new Name('bar'),
                 $this->services
             ),
-            new Lazy(
+            Lazy::service(
                 new Name('baz'),
                 $this->services
             )

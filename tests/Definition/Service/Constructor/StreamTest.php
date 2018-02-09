@@ -49,7 +49,7 @@ class StreamTest extends TestCase
         $construct = Stream::fromString(Str::of('stream<stdClass>'));
 
         $instance = $construct(
-            new Lazy(
+            Lazy::service(
                 new Name('foo'),
                 new Services(
                     new Arguments,

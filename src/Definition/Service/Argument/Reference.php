@@ -61,7 +61,7 @@ final class Reference implements Argument, HoldReference
             );
         } catch (ArgumentNotProvided $e) {
             if ($e->argument()->hasDefault()) {
-                return $built->add(new Lazy(
+                return $built->add(Lazy::service(
                     $e->argument()->default(),
                     $services
                 ));
@@ -84,7 +84,7 @@ final class Reference implements Argument, HoldReference
             //pass
         }
 
-        return $built->add(new Lazy($this->name, $services));
+        return $built->add(Lazy::service($this->name, $services));
     }
 
     public function reference(): Name

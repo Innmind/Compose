@@ -48,21 +48,21 @@ class MapTest extends TestCase
             'stdClass',
             'stdClass',
             new Pair(
-                new Lazy(
+                Lazy::service(
                     new Name('foo'),
                     $this->services
                 ),
-                new Lazy(
+                Lazy::service(
                     new Name('bar'),
                     $this->services
                 )
             ),
             new Pair(
-                new Lazy(
+                Lazy::service(
                     new Name('bar'),
                     $this->services
                 ),
-                new Lazy(
+                Lazy::service(
                     new Name('foo'),
                     $this->services
                 )

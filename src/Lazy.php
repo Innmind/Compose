@@ -10,23 +10,28 @@ use Innmind\Compose\{
 
 final class Lazy
 {
-    private $name;
-    private $services;
+    private $load;
 
-    public function __construct(
+    public function __construct(callable $load)
+    {
+        $this->load = $load;
+    }
+
+    public static function service(
         Name $name,
         Services $services
-    ) {
+    ): self {
         if (!$services->has($name)) {
             throw new ReferenceNotFound((string) $name);
         }
 
-        $this->name = $name;
-        $this->services = $services;
+        return new self(static function() use ($services, $name): object {
+            return $services->build($name);
+        });
     }
 
     public function load(): object
     {
-        return $this->services->build($this->name);
+        return ($this->load)();
     }
 }

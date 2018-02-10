@@ -3,10 +3,6 @@ declare(strict_types = 1);
 
 namespace Innmind\Compose;
 
-use Innmind\Compose\{
-    Services,
-    Loader
-};
 use Innmind\Url\PathInterface;
 use Innmind\Immutable\{
     MapInterface,

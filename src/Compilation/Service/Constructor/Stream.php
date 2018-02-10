@@ -20,7 +20,7 @@ final class Stream implements Constructor
         $this->type = $type;
         $this->arguments = ImmutableStream::of(Argument::class, ...$arguments)->map(static function(Argument $argument): Argument {
             return new Lazy($argument);
-        });;
+        });
     }
 
     public function __toString(): string

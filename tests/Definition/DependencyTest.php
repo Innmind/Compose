@@ -21,7 +21,8 @@ use Innmind\Compose\{
     Lazy,
     Exception\ReferenceNotFound,
     Exception\ArgumentNotProvided,
-    Exception\ArgumentNotExtractable
+    Exception\ArgumentNotExtractable,
+    Compilation\Dependency as CompiledDependency
 };
 use Innmind\Immutable\{
     MapInterface,
@@ -562,5 +563,18 @@ class DependencyTest extends TestCase
         $this->assertSame(Constructor::class, (string) $exposed->valueType());
         $this->assertCount(1, $exposed);
         $this->assertSame($expected, $exposed->get($key));
+    }
+
+    public function testCompile()
+    {
+        $dependency = new Dependency(
+            new Name('foo'),
+            new Services(
+                new Arguments,
+                new Dependencies
+            )
+        );
+
+        $this->assertInstanceOf(CompiledDependency::class, $dependency->compile());
     }
 }

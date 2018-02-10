@@ -10,7 +10,8 @@ use Innmind\Compose\{
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
     Exception\NameNotNamespaced,
-    Exception\ReferenceNotFound
+    Exception\ReferenceNotFound,
+    Compilation\Dependency\Parameter as CompiledParameter
 };
 use Innmind\Immutable\Str;
 
@@ -102,5 +103,14 @@ final class Parameter
         }
 
         return $dependeny->has($this->reference->withoutRoot());
+    }
+
+    public function compile(): CompiledParameter
+    {
+        if (!$this->reference instanceof Name) {
+            return CompiledParameter::raw($this->name, $this->value);
+        }
+
+        return CompiledParameter::reference($this->name, $this->reference);
     }
 }

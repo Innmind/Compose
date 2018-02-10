@@ -10,7 +10,8 @@ use Innmind\Compose\{
     Definition\Argument\Type\Primitive,
     Exception\MissingArgument,
     Exception\InvalidArgument,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Compilation\Arguments as CompiledArguments
 };
 use Innmind\Immutable\{
     Map,
@@ -170,6 +171,14 @@ class ArgumentsTest extends TestCase
         $this->assertInstanceOf(SetInterface::class, $all);
         $this->assertSame(Argument::class, (string) $all->type());
         $this->assertSame([$arg1, $arg2, $arg3], $all->toPrimitive());
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledArguments::class,
+            (new Arguments)->compile()
+        );
     }
 
     public function arguments(): array

@@ -14,7 +14,8 @@ use Innmind\Compose\{
     Dependencies,
     Lazy,
     Lazy\Set as LazySet,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Compilation\Service\Constructor\Set as CompiledSet
 };
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
@@ -65,5 +66,13 @@ class SetTest extends TestCase
         $this->assertInstanceOf(LazySet::class, $instance);
         $this->assertCount(1, $instance);
         $this->assertInstanceOf('stdClass', $instance->current());
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledSet::class,
+            Set::fromString(Str::of('set<int>'))->compile()
+        );
     }
 }

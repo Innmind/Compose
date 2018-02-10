@@ -14,7 +14,8 @@ use Innmind\Compose\{
     Services,
     Arguments,
     Dependencies,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Compilation\Dependency\Parameter as CompiledParameter
 };
 use Innmind\Immutable\{
     Map,
@@ -282,5 +283,15 @@ class ParameterTest extends TestCase
                 )
             )
         ));
+    }
+
+    public function testCompile()
+    {
+        $parameter = Parameter::fromValue(
+            new Name('foo'),
+            '$foo.foo'
+        );
+
+        $this->assertInstanceOf(CompiledParameter::class, $parameter->compile());
     }
 }

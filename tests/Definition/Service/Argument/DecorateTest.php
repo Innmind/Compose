@@ -14,7 +14,8 @@ use Innmind\Compose\{
     Arguments,
     Dependencies,
     Exception\ValueNotSupported,
-    Exception\DecoratedArgumentCannotBeResolved
+    Exception\DecoratedArgumentCannotBeResolved,
+    Exception\DecoratedArgumentCannotBeCompiled
 };
 use Innmind\Immutable\{
     Stream,
@@ -54,5 +55,12 @@ class DecorateTest extends TestCase
                 ))->exposeAs(new Name('foo'))
             )
         );
+    }
+
+    public function testCompile()
+    {
+        $this->expectException(DecoratedArgumentCannotBeCompiled::class);
+
+        Decorate::fromValue('@decorated', new Args)->compile();
     }
 }

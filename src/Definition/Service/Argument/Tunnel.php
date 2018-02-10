@@ -8,6 +8,8 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
     Services,
+    Compilation\Service\Argument as CompiledArgument,
+    Compilation\Service\Argument\Tunnel as CompiledTunnel,
     Exception\LogicException
 };
 use Innmind\Immutable\StreamInterface;
@@ -41,5 +43,13 @@ final class Tunnel implements Argument
         return $services
             ->dependencies()
             ->extract($this->dependency, $built, $this->argument);
+    }
+
+    public function compile(): CompiledArgument
+    {
+        return new CompiledTunnel(
+            $this->dependency->root(),
+            $this->argument->compile()->method()
+        );
     }
 }

@@ -6,7 +6,10 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 use Innmind\Compose\{
     Definition\Service\Constructor,
     Exception\ValueNotSupported,
-    Lazy\Set as LazySet
+    Lazy\Set as LazySet,
+    Compilation\Service\Constructor as CompiledConstructor,
+    Compilation\Service\Constructor\Set as CompiledSet,
+    Compilation\Service\Argument as CompiledArgument
 };
 use Innmind\Immutable\Str;
 
@@ -39,6 +42,11 @@ final class Set implements Constructor
     public function __invoke(...$arguments): object
     {
         return LazySet::of($this->type, ...$arguments);
+    }
+
+    public function compile(CompiledArgument ...$arguments): CompiledConstructor
+    {
+        return new CompiledSet($this->type, ...$arguments);
     }
 
     public function __toString(): string

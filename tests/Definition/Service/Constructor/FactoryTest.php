@@ -13,7 +13,8 @@ use Innmind\Compose\{
     Arguments,
     Dependencies,
     Lazy,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Compilation\Service\Constructor\Factory as CompiledFactory
 };
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
@@ -62,5 +63,13 @@ class FactoryTest extends TestCase
         );
 
         $this->assertInstanceOf(ServiceFixture::class, $instance);
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledFactory::class,
+            Factory::fromString(Str::of('stdClass::make'))->compile()
+        );
     }
 }

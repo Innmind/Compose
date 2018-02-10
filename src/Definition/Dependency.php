@@ -9,7 +9,8 @@ use Innmind\Compose\{
     Services,
     Lazy,
     Exception\ReferenceNotFound,
-    Exception\ArgumentNotExtractable
+    Exception\ArgumentNotExtractable,
+    Compilation\Dependency as CompiledDependency
 };
 use Innmind\Immutable\{
     Set,
@@ -152,5 +153,14 @@ final class Dependency
     public function exposed(): MapInterface
     {
         return $this->services->exposed();
+    }
+
+    public function compile(): CompiledDependency
+    {
+        return new CompiledDependency(
+            $this->name,
+            $this->services,
+            ...$this->parameters
+        );
     }
 }

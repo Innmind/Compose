@@ -9,6 +9,8 @@ use Innmind\Compose\{
     Definition\Name,
     Services,
     Lazy,
+    Compilation\Service\Argument as CompiledArgument,
+    Compilation\Service\Argument\Reference as CompiledReference,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
@@ -90,5 +92,10 @@ final class Reference implements Argument, HoldReference
     public function reference(): Name
     {
         return $this->name;
+    }
+
+    public function compile(): CompiledArgument
+    {
+        return new CompiledReference($this->name);
     }
 }

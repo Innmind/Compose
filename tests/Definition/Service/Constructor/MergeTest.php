@@ -6,7 +6,9 @@ namespace Tests\Innmind\Compose\Definition\Service\Constructor;
 use Innmind\Compose\{
     Definition\Service\Constructor\Merge,
     Definition\Service\Constructor,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Compilation\Service\Constructor\Merge as CompiledMerge,
+    Compilation\Service\Argument as CompiledArgument,
 };
 use Innmind\Immutable\{
     Str,
@@ -70,5 +72,16 @@ class MergeTest extends TestCase
         $this->expectExceptionMessage('foo');
 
         Merge::fromString(Str::of('foo'));
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledMerge::class,
+            Merge::fromString(Str::of('merge'))->compile(
+                $this->createMock(CompiledArgument::class),
+                $this->createMock(CompiledArgument::class)
+            )
+        );
     }
 }

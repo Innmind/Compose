@@ -5,7 +5,10 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor,
-    Lazy
+    Lazy,
+    Compilation\Service\Constructor as CompiledConstructor,
+    Compilation\Service\Constructor\Construct as CompiledConstruct,
+    Compilation\Service\Argument as CompiledArgument
 };
 use Innmind\Immutable\{
     Str,
@@ -45,6 +48,11 @@ final class Construct implements Constructor
         });
 
         return new $class(...$arguments);
+    }
+
+    public function compile(CompiledArgument ...$arguments): CompiledConstructor
+    {
+        return new CompiledConstruct($this->value, ...$arguments);
     }
 
     public function __toString(): string

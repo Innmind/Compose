@@ -10,7 +10,8 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments as Args,
     Exception\ServiceCannotDecorateMultipleServices,
-    Exception\LogicException
+    Exception\LogicException,
+    Compilation\Service as CompiledService
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -260,5 +261,15 @@ class ServiceTest extends TestCase
             new Name('dep'),
             new Name('decorated')
         );
+    }
+
+    public function testCompile()
+    {
+        $service = new Service(
+            new Name('foo'),
+            $this->createMock(Constructor::class)
+        );
+
+        $this->assertInstanceOf(CompiledService::class, $service->compile());
     }
 }

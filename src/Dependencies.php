@@ -11,7 +11,8 @@ use Innmind\Compose\{
     Exception\ReferenceNotFound,
     Exception\NameNotNamespaced,
     Exception\CircularDependency,
-    Exception\LogicException
+    Exception\LogicException,
+    Compilation\Dependencies as CompiledDependencies
 };
 use Innmind\Immutable\{
     Sequence,
@@ -144,6 +145,13 @@ final class Dependencies
                     $dependency->exposed()
                 );
             }
+        );
+    }
+
+    public function compile(): CompiledDependencies
+    {
+        return new CompiledDependencies(
+            ...$this->dependencies->values()
         );
     }
 

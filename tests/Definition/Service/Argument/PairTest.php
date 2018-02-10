@@ -16,7 +16,8 @@ use Innmind\Compose\{
     Arguments,
     Dependencies,
     Exception\ValueNotSupported,
-    Exception\LogicException
+    Exception\LogicException,
+    Compilation\Service\Argument\Pair as CompiledPair
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -91,5 +92,13 @@ class PairTest extends TestCase
         $this->assertInstanceOf(ImmutablePair::class, $value->current());
         $this->assertSame('foo', $value->current()->key());
         $this->assertSame('bar', $value->current()->value());
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledPair::class,
+            Pair::fromValue('<foo,bar>', new Args)->compile()
+        );
     }
 }

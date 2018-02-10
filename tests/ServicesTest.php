@@ -19,7 +19,8 @@ use Innmind\Compose\{
     Definition\Service\Argument\Primitive as ServicePrimitive,
     Definition\Dependency,
     Exception\CircularDependency,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Compilation\Services as CompiledServices
 };
 use Innmind\Immutable\{
     MapInterface,
@@ -538,5 +539,15 @@ class ServicesTest extends TestCase
         $this->assertInstanceOf(SetInterface::class, $all);
         $this->assertSame(Service::class, (string) $all->type());
         $this->assertSame([$service1, $service2], $all->toPrimitive());
+    }
+
+    public function testCompile()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies
+        );
+
+        $this->assertInstanceOf(CompiledServices::class, $services->compile());
     }
 }

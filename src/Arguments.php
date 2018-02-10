@@ -8,7 +8,8 @@ use Innmind\Compose\{
     Definition\Name,
     Exception\MissingArgument,
     Exception\ArgumentNotProvided,
-    Exception\ArgumentNotDefined
+    Exception\ArgumentNotDefined,
+    Compilation
 };
 use Innmind\Immutable\{
     Sequence,
@@ -100,5 +101,10 @@ final class Arguments
     public function all(): SetInterface
     {
         return Set::of(Argument::class, ...$this->arguments->values());
+    }
+
+    public function compile(): Compilation\Arguments
+    {
+        return new Compilation\Arguments($this);
     }
 }

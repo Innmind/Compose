@@ -12,6 +12,8 @@ use Innmind\Compose\{
     Definition\Service\Constructor\Construct,
     Definition\Service\Constructor\Merge,
     Definition\Service\Constructor\Map,
+    Compilation\Service\Constructor as CompiledConstructor,
+    Compilation\Service\Argument as CompiledArgument,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\{
@@ -56,6 +58,10 @@ class ConstructorsTest extends TestCase
             }
 
             public function __invoke(...$arguments): object
+            {
+            }
+
+            public function compile(CompiledArgument ...$arguments): CompiledConstructor
             {
             }
 

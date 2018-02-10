@@ -7,7 +7,8 @@ use Innmind\Compose\{
     Definition\Argument,
     Definition\Name,
     Definition\Argument\Type,
-    Exception\InvalidArgument
+    Exception\InvalidArgument,
+    Compilation\Argument as CompiledArgument
 };
 use PHPUnit\Framework\TestCase;
 
@@ -83,5 +84,15 @@ class ArgumentTest extends TestCase
         $this->expectExceptionMessage('foo');
 
         $argument->validate('42');
+    }
+
+    public function testCompile()
+    {
+        $argument = new Argument(
+            new Name('foo'),
+            $this->createMock(Type::class)
+        );
+
+        $this->assertInstanceOf(CompiledArgument::class, $argument->compile());
     }
 }

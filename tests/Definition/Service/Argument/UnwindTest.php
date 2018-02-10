@@ -18,7 +18,8 @@ use Innmind\Compose\{
     Arguments,
     Dependencies,
     Exception\ValueNotSupported,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Compilation\Service\Argument\Unwind as CompiledUnwind
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -238,6 +239,14 @@ class UnwindTest extends TestCase
         $this->assertSame(
             [24, 42, 66],
             $value->toPrimitive()
+        );
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledUnwind::class,
+            Unwind::fromValue('...$foo', new Args)->compile()
         );
     }
 }

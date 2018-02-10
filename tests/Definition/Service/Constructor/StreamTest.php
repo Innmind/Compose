@@ -14,7 +14,8 @@ use Innmind\Compose\{
     Dependencies,
     Lazy,
     Lazy\Stream as LazyStream,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Compilation\Service\Constructor\Stream as CompiledStream
 };
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
@@ -65,5 +66,13 @@ class StreamTest extends TestCase
         $this->assertInstanceOf(LazyStream::class, $instance);
         $this->assertCount(1, $instance);
         $this->assertInstanceOf('stdClass', $instance->current());
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledStream::class,
+            Stream::fromString(Str::of('stream<int>'))->compile()
+        );
     }
 }

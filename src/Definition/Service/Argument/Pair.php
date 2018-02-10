@@ -7,6 +7,8 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
     Services,
+    Compilation\Service\Argument as CompiledArgument,
+    Compilation\Service\Argument\Pair as CompiledPair,
     Exception\ValueNotSupported,
     Exception\LogicException
 };
@@ -77,5 +79,13 @@ final class Pair implements Argument
             ->first();
 
         return $built->add(new ImmutablePair($key, $value));
+    }
+
+    public function compile(): CompiledArgument
+    {
+        return new CompiledPair(
+            $this->key->compile(),
+            $this->value->compile()
+        );
     }
 }

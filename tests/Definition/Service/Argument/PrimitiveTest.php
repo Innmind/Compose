@@ -12,7 +12,8 @@ use Innmind\Compose\{
     Definition\Name,
     Services,
     Arguments,
-    Dependencies
+    Dependencies,
+    Compilation\Service\Argument\Primitive as CompiledPrimitive
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -49,5 +50,13 @@ class PrimitiveTest extends TestCase
         $this->assertSame('mixed', (string) $value->type());
         $this->assertCount(1, $value);
         $this->assertSame(42, $value->current());
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledPrimitive::class,
+            Primitive::fromValue(42, new Args)->compile()
+        );
     }
 }

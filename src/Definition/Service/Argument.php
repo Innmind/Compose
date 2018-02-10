@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Compose\Definition\Service;
 
-use Innmind\Compose\Services;
+use Innmind\Compose\{
+    Services,
+    Compilation\Service\Argument as CompiledArgument
+};
 use Innmind\Immutable\StreamInterface;
 
 interface Argument
@@ -24,4 +27,6 @@ interface Argument
         StreamInterface $built,
         Services $services
     ): StreamInterface;
+
+    public function compile(): CompiledArgument;
 }

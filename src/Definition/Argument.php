@@ -5,7 +5,8 @@ namespace Innmind\Compose\Definition;
 
 use Innmind\Compose\{
     Definition\Argument\Type,
-    Exception\InvalidArgument
+    Exception\InvalidArgument,
+    Compilation\Argument as CompiledArgument
 };
 
 final class Argument
@@ -72,5 +73,10 @@ final class Argument
         if (!$this->type->accepts($value)) {
             throw new InvalidArgument((string) $this->name);
         }
+    }
+
+    public function compile(): CompiledArgument
+    {
+        return new CompiledArgument($this);
     }
 }

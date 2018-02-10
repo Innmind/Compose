@@ -6,7 +6,10 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 use Innmind\Compose\{
     Definition\Service\Constructor,
     Exception\ValueNotSupported,
-    Lazy\Map as LazyMap
+    Lazy\Map as LazyMap,
+    Compilation\Service\Constructor as CompiledConstructor,
+    Compilation\Service\Constructor\Map as CompiledMap,
+    Compilation\Service\Argument as CompiledArgument
 };
 use Innmind\Immutable\Str;
 
@@ -44,6 +47,11 @@ final class Map implements Constructor
     public function __invoke(...$arguments): object
     {
         return LazyMap::of($this->key, $this->value, ...$arguments);
+    }
+
+    public function compile(CompiledArgument ...$arguments): CompiledConstructor
+    {
+        return new CompiledMap($this->key, $this->value, ...$arguments);
     }
 
     public function __toString(): string

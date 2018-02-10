@@ -8,6 +8,8 @@ use Innmind\Compose\{
     Definition\Service\Arguments,
     Definition\Name,
     Services,
+    Compilation\Service\Argument as CompiledArgument,
+    Compilation\Service\Argument\Unwind as CompiledUnwind,
     Exception\ValueNotSupported,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
@@ -95,5 +97,10 @@ final class Unwind implements Argument, HoldReference
     public function reference(): Name
     {
         return $this->name;
+    }
+
+    public function compile(): CompiledArgument
+    {
+        return new CompiledUnwind($this->name);
     }
 }

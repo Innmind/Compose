@@ -23,7 +23,8 @@ use Innmind\Compose\{
     Exception\ReferenceNotFound,
     Exception\ArgumentNotProvided,
     Exception\CircularDependency,
-    Exception\LogicException
+    Exception\LogicException,
+    Compilation\Dependencies as CompiledDependencies
 };
 use Innmind\Immutable\{
     Str,
@@ -765,5 +766,13 @@ class DependenciesTest extends TestCase
         $this->assertSame(Name::class, (string) $exposed->get($dep)->keyType());
         $this->assertSame(Constructor::class, (string) $exposed->get($dep)->valueType());
         $this->assertSame($expected, $exposed->get($dep)->get($key));
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledDependencies::class,
+            (new Dependencies)->compile()
+        );
     }
 }

@@ -5,7 +5,10 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 
 use Innmind\Compose\{
     Definition\Service\Constructor,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Compilation\Service\Constructor as CompiledConstructor,
+    Compilation\Service\Constructor\Merge as CompiledMerge,
+    Compilation\Service\Argument as CompiledArgument
 };
 use Innmind\Immutable\{
     Str,
@@ -48,6 +51,11 @@ final class Merge implements Constructor
                     return $structure->merge($element);
                 }
             );
+    }
+
+    public function compile(CompiledArgument ...$arguments): CompiledConstructor
+    {
+        return new CompiledMerge(...$arguments);
     }
 
     public function __toString(): string

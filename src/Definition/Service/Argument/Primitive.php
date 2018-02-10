@@ -6,7 +6,9 @@ namespace Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
-    Services
+    Services,
+    Compilation\Service\Argument as CompiledArgument,
+    Compilation\Service\Argument\Primitive as CompiledPrimitive
 };
 use Innmind\Immutable\StreamInterface;
 
@@ -35,5 +37,10 @@ final class Primitive implements Argument
         Services $services
     ): StreamInterface {
         return $built->add($this->value);
+    }
+
+    public function compile(): CompiledArgument
+    {
+        return new CompiledPrimitive($this->value);
     }
 }

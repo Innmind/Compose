@@ -6,7 +6,10 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 use Innmind\Compose\{
     Definition\Service\Constructor,
     Exception\ValueNotSupported,
-    Lazy\Stream as LazyStream
+    Lazy\Stream as LazyStream,
+    Compilation\Service\Constructor as CompiledConstructor,
+    Compilation\Service\Constructor\Stream as CompiledStream,
+    Compilation\Service\Argument as CompiledArgument
 };
 use Innmind\Immutable\Str;
 
@@ -39,6 +42,11 @@ final class Stream implements Constructor
     public function __invoke(...$arguments): object
     {
         return new LazyStream($this->type, ...$arguments);
+    }
+
+    public function compile(CompiledArgument ...$arguments): CompiledConstructor
+    {
+        return new CompiledStream($this->type, ...$arguments);
     }
 
     public function __toString(): string

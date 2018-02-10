@@ -8,12 +8,14 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
     Services,
+    Compilation,
     Exception\ServiceCannotDecorateMultipleServices,
     Exception\LogicException
 };
 use Innmind\Immutable\{
     StreamInterface,
-    Stream
+    Stream,
+    Sequence
 };
 
 final class Service
@@ -149,6 +151,21 @@ final class Service
                     $argument
                 );
             })
+        );
+    }
+
+    public function compile(): Compilation\Service
+    {
+        return new Compilation\Service(
+            $this,
+            $this->construct->compile(
+                ...$this->arguments->reduce(
+                    new Sequence,
+                    static function(Sequence $arguments, Argument $argument): Sequence {
+                        return $arguments->add($argument->compile());
+                    }
+                )
+            )
         );
     }
 }

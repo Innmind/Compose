@@ -7,6 +7,7 @@ use Innmind\Compose\{
     Definition\Service\Argument\Tunnel,
     Definition\Service\Argument\Primitive,
     Definition\Service\Argument\Decorate,
+    Definition\Service\Argument\Reference,
     Definition\Service\Argument,
     Definition\Service\Arguments,
     Definition\Service\Constructor,
@@ -16,7 +17,8 @@ use Innmind\Compose\{
     Services,
     Arguments as Args,
     Dependencies,
-    Exception\LogicException
+    Exception\LogicException,
+    Compilation\Service\Argument\Tunnel as CompiledTunnel
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -73,5 +75,15 @@ class TunnelTest extends TestCase
         $this->assertSame('mixed', (string) $arguments->type());
         $this->assertCount(1, $arguments);
         $this->assertSame(42, $arguments->first());
+    }
+
+    public function testCompile()
+    {
+        $argument = new Tunnel(
+            new Name('foo.bar'),
+            new Reference(new Name('baz'))
+        );
+
+        $this->assertInstanceOf(CompiledTunnel::class, $argument->compile());
     }
 }

@@ -6,7 +6,10 @@ namespace Innmind\Compose\Definition\Service\Constructor;
 use Innmind\Compose\{
     Definition\Service\Constructor,
     Exception\ValueNotSupported,
-    Lazy
+    Lazy,
+    Compilation\Service\Constructor as CompiledConstructor,
+    Compilation\Service\Constructor\Factory as CompiledFactory,
+    Compilation\Service\Argument as CompiledArgument
 };
 use Innmind\Immutable\{
     Str,
@@ -52,6 +55,11 @@ final class Factory implements Constructor
         });
 
         return [$this->class, $this->method](...$arguments);
+    }
+
+    public function compile(CompiledArgument ...$arguments): CompiledConstructor
+    {
+        return new CompiledFactory($this->class, $this->method, ...$arguments);
     }
 
     public function __toString(): string

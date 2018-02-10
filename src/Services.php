@@ -9,6 +9,7 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Constructor,
     Definition\Dependency,
+    Compilation,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
     Exception\CircularDependency
@@ -228,6 +229,11 @@ final class Services
     public function all(): SetInterface
     {
         return Set::of(Service::class, ...$this->definitions->values());
+    }
+
+    public function compile(): Compilation\Services
+    {
+        return new Compilation\Services($this);
     }
 
     private function decorate(

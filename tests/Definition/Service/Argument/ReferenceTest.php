@@ -19,7 +19,8 @@ use Innmind\Compose\{
     Dependencies,
     Lazy,
     Exception\ValueNotSupported,
-    Exception\ArgumentNotProvided
+    Exception\ArgumentNotProvided,
+    Compilation\Service\Argument\Reference as CompiledReference
 };
 use Innmind\Immutable\{
     StreamInterface,
@@ -239,5 +240,13 @@ class ReferenceTest extends TestCase
         $this->assertCount(1, $value);
         $this->assertInstanceOf(Lazy::class, $value->current());
         $this->assertInstanceOf('stdClass', $value->current()->load());
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledReference::class,
+            Reference::fromValue('$foo', new Args)->compile()
+        );
     }
 }

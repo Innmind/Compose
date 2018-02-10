@@ -11,6 +11,7 @@ use Innmind\Compose\{
     Definition\Service\Argument\Reference,
     Definition\Service\Argument\Unwind,
     Services,
+    Compilation\Service\Argument as CompiledArgument,
     Exception\ValueNotSupported
 };
 use Innmind\Immutable\StreamInterface;
@@ -56,6 +57,10 @@ class ArgumentsTest extends TestCase
                 Services $services
             ): StreamInterface {
                 return $built;
+            }
+
+            public function compile(): CompiledArgument
+            {
             }
         };
         $class = get_class($type);

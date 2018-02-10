@@ -14,7 +14,8 @@ use Innmind\Compose\{
     Dependencies,
     Lazy,
     Lazy\Map as LazyMap,
-    Exception\ValueNotSupported
+    Exception\ValueNotSupported,
+    Compilation\Service\Constructor\Map as CompiledMap
 };
 use Innmind\Immutable\{
     Str,
@@ -88,6 +89,14 @@ class MapTest extends TestCase
         $this->assertSame(
             $services->build(new Name('bar')),
             $instance->get($services->build(new Name('foo')))
+        );
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledMap::class,
+            Map::fromString(Str::of('map<int, string>'))->compile()
         );
     }
 }

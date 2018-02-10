@@ -7,8 +7,10 @@ use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
     Services,
+    Compilation\Service\Argument as CompiledArgument,
     Exception\ValueNotSupported,
-    Exception\DecoratedArgumentCannotBeResolved
+    Exception\DecoratedArgumentCannotBeResolved,
+    Exception\DecoratedArgumentCannotBeCompiled
 };
 use Innmind\Immutable\StreamInterface;
 
@@ -34,5 +36,10 @@ final class Decorate implements Argument
         Services $services
     ): StreamInterface {
         throw new DecoratedArgumentCannotBeResolved;
+    }
+
+    public function compile(): CompiledArgument
+    {
+        throw new DecoratedArgumentCannotBeCompiled;
     }
 }

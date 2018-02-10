@@ -11,7 +11,8 @@ use Innmind\Compose\{
     Lazy,
     Services,
     Arguments,
-    Dependencies
+    Dependencies,
+    Compilation\Service\Constructor\Construct as CompiledConstruct
 };
 use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
@@ -52,5 +53,13 @@ class ConstructTest extends TestCase
         );
 
         $this->assertInstanceOf(ServiceFixture::class, $instance);
+    }
+
+    public function testCompile()
+    {
+        $this->assertInstanceOf(
+            CompiledConstruct::class,
+            Construct::fromString(Str::of('stdClass'))->compile()
+        );
     }
 }

@@ -126,7 +126,7 @@ PHP
         sleep(2);
         file_put_contents(
             'fixtures/container/full.yml',
-            file_get_contents('fixtures/container/full.yml')."\n"
+            file_get_contents('fixtures/container/full.yml')
         );
 
         $container = $compile(

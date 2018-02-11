@@ -223,3 +223,5 @@ When actively building your services definition you can use `bin/compose watch d
 Here's an example of the [`amqp.yml`](fixtures/container/amqp.yml) file:
 
 ![](amqp.svg)
+
+Green homes are the services exposed, in blue are the arguments and in orange are the exposed services of your dependencies.

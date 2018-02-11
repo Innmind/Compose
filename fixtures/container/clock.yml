@@ -1,0 +1,5 @@
+expose:
+    clock: $clock
+
+services:
+    clock Innmind\TimeContinuum\TimeContinuum\Earth: []

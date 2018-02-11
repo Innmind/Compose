@@ -1,0 +1,95 @@
+#!/usr/bin/env php
+<?php
+
+foreach ([__DIR__ . '/../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+    if (file_exists($file)) {
+        require $file;
+
+        break;
+    }
+}
+
+use Innmind\Compose\{
+    Loader\Yaml,
+    Visualize
+};
+use Innmind\Url\Path;
+use Innmind\Graphviz\Layout\Dot;
+use Innmind\Server\Control\{
+    ServerFactory,
+    Server\Command,
+    Server\Processes
+};
+use Innmind\Filesystem\Stream\StringStream;
+use Innmind\Immutable\Str;
+use Symfony\Component\Console\Output\OutputInterface;
+
+function buildDot(string $path): Str
+{
+    $services = (new Yaml)(new Path($path));
+    $graph = (new Visualize)($services);
+
+    return (new Dot)($graph);
+}
+
+function generateFile(Processes $processes, Str $dot, string $out): void
+{
+    $type = pathinfo($out, PATHINFO_EXTENSION);
+    $processes
+        ->execute(
+            Command::foreground('dot')
+                ->withShortOption('T'.$type)
+                ->withShortOption('o', $out)
+                ->withInput(new StringStream((string) $dot))
+        )
+        ->wait();
+}
+
+$app = new Silly\Application;
+$app->command('visualize path [-o|--out=]', function(string $path, ?string $out, OutputInterface $output): void {
+    $dot = buildDot($path);
+
+    if (!is_string($out)) {
+        $output->writeln((string) $dot);
+
+        return;
+    }
+
+    generateFile(
+        (new ServerFactory)->make()->processes(),
+        $dot,
+        $out
+    );
+});
+$app->command('watch path out', function(string $path, string $out, OutputInterface $output): void {
+    $processes = (new ServerFactory)
+        ->make()
+        ->processes();
+
+    $processes
+        ->execute(
+            Command::foreground('tail')
+                ->withShortOption('f')
+                ->withArgument($path)
+        )
+        ->output()
+        ->foreach(function() use ($processes, $path, $out, $output): void {
+            try {
+                $dot = buildDot($path);
+                generateFile($processes, $dot, $out);
+                $output->writeln('Graphed generated');
+            } catch (\Throwable $e) {
+                $class = get_class($e);
+                $message = Str::of($e->getMessage())->replace('"', '');
+                $dot = <<<DOT
+digraph G {
+    error [shape="doubleoctagon", style="filled", fillcolor="red", label="$class\n$message"]
+}
+DOT;
+                $dot = Str::of($dot)->replace('\\', '\\\\');
+                generateFile($processes, $dot, $out);
+                $output->writeln('<error>Definition error</>');
+            }
+        });
+});
+$app->run();

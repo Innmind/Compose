@@ -1,0 +1,10 @@
+dependencies:
+    foo:
+        bar: 42
+
+expose:
+    foo: '$inner.bar'
+
+services:
+    inner:
+        bar stdClass: []

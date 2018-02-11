@@ -1,0 +1,11 @@
+expose:
+    foo: '$inner.bar'
+
+services:
+    inner:
+        bar stdClass: []
+
+        baz:
+            - 24
+            - 42
+            - 66

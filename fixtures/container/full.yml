@@ -1,0 +1,62 @@
+arguments:
+    first: int
+    second: stdClass ?? $inner.fallback.forBar
+    third: '?array'
+
+dependencies:
+    dep dep.yml:
+        first: 24
+        second: '$inner.fallback.forBar'
+        middleText: 'milieu'
+
+expose:
+    foo: '$inner.bar'
+    baz: '$inner.baz'
+    set: '$ints'
+    stream: '$strings'
+    map: '$fixtures'
+    stack: '$fixtureStack'
+    fromDep: '$fromDep'
+
+services:
+    inner:
+        bar Fixture\Innmind\Compose\ServiceFixture:
+            - '$first'
+            - '$second'
+            - '$third'
+
+        baz Fixture\Innmind\Compose\ServiceFixture:
+            - '$first'
+            - '$inner.fallback.forBar'
+
+        fallback:
+            forBar stdClass: []
+
+    ints set<int>:
+        - 1
+        - 2
+        - 42
+
+    strings stream<string>:
+        - foo
+        - bar
+        - baz
+
+    fixtures map<string, Fixture\Innmind\Compose\ServiceFixture>:
+        - <bar, $inner.bar>
+        - <baz, $inner.baz>
+
+    fixtureStack stack:
+        - $stack.high
+        - $dep.middle
+        - $stack.low
+
+    stack:
+        low Fixture\Innmind\Compose\Stack\Low: []
+        high Fixture\Innmind\Compose\Stack\High:
+            - '@decorated'
+
+    fromDep Fixture\Innmind\Compose\ServiceFixture:
+        - 42
+        - $second
+        - $dep.fixture

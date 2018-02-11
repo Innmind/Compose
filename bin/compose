@@ -1,7 +1,14 @@
 #!/usr/bin/env php
 <?php
 
-foreach ([__DIR__ . '/../autoload.php', __DIR__ . '/../vendor/autoload.php'] as $file) {
+$paths = [
+    __DIR__ . '/../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    getcwd() . '/vendor/autoload.php',
+    getcwd() . '/../vendor/autoload.php',
+];
+
+foreach ($paths as $file) {
     if (file_exists($file)) {
         require $file;
 

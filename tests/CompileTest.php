@@ -51,4 +51,91 @@ class CompileTest extends TestCase
 
         $container->get('inner.bar');
     }
+
+    public function testCachedContainerIsNotRecompiled()
+    {
+        $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
+        @unlink($cache);
+        $compile = new Compile(new Path('/tmp/'));
+
+        $compile(
+            new Yaml,
+            new Path('fixtures/container/full.yml'),
+            (new Map('string', 'mixed'))
+                ->put('first', 42)
+        );
+        file_put_contents($cache, <<<PHP
+<?php
+return new class implements \Psr\Container\ContainerInterface {
+    public function get(\$id)
+    {
+        throw new \Exception('not overridden');
+    }
+
+    public function has(\$id)
+    {
+        return null;
+    }
+};
+PHP
+        );
+        //sleep otherwise the modify time of the definition will be the same
+        sleep(2);
+
+        $container = $compile(
+            new Yaml,
+            new Path('fixtures/container/full.yml'),
+            (new Map('string', 'mixed'))
+                ->put('first', 42)
+        );
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('not overridden');
+
+        $container->get('foo');
+    }
+
+    public function testCachedContainerIsRecompiled()
+    {
+        $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
+        @unlink($cache);
+        $compile = Compile::onChange(new Path('/tmp/'));
+
+        $compile(
+            new Yaml,
+            new Path('fixtures/container/full.yml'),
+            (new Map('string', 'mixed'))
+                ->put('first', 42)
+        );
+        file_put_contents($cache, <<<PHP
+<?php
+return new class implements \Psr\Container\ContainerInterface {
+    public function get(\$id)
+    {
+        throw new \Exception('not overridden');
+    }
+
+    public function has(\$id)
+    {
+        return null;
+    }
+};
+PHP
+        );
+        //sleep otherwise the modify time of the definition will be the same
+        sleep(2);
+        file_put_contents(
+            'fixtures/container/full.yml',
+            file_get_contents('fixtures/container/full.yml')."\n"
+        );
+
+        $container = $compile(
+            new Yaml,
+            new Path('fixtures/container/full.yml'),
+            (new Map('string', 'mixed'))
+                ->put('first', 42)
+        );
+
+        $this->assertTrue($container->has('foo'));
+    }
 }

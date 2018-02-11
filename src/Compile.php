@@ -18,10 +18,23 @@ use Psr\Container\ContainerInterface;
 final class Compile
 {
     private $cache;
+    private $debug = false;
 
     public function __construct(PathInterface $cache)
     {
         $this->cache = Str::of((string) $cache)->rightTrim('/');
+    }
+
+    /**
+     * The cached container will be recompiled if the definition file has changed
+     * since the last compilation
+     */
+    public static function onChange(PathInterface $cache): self
+    {
+        $self = new self($cache);
+        $self->debug = true;
+
+        return $self;
     }
 
     /**
@@ -37,7 +50,7 @@ final class Compile
             $this->cache,
             md5((string) $path)
         );
-        $cache = new ConfigCache($cachePath, false);
+        $cache = new ConfigCache($cachePath, $this->debug);
 
         if ($cache->isFresh()) {
             return require $cachePath;

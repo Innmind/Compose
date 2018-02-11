@@ -41,9 +41,9 @@ final class Yaml implements Loader
 {
     private const ARGUMENT_PATTERN = '~^(?<optional>\?)?(?<type>.+)( \?\? \$.+)?$~';
     private const ARGUMENT_DEFAULT_PATTERN = '~( \?\? \$(?<default>.+))$~';
-    private const SERVICE_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ](?<constructor>.+)$~"; //split on space or non breaking space
-    private const STACK_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ]stack$~"; //split on space or non breaking space
-    private const DEPENDENCY_NAME = "~^(?<name>[a-zA-Z0-9]+)[\s ](?<path>.+)$~"; //split on space or non breaking space
+    private const SERVICE_NAME = "~^(?<name>[a-zA-Z0-9_]+)[\s ](?<constructor>.+)$~"; //split on space or non breaking space
+    private const STACK_NAME = "~^(?<name>[a-zA-Z0-9_]+)[\s ]stack$~"; //split on space or non breaking space
+    private const DEPENDENCY_NAME = "~^(?<name>[a-zA-Z0-9_]+)[\s ](?<path>.+)$~"; //split on space or non breaking space
 
     private $resolver;
     private $types;

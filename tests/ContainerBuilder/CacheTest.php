@@ -1,10 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\Compose;
+namespace Tests\Innmind\Compose\ContainerBuilder;
 
 use Innmind\Compose\{
-    Compile,
+    ContainerBuilder\Cache,
+    ContainerBuilder,
     Container,
     Loader\Yaml,
     Exception\NotFound,
@@ -22,10 +23,9 @@ class CompileTest extends TestCase
     {
         $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
         @unlink($cache);
-        $compile = new Compile(new Path('/tmp/'));
+        $compile = new Cache(new Path('/tmp/'), new Yaml);
 
         $container = $compile(
-            new Yaml,
             new Path('fixtures/container/full.yml'),
             (new Map('string', 'mixed'))
                 ->put('first', 42)
@@ -56,10 +56,9 @@ class CompileTest extends TestCase
     {
         $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
         @unlink($cache);
-        $compile = new Compile(new Path('/tmp/'));
+        $compile = new Cache(new Path('/tmp/'), new Yaml);
 
         $compile(
-            new Yaml,
             new Path('fixtures/container/full.yml'),
             (new Map('string', 'mixed'))
                 ->put('first', 42)
@@ -83,7 +82,6 @@ PHP
         sleep(2);
 
         $container = $compile(
-            new Yaml,
             new Path('fixtures/container/full.yml'),
             (new Map('string', 'mixed'))
                 ->put('first', 42)
@@ -99,10 +97,9 @@ PHP
     {
         $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
         @unlink($cache);
-        $compile = Compile::onChange(new Path('/tmp/'));
+        $compile = Cache::onChange(new Path('/tmp/'), new Yaml);
 
         $compile(
-            new Yaml,
             new Path('fixtures/container/full.yml'),
             (new Map('string', 'mixed'))
                 ->put('first', 42)
@@ -130,7 +127,6 @@ PHP
         );
 
         $container = $compile(
-            new Yaml,
             new Path('fixtures/container/full.yml'),
             (new Map('string', 'mixed'))
                 ->put('first', 42)

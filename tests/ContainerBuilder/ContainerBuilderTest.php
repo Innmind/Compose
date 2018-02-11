@@ -1,10 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\Compose;
+namespace Tests\Innmind\Compose\ContainerBuilder;
 
 use Innmind\Compose\{
-    ContainerBuilder,
+    ContainerBuilder\ContainerBuilder,
+    ContainerBuilder as ContainerBuilderInterface,
     Container,
     Loader\Yaml,
     Definition\Argument\Types,

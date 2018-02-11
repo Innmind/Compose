@@ -1,8 +1,13 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Compose;
+namespace Innmind\Compose\ContainerBuilder;
 
+use Innmind\Compose\{
+    ContainerBuilder as ContainerBuilderInterface,
+    Loader,
+    Services
+};
 use Innmind\Url\PathInterface;
 use Innmind\Immutable\{
     MapInterface,
@@ -15,23 +20,25 @@ use Symfony\Component\Config\{
 };
 use Psr\Container\ContainerInterface;
 
-final class Compile
+final class Cache implements ContainerBuilderInterface
 {
     private $cache;
+    private $load;
     private $debug = false;
 
-    public function __construct(PathInterface $cache)
+    public function __construct(PathInterface $cache, Loader $load)
     {
         $this->cache = Str::of((string) $cache)->rightTrim('/');
+        $this->load = $load;
     }
 
     /**
      * The cached container will be recompiled if the definition file has changed
      * since the last compilation
      */
-    public static function onChange(PathInterface $cache): self
+    public static function onChange(PathInterface $cache, Loader $load): self
     {
-        $self = new self($cache);
+        $self = new self($cache, $load);
         $self->debug = true;
 
         return $self;
@@ -41,7 +48,6 @@ final class Compile
      * @param MapInterface<string, mixed> $arguments
      */
     public function __invoke(
-        Loader $load,
         PathInterface $path,
         MapInterface $arguments
     ): ContainerInterface {
@@ -56,7 +62,7 @@ final class Compile
             return require $cachePath;
         }
 
-        $services = $load($path);
+        $services = ($this->load)($path);
         $code = $this->generateCode($services);
         $cache->write($code, [new FileResource((string) $path)]);
 

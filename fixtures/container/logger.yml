@@ -1,0 +1,5 @@
+expose:
+    logger: $logger
+
+services:
+    logger Psr\Log\NullLogger: []

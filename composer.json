@@ -2,7 +2,7 @@
     "name": "innmind/compose",
     "type": "library",
     "description": "Service locator",
-    "keywords": ["service", "locator", "dependency", "injection"],
+    "keywords": ["service", "locator", "dependency", "injection", "psr-11"],
     "homepage": "http://github.com/Innmind/Compose",
     "license": "MIT",
     "authors": [

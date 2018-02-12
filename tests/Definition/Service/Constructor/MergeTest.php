@@ -9,6 +9,7 @@ use Innmind\Compose\{
     Exception\ValueNotSupported,
     Compilation\Service\Constructor\Merge as CompiledMerge,
     Compilation\Service\Argument as CompiledArgument,
+    Lazy,
 };
 use Innmind\Immutable\{
     Str,
@@ -72,6 +73,22 @@ class MergeTest extends TestCase
         $this->expectExceptionMessage('foo');
 
         Merge::fromString(Str::of('foo'));
+    }
+
+    public function testMergeLazyService()
+    {
+        $merge = Merge::fromString(Str::of('merge'));
+
+        $structure = $merge(
+            new Lazy(function() {
+                return Set::of('int', 1);
+            }),
+            new Lazy(function() {
+                return Set::of('int', 2);
+            })
+        );
+
+        $this->assertSame([1, 2], $structure->toPrimitive());
     }
 
     public function testCompile()

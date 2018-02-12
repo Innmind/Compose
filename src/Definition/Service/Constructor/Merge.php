@@ -8,13 +8,15 @@ use Innmind\Compose\{
     Exception\ValueNotSupported,
     Compilation\Service\Constructor as CompiledConstructor,
     Compilation\Service\Constructor\Merge as CompiledMerge,
-    Compilation\Service\Argument as CompiledArgument
+    Compilation\Service\Argument as CompiledArgument,
+    Lazy,
 };
 use Innmind\Immutable\{
     Str,
     SetInterface,
     MapInterface,
     Stream,
+    Sequence,
     Exception\InvalidArgumentException
 };
 
@@ -37,6 +39,14 @@ final class Merge implements Constructor
      */
     public function __invoke(...$arguments): object
     {
+        $arguments = Sequence::of(...$arguments)->map(static function($argument) {
+            if ($argument instanceof Lazy) {
+                return $argument->load();
+            }
+
+            return $argument;
+        });
+
         try {
             $arguments = Stream::of(SetInterface::class, ...$arguments);
         } catch (InvalidArgumentException $e) {

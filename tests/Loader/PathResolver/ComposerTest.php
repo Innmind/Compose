@@ -21,18 +21,21 @@ class ComposerTest extends TestCase
         $this->assertInstanceOf(PathResolver::class, new Composer);
     }
 
-    public function testInvokation()
+    /**
+     * @dataProvider cases
+     */
+    public function testInvokation($vendor, $package)
     {
         $resolve = new Composer;
 
         $path = $resolve(
             new Path('some/relative/container.yml'),
-            new Path('@user/package/path/to/container.yml')
+            new Path("@$vendor/$package/path/to/container.yml")
         );
 
         $this->assertInstanceOf(PathInterface::class, $path);
         $this->assertSame(
-            getcwd().'/vendor/user/package/path/to/container.yml',
+            getcwd()."/vendor/$vendor/$package/path/to/container.yml",
             (string) $path
         );
     }
@@ -46,5 +49,16 @@ class ComposerTest extends TestCase
             new Path('local.yml'),
             new Path('./relative/container.yml')
         );
+    }
+
+    public function cases(): array
+    {
+        return [
+            ['user', 'package'],
+            ['user-foo', 'package'],
+            ['user_foo', 'package'],
+            ['user', 'package-foo'],
+            ['user', 'package_foo'],
+        ];
     }
 }

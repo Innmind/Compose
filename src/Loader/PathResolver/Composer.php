@@ -38,7 +38,7 @@ final class Composer implements PathResolver
     {
         $target = Str::of((string) $to);
 
-        if (!$target->matches('|^@[a-zA-Z0-9]+/[a-zA-Z0-9]+/.+|')) {
+        if (!$target->matches('|^@[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+/.+|')) {
             throw new ValueNotSupported((string) $to);
         }
 

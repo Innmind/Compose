@@ -7,7 +7,6 @@ use Innmind\Compose\{
     ContainerBuilder\ContainerBuilder,
     ContainerBuilder as ContainerBuilderInterface,
     Container,
-    Loader\Yaml,
     Definition\Argument\Types,
     Definition\Service\Arguments,
     Definition\Service\Constructors
@@ -29,13 +28,7 @@ class ContainerBuilderTest extends TestCase
 {
     public function testInvokation()
     {
-        $build = new ContainerBuilder(
-            new Yaml(
-                new Types,
-                new Arguments,
-                new Constructors
-            )
-        );
+        $build = new ContainerBuilder;
 
         $container = $build(
             new Path('fixtures/container/full.yml'),

@@ -7,7 +7,6 @@ use Innmind\Compose\{
     ContainerBuilder\Cache,
     ContainerBuilder,
     Container,
-    Loader\Yaml,
     Exception\NotFound,
     Lazy\Map as LazyMap
 };
@@ -23,7 +22,7 @@ class CompileTest extends TestCase
     {
         $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
         @unlink($cache);
-        $compile = new Cache(new Path('/tmp/'), new Yaml);
+        $compile = new Cache(new Path('/tmp/'));
 
         $container = $compile(
             new Path('fixtures/container/full.yml'),
@@ -56,7 +55,7 @@ class CompileTest extends TestCase
     {
         $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
         @unlink($cache);
-        $compile = new Cache(new Path('/tmp/'), new Yaml);
+        $compile = new Cache(new Path('/tmp/'));
 
         $compile(
             new Path('fixtures/container/full.yml'),
@@ -97,7 +96,7 @@ PHP
     {
         $cache = '/tmp/'.md5('fixtures/container/full.yml').'.php';
         @unlink($cache);
-        $compile = Cache::onChange(new Path('/tmp/'), new Yaml);
+        $compile = Cache::onChange(new Path('/tmp/'));
 
         $compile(
             new Path('fixtures/container/full.yml'),

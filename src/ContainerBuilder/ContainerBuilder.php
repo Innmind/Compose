@@ -16,9 +16,9 @@ final class ContainerBuilder implements ContainerBuilderInterface
 {
     private $load;
 
-    public function __construct(Loader $loader)
+    public function __construct(Loader $loader = null)
     {
-        $this->load = $loader;
+        $this->load = $loader ?? new Loader\Yaml;
     }
 
     /**

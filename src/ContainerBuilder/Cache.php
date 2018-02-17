@@ -26,17 +26,17 @@ final class Cache implements ContainerBuilderInterface
     private $load;
     private $debug = false;
 
-    public function __construct(PathInterface $cache, Loader $load)
+    public function __construct(PathInterface $cache, Loader $load = null)
     {
         $this->cache = Str::of((string) $cache)->rightTrim('/');
-        $this->load = $load;
+        $this->load = $load ?? new Loader\Yaml;
     }
 
     /**
      * The cached container will be recompiled if the definition file has changed
      * since the last compilation
      */
-    public static function onChange(PathInterface $cache, Loader $load): self
+    public static function onChange(PathInterface $cache, Loader $load = null): self
     {
         $self = new self($cache, $load);
         $self->debug = true;

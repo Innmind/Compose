@@ -27,7 +27,7 @@ use Innmind\Server\Control\{
     Server\Command,
     Server\Processes
 };
-use Innmind\Filesystem\Stream\StringStream;
+use Innmind\Stream\Readable\Stream;
 use Innmind\Immutable\Str;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -42,12 +42,14 @@ function buildDot(string $path): Str
 function generateFile(Processes $processes, Str $dot, string $out): void
 {
     $type = pathinfo($out, PATHINFO_EXTENSION);
+    $handle = fopen('php://temp', 'r+');
+    fputs($handle, (string) $dot);
     $processes
         ->execute(
             Command::foreground('dot')
                 ->withShortOption('T'.$type)
                 ->withShortOption('o', $out)
-                ->withInput(new StringStream((string) $dot))
+                ->withInput(new Stream($handle))
         )
         ->wait();
 }

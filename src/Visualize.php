@@ -11,6 +11,7 @@ use Innmind\Compose\{
     Definition\Service\Constructor,
     Definition\Service\Argument,
     Definition\Service\Argument\HoldReference,
+    Definition\Service\Argument\HoldReferences,
     Visualization\Graph\Dependency,
     Visualization\Graph\Arguments,
     Visualization\Node\Element
@@ -105,6 +106,45 @@ final class Visualize
                     })
                     ->foreach(static function(HoldReference $argument) use ($pair, $nodes): void {
                         $name = (string) Element::build($argument->reference())->name();
+
+                        //an argument or a dependency
+                        if (!$nodes->contains($name)) {
+                            $pair[0]->linkedTo(Node::named($name));
+
+                            return;
+                        }
+
+                        $pair[0]->linkedTo(
+                            $nodes->get($name)[0]
+                        );
+                    });
+            });
+        $nodes
+            ->values()
+            ->filter(static function(array $pair): bool {
+                //do not try to link nodes for services that do not depend on
+                //other services
+                return $pair[1]
+                    ->arguments()
+                    ->filter(static function(Argument $argument): bool {
+                        return $argument instanceof HoldReferences;
+                    })
+                    ->size() > 0;
+            })
+            ->foreach(static function(array $pair) use ($nodes): void {
+                $pair[1]
+                    ->arguments()
+                    ->filter(static function(Argument $argument): bool {
+                        return $argument instanceof HoldReferences;
+                    })
+                    ->reduce(
+                        Set::of(Name::class),
+                        static function(Set $names, HoldReferences $argument): Set {
+                            return $names->merge($argument->references());
+                        }
+                    )
+                    ->foreach(static function(Name $name) use ($pair, $nodes): void {
+                        $name = (string) Element::build($name)->name();
 
                         //an argument or a dependency
                         if (!$nodes->contains($name)) {

@@ -48,6 +48,8 @@ digraph G {
     second -> inner_fallback_forBar [style="dotted", label="defaults to"];
     inner_baz -> first;
     inner_baz -> inner_fallback_forBar;
+    fixtures -> inner_bar;
+    fixtures -> inner_baz;
     fromDep -> second;
     fromDep -> dep_fixture;
     tunnel_37c76f70a65dbde92256c277c7c52469 -> stack_low;

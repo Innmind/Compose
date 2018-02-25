@@ -6,19 +6,22 @@ namespace Innmind\Compose\Definition\Service\Argument;
 use Innmind\Compose\{
     Definition\Service\Argument,
     Definition\Service\Arguments,
+    Definition\Name,
     Services,
     Compilation\Service\Argument as CompiledArgument,
     Compilation\Service\Argument\Pair as CompiledPair,
     Exception\ValueNotSupported,
-    Exception\LogicException
+    Exception\LogicException,
 };
 use Innmind\Immutable\{
     Pair as ImmutablePair,
     StreamInterface,
-    Str
+    Str,
+    SetInterface,
+    Set,
 };
 
-final class Pair implements Argument
+final class Pair implements Argument, HoldReferences
 {
     private $key;
     private $value;
@@ -79,6 +82,24 @@ final class Pair implements Argument
             ->first();
 
         return $built->add(new ImmutablePair($key, $value));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function references(): SetInterface
+    {
+        $references = Set::of(Name::class);
+
+        if ($this->key instanceof HoldReference) {
+            $references = $references->add($this->key->reference());
+        }
+
+        if ($this->value instanceof HoldReference) {
+            $references = $references->add($this->value->reference());
+        }
+
+        return $references;
     }
 
     public function compile(): CompiledArgument

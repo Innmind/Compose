@@ -85,12 +85,16 @@ final class Services
 
     public function stack(Name $name, Name $highest, Name $lower, Name ...$rest): self
     {
-        $stack = Sequence::of($lower, ...$rest)->reverse();
+        $stack = Sequence::of($highest, $lower, ...$rest)->reverse();
         $stacked = Sequence::of(
-            $this->get($stack->first())
+            $this->decorate(
+                $stack->get(1),
+                $stack->first(),
+                $stack->size() === 2 ? $name : null
+            )
         );
 
-        $stacked = $stack->drop(1)->reduce(
+        $stacked = $stack->drop(2)->dropEnd(1)->reduce(
             $stacked,
             function(Sequence $stacked, Name $decorator): Sequence {
                 return $stacked->add(
@@ -98,9 +102,12 @@ final class Services
                 );
             }
         );
-        $stacked = $stacked->add(
-            $this->decorate($highest, $stacked->last()->name(), $name)
-        );
+
+        if ($stack->size() > 2) {
+            $stacked = $stacked->add(
+                $this->decorate($highest, $stacked->last()->name(), $name)
+            );
+        }
 
         $self = clone $this;
         $self->definitions = $stacked->reduce(

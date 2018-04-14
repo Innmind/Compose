@@ -562,4 +562,40 @@ class ServicesTest extends TestCase
             new Dependencies
         ))->get(new Name('foo'));
     }
+
+    public function testTheLowestStackServiceCanComeFromADependeny()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies(
+                new Dependency(
+                    new Name('dep'),
+                    new Services(
+                        new Arguments,
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(Low::class))
+                        ))->exposeAs(new Name('bar'))
+                    )
+                )
+            ),
+            new Service(
+                new Name('middle'),
+                Construct::fromString(Str::of(Middle::class)),
+                $this->args->load('@decorated')
+            )
+        );
+
+        $services2 = $services->stack(
+            new Name('stack'),
+            new Name('middle'),
+            new Name('dep.bar')
+        );
+
+        $this->assertSame(
+            'middle|low|middle',
+            $services2->build(new Name('stack'))()
+        );
+    }
 }

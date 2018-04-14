@@ -417,6 +417,12 @@ class ServicesTest extends TestCase
                 Construct::fromString(Str::of(Low::class))
             ),
             new Service(
+                new Name('middle'),
+                Construct::fromString(Str::of(Middle::class)),
+                $this->args->load('@decorated'),
+                $this->args->load('foo')
+            ),
+            new Service(
                 new Name('high'),
                 Construct::fromString(Str::of(High::class)),
                 $this->args->load('@decorated')
@@ -426,6 +432,7 @@ class ServicesTest extends TestCase
         $services2 = $services->stack(
             new Name('stack'),
             new Name('high'),
+            new Name('middle'),
             new Name('dep.bar'),
             new Name('low')
         );
@@ -435,7 +442,7 @@ class ServicesTest extends TestCase
         $this->assertFalse($services->has(new Name('stack')));
         $this->assertTrue($services2->has(new Name('stack')));
         $this->assertSame(
-            'high|middle|low|middle|high',
+            'high|foo|middle|low|middle|foo|high',
             $services2->build(new Name('stack'))()
         );
     }

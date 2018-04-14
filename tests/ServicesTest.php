@@ -20,6 +20,7 @@ use Innmind\Compose\{
     Definition\Dependency,
     Exception\CircularDependency,
     Exception\ArgumentNotProvided,
+    Exception\ServiceNotFound,
     Compilation\Services as CompiledServices
 };
 use Innmind\Immutable\{
@@ -549,5 +550,16 @@ class ServicesTest extends TestCase
         );
 
         $this->assertInstanceOf(CompiledServices::class, $services->compile());
+    }
+
+    public function testThrowWhenTryingToGetUnknownService()
+    {
+        $this->expectException(ServiceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        (new Services(
+            new Arguments,
+            new Dependencies
+        ))->get(new Name('foo'));
     }
 }

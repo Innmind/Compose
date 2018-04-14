@@ -12,7 +12,8 @@ use Innmind\Compose\{
     Compilation,
     Exception\ArgumentNotProvided,
     Exception\ArgumentNotDefined,
-    Exception\CircularDependency
+    Exception\CircularDependency,
+    Exception\ServiceNotFound,
 };
 use Innmind\Immutable\{
     Sequence,
@@ -201,8 +202,16 @@ final class Services
         try {
             return $this->definitions->get((string) $name);
         } catch (\Exception $e) {
-            return $this->exposed->get((string) $name);
+            //pass
         }
+
+        try {
+            return $this->exposed->get((string) $name);
+        } catch (\Exception $e) {
+            //pass
+        }
+
+        throw new ServiceNotFound((string) $name);
     }
 
     /**

@@ -20,6 +20,7 @@ use Innmind\Compose\{
     Definition\Dependency,
     Exception\CircularDependency,
     Exception\ArgumentNotProvided,
+    Exception\ServiceNotFound,
     Compilation\Services as CompiledServices
 };
 use Innmind\Immutable\{
@@ -416,6 +417,12 @@ class ServicesTest extends TestCase
                 Construct::fromString(Str::of(Low::class))
             ),
             new Service(
+                new Name('middle'),
+                Construct::fromString(Str::of(Middle::class)),
+                $this->args->load('@decorated'),
+                $this->args->load('foo')
+            ),
+            new Service(
                 new Name('high'),
                 Construct::fromString(Str::of(High::class)),
                 $this->args->load('@decorated')
@@ -425,6 +432,7 @@ class ServicesTest extends TestCase
         $services2 = $services->stack(
             new Name('stack'),
             new Name('high'),
+            new Name('middle'),
             new Name('dep.bar'),
             new Name('low')
         );
@@ -434,7 +442,7 @@ class ServicesTest extends TestCase
         $this->assertFalse($services->has(new Name('stack')));
         $this->assertTrue($services2->has(new Name('stack')));
         $this->assertSame(
-            'high|middle|low|middle|high',
+            'high|foo|middle|low|middle|foo|high',
             $services2->build(new Name('stack'))()
         );
     }
@@ -549,5 +557,52 @@ class ServicesTest extends TestCase
         );
 
         $this->assertInstanceOf(CompiledServices::class, $services->compile());
+    }
+
+    public function testThrowWhenTryingToGetUnknownService()
+    {
+        $this->expectException(ServiceNotFound::class);
+        $this->expectExceptionMessage('foo');
+
+        (new Services(
+            new Arguments,
+            new Dependencies
+        ))->get(new Name('foo'));
+    }
+
+    public function testTheLowestStackServiceCanComeFromADependeny()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies(
+                new Dependency(
+                    new Name('dep'),
+                    new Services(
+                        new Arguments,
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(Low::class))
+                        ))->exposeAs(new Name('bar'))
+                    )
+                )
+            ),
+            new Service(
+                new Name('middle'),
+                Construct::fromString(Str::of(Middle::class)),
+                $this->args->load('@decorated')
+            )
+        );
+
+        $services2 = $services->stack(
+            new Name('stack'),
+            new Name('middle'),
+            new Name('dep.bar')
+        );
+
+        $this->assertSame(
+            'middle|low|middle',
+            $services2->build(new Name('stack'))()
+        );
     }
 }

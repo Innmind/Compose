@@ -27,6 +27,7 @@ class VisualizeTest extends TestCase
         $dot = (new Dot)($graph);
         $expected = <<<DOT
 digraph G {
+    rankdir="LR";
     subgraph cluster_dep {
         style="filled"
         fillcolor="#ffb600"

@@ -34,7 +34,7 @@ final class Visualize
         $graph = $this
             ->loadClusters($services->dependencies())
             ->reduce(
-                Graph\Graph::directed(),
+                Graph\Graph::directed('G', Graph\Rankdir::leftToRight()),
                 static function(Graph $graph, Graph $cluster): Graph {
                     return $graph->cluster($cluster);
                 }

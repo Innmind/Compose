@@ -112,6 +112,7 @@ A service definition must always follow the pattern `{name} {constructor}` where
 
 * a class name, as just mentioned
 * `{class}::{method}` describing a factory method
+* `$factory->{method}` describing to call the method on the first argument declared that will be used as the factory object
 * `map<K, V>` that will create an instance of `Innmind\Compose\Lazy\Map` with `K` and `V` types
 * `set<T>` that will create an instance of `Innmind\Compose\Lazy\Set` with `T` type
 * `stream<T>` that will create an instance of `Innmind\Compose\Lazy\Stream` with `T` type

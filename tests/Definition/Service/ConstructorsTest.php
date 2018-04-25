@@ -7,6 +7,7 @@ use Innmind\Compose\{
     Definition\Service\Constructors,
     Definition\Service\Constructor,
     Definition\Service\Constructor\Factory,
+    Definition\Service\Constructor\ServiceFactory,
     Definition\Service\Constructor\Set,
     Definition\Service\Constructor\Stream,
     Definition\Service\Constructor\Construct,
@@ -28,7 +29,7 @@ class ConstructorsTest extends TestCase
     {
         $this->assertInstanceOf(StreamInterface::class, Constructors::defaults());
         $this->assertSame('string', (string) Constructors::defaults()->type());
-        $this->assertCount(6, Constructors::defaults());
+        $this->assertCount(7, Constructors::defaults());
         $this->assertSame(Constructors::defaults(), Constructors::defaults());
     }
 
@@ -87,6 +88,7 @@ class ConstructorsTest extends TestCase
         return [
             [ServiceFixture::class, Construct::class],
             [ServiceFixture::class.'::make', Factory::class],
+            ['$factory->make', ServiceFactory::class],
             ['set<int>', Set::class],
             ['map<int, int>', Map::class],
             ['stream<int>', Stream::class],

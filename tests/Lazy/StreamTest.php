@@ -592,6 +592,33 @@ class StreamTest extends TestCase
         );
     }
 
+    public function testNonAppendNonLoadedStreams()
+    {
+        $stream = new Stream(
+            'stdClass',
+            Lazy::service(
+                new Name('foo'),
+                $this->services
+            ),
+            Lazy::service(
+                new Name('bar'),
+                $this->services
+            ),
+            Lazy::service(
+                new Name('baz'),
+                $this->services
+            )
+        );
+
+        $newStream = $this->stream->append($stream);
+
+        $this->assertCount(6, $newStream);
+        $this->assertSame(
+            [$this->foo(), $this->bar(), $this->baz(), $this->foo(), $this->bar(), $this->baz()],
+            $newStream->toPrimitive()
+        );
+    }
+
     private function assertImmutability(StreamInterface $stream = null): void
     {
         if ($stream) {

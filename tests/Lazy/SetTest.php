@@ -325,6 +325,29 @@ class SetTest extends TestCase
         $this->assertCount(0, $set);
     }
 
+    public function testMergeNonLoadedLazySets()
+    {
+        $set = Set::of(
+            'stdClass',
+            Lazy::service(
+                new Name('foo'),
+                $this->services
+            ),
+            Lazy::service(
+                new Name('bar'),
+                $this->services
+            ),
+            Lazy::service(
+                new Name('baz'),
+                $this->services
+            )
+        );
+        $newSet = $this->set->merge($set);
+
+        $this->assertCount(3, $newSet);
+        $this->assertSame([$this->foo(), $this->bar(), $this->baz()], $newSet->toPrimitive());
+    }
+
     private function assertImmutability(SetInterface $set = null): void
     {
         if ($set) {

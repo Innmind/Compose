@@ -105,6 +105,15 @@ final class Parameter
         return $dependeny->has($this->reference->withoutRoot());
     }
 
+    public function need(Services $services): bool
+    {
+        if (!$this->reference instanceof Name) {
+            return false;
+        }
+
+        return $services->has($this->reference);
+    }
+
     public function compile(): CompiledParameter
     {
         if (!$this->reference instanceof Name) {

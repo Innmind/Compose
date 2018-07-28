@@ -55,7 +55,11 @@ final class Dependencies
         return $this
             ->dependencies
             ->values()
-            ->sort(static function(Dependency $a, Dependency $b): bool {
+            ->sort(static function(Dependency $a, Dependency $b) use ($services): bool {
+                if ($a->need($services)) {
+                    return true;
+                }
+
                 return $a->dependsOn($b);
             })
             ->reduce(

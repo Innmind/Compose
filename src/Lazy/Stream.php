@@ -58,6 +58,10 @@ final class Stream implements StreamInterface
      */
     public function toPrimitive()
     {
+        if ($this->loaded) {
+            return $this->loaded->toPrimitive();
+        }
+
         return $this->values->reduce(
             [],
             function(array $values, $value): array {
@@ -339,6 +343,14 @@ final class Stream implements StreamInterface
      */
     public function append(StreamInterface $stream): StreamInterface
     {
+        if ($stream instanceof self && !$this->loaded && !$stream->loaded) {
+            return new self(
+                (string) $this->type,
+                ...$this->values,
+                ...$stream->values
+            );
+        }
+
         return $this->stream()->append($stream);
     }
 

@@ -352,6 +352,39 @@ class MapTest extends TestCase
         $this->assertSame([$this->bar(), $this->foo()], $value);
     }
 
+    public function testMergeNonLoadedMaps()
+    {
+        $map = Map::of(
+            'stdClass',
+            'stdClass',
+            new Pair(
+                Lazy::service(
+                    new Name('foo'),
+                    $this->services
+                ),
+                Lazy::service(
+                    new Name('bar'),
+                    $this->services
+                )
+            ),
+            new Pair(
+                Lazy::service(
+                    new Name('bar'),
+                    $this->services
+                ),
+                Lazy::service(
+                    new Name('foo'),
+                    $this->services
+                )
+            )
+        );
+
+        $newMap = $this->map->merge($map);
+
+        $this->assertCount(2, $map);
+        $this->assertSame($this->bar(), $newMap->get($this->foo()));
+    }
+
     private function assertImmutability(MapInterface $map = null): void
     {
         if ($map) {

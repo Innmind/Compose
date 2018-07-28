@@ -66,7 +66,7 @@ final class Map implements MapInterface
      */
     public function size(): int
     {
-        return $this->values->size();
+        return $this->loadedMap()->size();
     }
 
     /**
@@ -74,7 +74,7 @@ final class Map implements MapInterface
      */
     public function count(): int
     {
-        return $this->values->count();
+        return $this->size();
     }
 
     /**
@@ -258,6 +258,13 @@ final class Map implements MapInterface
      */
     public function merge(MapInterface $map): MapInterface
     {
+        if ($map instanceof self && !$this->loaded && !$map->loaded) {
+            $self = clone $this;
+            $self->values = $this->values->merge($map->values);
+
+            return $self;
+        }
+
         return $this->loadedMap()->merge($map);
     }
 

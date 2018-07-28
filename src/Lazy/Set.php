@@ -45,7 +45,7 @@ final class Set implements SetInterface
      */
     public function size(): int
     {
-        return $this->values->size();
+        return $this->set()->size();
     }
 
     /**
@@ -53,7 +53,7 @@ final class Set implements SetInterface
      */
     public function count(): int
     {
-        return $this->values->size();
+        return $this->size();
     }
 
     /**
@@ -61,6 +61,10 @@ final class Set implements SetInterface
      */
     public function toPrimitive()
     {
+        if ($this->loaded) {
+            return $this->loaded->toPrimitive();
+        }
+
         return $this->values->reduce(
             [],
             function(array $values, $value): array {
@@ -220,6 +224,14 @@ final class Set implements SetInterface
      */
     public function merge(SetInterface $set): SetInterface
     {
+        if ($set instanceof self && !$this->loaded && !$set->loaded) {
+            return self::of(
+                (string) $this->type,
+                ...$this->values,
+                ...$set->values
+            );
+        }
+
         return $this->set()->merge($set);
     }
 

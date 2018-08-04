@@ -181,6 +181,12 @@ class DependenciesTest extends TestCase
                 new Reference(new Name('first.bar'))
             ))->exposeAs(new Name('bar'))
         );
+        // simulate we are in feeding mode to allow to test
+        $refl = new \ReflectionObject($upper);
+        $refl = $refl->getProperty('feeding');
+        $refl->setAccessible(true);
+        $refl->setValue($upper, true);
+        $refl->setAccessible(false);
 
         $services = $dependencies->bind($upper);
 
@@ -255,6 +261,12 @@ class DependenciesTest extends TestCase
             new Arguments,
             $dependencies
         );
+        // simulate we are in feeding mode to allow to test
+        $refl = new \ReflectionObject($upper);
+        $refl = $refl->getProperty('feeding');
+        $refl->setAccessible(true);
+        $refl->setValue($upper, true);
+        $refl->setAccessible(false);
 
         $services = $dependencies->bind($upper);
 

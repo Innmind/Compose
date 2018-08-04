@@ -185,17 +185,11 @@ class DependenciesTest extends TestCase
         $services = $dependencies->bind($upper);
 
         $this->assertInstanceOf(Services::class, $services);
-        $this->assertNotSame($services, $upper);
+        $this->assertSame($services, $upper);
 
         $service = $services->build(new Name('bar'));
 
         $this->assertInstanceOf(ServiceFixture::class, $service);
-
-        //assert the original object is not aware of the binding
-        $this->expectException(ArgumentNotProvided::class);
-        $this->expectExceptionMessage('arg');
-
-        $dependencies->build(new Name('first.bar'));
     }
 
     public function testBindDependenciesInTheRightOrderWhenCrossDependenciesDependency()

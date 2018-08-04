@@ -488,7 +488,7 @@ class ServicesTest extends TestCase
         $services2 = $services->feed(new Name('first'));
 
         $this->assertInstanceOf(Services::class, $services2);
-        $this->assertNotSame($services2, $services);
+        $this->assertSame($services2, $services);
         $service = $services2->build(new Name('bar'));
         $this->assertInstanceOf(ServiceFixture::class, $service);
         $this->assertSame(42, $service->first);
@@ -497,10 +497,6 @@ class ServicesTest extends TestCase
         $this->assertInstanceOf(ServiceFixture::class, $service->third[0]);
         $this->assertSame(24, $service->third[0]->first);
         $this->assertSame($service->second, $service->third[0]->second);
-
-        $this->expectException(ArgumentNotProvided::class);
-
-        $services->build(new Name('bar'));
     }
 
     public function testExposed()

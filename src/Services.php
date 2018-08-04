@@ -132,10 +132,9 @@ final class Services
      */
     public function feed(Name $dependency): self
     {
-        $self = clone $this;
-        $self->dependencies = $self->dependencies->feed($dependency, $self);
+        $this->dependencies = $this->dependencies->feed($dependency, $this);
 
-        return $self;
+        return $this;
     }
 
     /**

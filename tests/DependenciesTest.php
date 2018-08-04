@@ -181,21 +181,21 @@ class DependenciesTest extends TestCase
                 new Reference(new Name('first.bar'))
             ))->exposeAs(new Name('bar'))
         );
+        // simulate we are in feeding mode to allow to test
+        $refl = new \ReflectionObject($upper);
+        $refl = $refl->getProperty('feeding');
+        $refl->setAccessible(true);
+        $refl->setValue($upper, true);
+        $refl->setAccessible(false);
 
         $services = $dependencies->bind($upper);
 
         $this->assertInstanceOf(Services::class, $services);
-        $this->assertNotSame($services, $upper);
+        $this->assertSame($services, $upper);
 
         $service = $services->build(new Name('bar'));
 
         $this->assertInstanceOf(ServiceFixture::class, $service);
-
-        //assert the original object is not aware of the binding
-        $this->expectException(ArgumentNotProvided::class);
-        $this->expectExceptionMessage('arg');
-
-        $dependencies->build(new Name('first.bar'));
     }
 
     public function testBindDependenciesInTheRightOrderWhenCrossDependenciesDependency()
@@ -261,6 +261,12 @@ class DependenciesTest extends TestCase
             new Arguments,
             $dependencies
         );
+        // simulate we are in feeding mode to allow to test
+        $refl = new \ReflectionObject($upper);
+        $refl = $refl->getProperty('feeding');
+        $refl->setAccessible(true);
+        $refl->setValue($upper, true);
+        $refl->setAccessible(false);
 
         $services = $dependencies->bind($upper);
 

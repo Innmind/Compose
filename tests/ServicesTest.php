@@ -21,6 +21,7 @@ use Innmind\Compose\{
     Exception\CircularDependency,
     Exception\ArgumentNotProvided,
     Exception\ServiceNotFound,
+    Exception\LogicException,
     Compilation\Services as CompiledServices
 };
 use Innmind\Immutable\{
@@ -133,6 +134,63 @@ class ServicesTest extends TestCase
         $this->assertCount(1, $iter);
         $this->assertInstanceOf(ServiceFixture::class, $iter->getIterator()[0]);
         $this->assertSame(42, $iter->getIterator()[0]->first);
+    }
+
+    public function testFeedingNotAllowedAfterInjection()
+    {
+        $services = new Services(
+            $arguments = new Arguments(
+                new Argument(
+                    new Name('baz'),
+                    new Primitive('int')
+                )
+            ),
+            $dependencies = new Dependencies(
+                new Dependency(
+                    new Name('inner'),
+                    new Services(
+                        new Arguments(
+                            new Argument(
+                                new Name('arg'),
+                                new Primitive('int')
+                            )
+                        ),
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(ServiceFixture::class)),
+                            new Reference(new Name('arg')),
+                            new Reference(new Name('std'))
+                        ))->exposeAs(new Name('bar')),
+                        new Service(
+                            new Name('std'),
+                            Construct::fromString(Str::of('stdClass'))
+                        )
+                    ),
+                    Dependency\Parameter::fromValue(new Name('arg'), '$baz')
+                )
+            ),
+            (new Service(
+                new Name('foo'),
+                Construct::fromString(Str::of('stdClass'))
+            ))->exposeAs(new Name('watev')),
+            (new Service(
+                new Name('iter'),
+                Construct::fromString(Str::of(Iterator::class)),
+                new Reference(new Name('inner.bar'))
+            ))->exposeAs(new Name('iter'))
+        );
+
+        $services2 = $services->inject(Map::of(
+            'string',
+            'mixed',
+            ['baz'],
+            [42]
+        ));
+
+        $this->expectException(LogicException::class);
+
+        $services2->feed(new Name('inner'));
     }
 
     public function testBuild()
@@ -484,11 +542,17 @@ class ServicesTest extends TestCase
                 new Reference(new Name('first.bar'))
             ))->exposeAs(new Name('bar'))
         );
+        // simulate we are in feeding mode to allow to test
+        $refl = new \ReflectionObject($services);
+        $refl = $refl->getProperty('feeding');
+        $refl->setAccessible(true);
+        $refl->setValue($services, true);
+        $refl->setAccessible(false);
 
         $services2 = $services->feed(new Name('first'));
 
         $this->assertInstanceOf(Services::class, $services2);
-        $this->assertNotSame($services2, $services);
+        $this->assertSame($services2, $services);
         $service = $services2->build(new Name('bar'));
         $this->assertInstanceOf(ServiceFixture::class, $service);
         $this->assertSame(42, $service->first);
@@ -497,10 +561,49 @@ class ServicesTest extends TestCase
         $this->assertInstanceOf(ServiceFixture::class, $service->third[0]);
         $this->assertSame(24, $service->third[0]->first);
         $this->assertSame($service->second, $service->third[0]->second);
+    }
 
-        $this->expectException(ArgumentNotProvided::class);
+    public function testThrowWhenFeedingOutOfParameterInjection()
+    {
+        $services = new Services(
+            new Arguments,
+            new Dependencies(
+                new Dependency(
+                    new Name('first'),
+                    new Services(
+                        new Arguments(
+                            new Argument(
+                                new Name('stdArg'),
+                                new Instance('stdClass')
+                            )
+                        ),
+                        new Dependencies,
+                        (new Service(
+                            new Name('foo'),
+                            Construct::fromString(Str::of(ServiceFixture::class)),
+                            new ServicePrimitive(24),
+                            new Reference(new Name('stdArg'))
+                        ))->exposeAs(new Name('bar'))
+                    ),
+                    Dependency\Parameter::fromValue(new Name('stdArg'), '$std')
+                )
+            ),
+            (new Service(
+                new Name('std'),
+                Construct::fromString(Str::of('stdClass'))
+            ))->exposeAs(new Name('std')),
+            (new Service(
+                new Name('foo'),
+                Construct::fromString(Str::of(ServiceFixture::class)),
+                new ServicePrimitive(42),
+                new Reference(new Name('std')),
+                new Reference(new Name('first.bar'))
+            ))->exposeAs(new Name('bar'))
+        );
 
-        $services->build(new Name('bar'));
+        $this->expectException(LogicException::class);
+
+        $services->feed(new Name('first'));
     }
 
     public function testExposed()

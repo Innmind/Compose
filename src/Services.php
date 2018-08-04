@@ -14,6 +14,7 @@ use Innmind\Compose\{
     Exception\ArgumentNotDefined,
     Exception\CircularDependency,
     Exception\ServiceNotFound,
+    Exception\LogicException,
 };
 use Innmind\Immutable\{
     Sequence,
@@ -33,6 +34,7 @@ final class Services
     private $dependencies;
     private $building;
     private $instances;
+    private $feeding = false;
 
     public function __construct(
         Arguments $arguments,
@@ -132,10 +134,13 @@ final class Services
      */
     public function feed(Name $dependency): self
     {
-        $self = clone $this;
-        $self->dependencies = $self->dependencies->feed($dependency, $self);
+        if (!$this->feeding) {
+            throw new LogicException;
+        }
 
-        return $self;
+        $this->dependencies = $this->dependencies->feed($dependency, $this);
+
+        return $this;
     }
 
     /**
@@ -143,12 +148,17 @@ final class Services
      */
     public function inject(MapInterface $arguments): self
     {
-        $self = clone $this;
-        $self->arguments = $self->arguments->bind($arguments);
-        $self->building = $self->building->clear();
-        $self->instances = $self->instances->clear();
+        try {
+            $self = clone $this;
+            $self->arguments = $self->arguments->bind($arguments);
+            $self->building = $self->building->clear();
+            $self->instances = $self->instances->clear();
+            $self->feeding = true;
 
-        return $self->dependencies->bind($self);
+            return $self->dependencies->bind($self);
+        } finally {
+            $self->feeding = false;
+        }
     }
 
     public function build(Name $name): object

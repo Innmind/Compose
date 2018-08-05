@@ -155,7 +155,12 @@ final class Dependencies
     public function compile(): CompiledDependencies
     {
         return new CompiledDependencies(
-            ...$this->dependencies->values()
+            ...$this
+                ->dependencies
+                ->values()
+                ->sort(static function(Dependency $a, Dependency $b): bool {
+                    return $a->dependsOn($b);
+                })
         );
     }
 

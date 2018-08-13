@@ -577,42 +577,4 @@ class DependencyTest extends TestCase
 
         $this->assertInstanceOf(CompiledDependency::class, $dependency->compile());
     }
-
-    public function testNeed()
-    {
-        $dependency = new Dependency(
-            new Name('watev'),
-            new Services(
-                new Arguments(
-                    new Argument(
-                        new Name('innerArg'),
-                        new Primitive('int')
-                    )
-                ),
-                new Dependencies
-            ),
-            Parameter::fromValue(new Name('innerArg'), '$arg')
-        );
-
-        $this->assertTrue($dependency->need(
-            new Services(
-                new Arguments,
-                new Dependencies,
-                new Service(
-                    new Name('arg'),
-                    $this->createMock(Constructor::class)
-                )
-            )
-        ));
-        $this->assertFalse($dependency->need(
-            new Services(
-                new Arguments,
-                new Dependencies,
-                new Service(
-                    new Name('watev'),
-                    $this->createMock(Constructor::class)
-                )
-            )
-        ));
-    }
 }

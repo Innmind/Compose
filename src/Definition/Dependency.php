@@ -102,19 +102,6 @@ final class Dependency
         );
     }
 
-    /**
-     * Check if this dependency need a service from the parent services container
-     */
-    public function need(Services $services): bool
-    {
-        return $this->parameters->reduce(
-            false,
-            function(bool $need, Parameter $parameter) use ($services): bool {
-                return $need || $parameter->need($services);
-            }
-        );
-    }
-
     public function decorate(
         Name $decorator,
         Name $decorated,

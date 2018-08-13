@@ -294,43 +294,4 @@ class ParameterTest extends TestCase
 
         $this->assertInstanceOf(CompiledParameter::class, $parameter->compile());
     }
-
-    public function testNeed()
-    {
-        $parameter = Parameter::fromValue(
-            new Name('foo'),
-            '$foo.foo'
-        );
-
-        $this->assertTrue($parameter->need(
-            new Services(
-                new Arguments,
-                new Dependencies,
-                (new Service(
-                    new Name('foo.foo'),
-                    Construct::fromString(Str::of('stdClass'))
-                ))->exposeAs(new Name('watev'))
-            )
-        ));
-        $this->assertTrue($parameter->need(
-            new Services(
-                new Arguments,
-                new Dependencies,
-                (new Service(
-                    new Name('foo.bar'),
-                    Construct::fromString(Str::of('stdClass'))
-                ))->exposeAs(new Name('foo.foo'))
-            )
-        ));
-        $this->assertFalse($parameter->need(
-            new Services(
-                new Arguments,
-                new Dependencies,
-                (new Service(
-                    new Name('foo.bar'),
-                    Construct::fromString(Str::of('stdClass'))
-                ))->exposeAs(new Name('watev'))
-            )
-        ));
-    }
 }
